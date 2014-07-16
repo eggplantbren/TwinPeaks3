@@ -24,7 +24,7 @@ ess = exp(-sum(exp(logWW)*logWW))
 
 plot(exp(logWW))
 ylabel('Weight wrt canonical distribution')
-title('ESS (for purposes of normaliser) = {ess}'.format(ess=ess))
+title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
 show()
 
 
