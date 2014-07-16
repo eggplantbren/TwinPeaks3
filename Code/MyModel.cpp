@@ -23,7 +23,7 @@ void MyModel::from_prior()
 
 double MyModel::perturb()
 {
-	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(9)));
+	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(99)));
 
 	for(int i=0; i<reps; i++)
 	{
