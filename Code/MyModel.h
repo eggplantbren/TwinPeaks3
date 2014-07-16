@@ -1,3 +1,6 @@
+#ifndef _MyModel_
+#define _MyModel_
+
 /*
 * An object of this class represents a
 * point in the parameter space.
@@ -25,4 +28,6 @@ class MyModel
 };
 
 std::ostream& operator << (std::ostream& out, const MyModel& m);
+
+#endif
 
