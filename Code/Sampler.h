@@ -14,15 +14,13 @@ class Sampler
 		std::vector<double> threshold;
 		std::vector<double> direction;
 
-		int mcmc_steps;
+		int mcmc_steps, thin;
 		int iteration;
-
-		std::fstream logw_file, scalars_file;
 
 		int find_worst(int which_scalar) const;
 
 	public:
-		Sampler(int num_particles, int mcmc_steps);
+		Sampler(int num_particles, int mcmc_steps, int thin);
 
 		void initialise();
 		void update();
@@ -35,12 +33,11 @@ class Sampler
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles, int mcmc_steps)
+Sampler<Type>::Sampler(int num_particles, int mcmc_steps, int thin)
 :particles(num_particles)
 ,mcmc_steps(mcmc_steps)
+,thin(thin)
 ,iteration(0)
-,logw_file()
-,scalars_file()
 {
 
 }
@@ -69,8 +66,11 @@ template<class Type>
 void Sampler<Type>::update()
 {
 	// Open files
-	logw_file.open("logw.txt", std::ios::out|std::ios::app);
-	scalars_file.open("scalars.txt", std::ios::out|std::ios::app);
+	std::fstream logw_file("logw.txt", std::ios::out|std::ios::app);
+	std::fstream scalars_file("scalars.txt", std::ios::out|std::ios::app);
+	std::fstream scalars_thinned_file("scalars_thinned.txt", std::ios::out|std::ios::app);
+	std::fstream logw_thinned_file("logw_thinned.txt", std::ios::out|std::ios::app);
+	std::fstream sample_file("sample.txt", std::ios::out|std::ios::app);
 
 	// Choose a scalar
 	int which_scalar;
@@ -89,8 +89,19 @@ void Sampler<Type>::update()
 		scalars_file<<particles[worst].get_scalars()[i]<<' ';
 	scalars_file<<std::endl;
 
+	// Save to thinned files with probability 1/thin
+	if(DNest3::randomU() <= 1./thin)
+	{
+		for(size_t i=0; i<particles[worst].get_scalars().size();  i++)
+			scalars_thinned_file<<particles[worst].get_scalars()[i]<<' ';
+		scalars_thinned_file<<std::endl;
+		logw_thinned_file<<logw<<std::endl;
+		sample_file<<particles[worst]<<std::endl;
+	}
+
 	// Close files
 	logw_file.close(); scalars_file.close();
+	scalars_thinned_file.close(); logw_thinned_file.close(); sample_file.close();
 
 	// Set the new threshold
 	threshold[which_scalar] = particles[worst].get_scalars()[which_scalar];

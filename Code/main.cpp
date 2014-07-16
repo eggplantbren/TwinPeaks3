@@ -13,7 +13,7 @@ int main()
 	RandomNumberGenerator::initialise_instance();
 	RandomNumberGenerator::get_instance().set_seed(time(0));
 
-	Sampler<MyModel> s(100, 1000);
+	Sampler<MyModel> s(100, 1000, 100);
 	s.initialise();
 
 	for(int i=0; i<20000; i++)
