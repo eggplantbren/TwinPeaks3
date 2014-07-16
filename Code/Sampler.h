@@ -106,7 +106,8 @@ void Sampler<Type>::update()
 	// Set the new threshold
 	threshold[which_scalar] = particles[worst].get_scalars()[which_scalar];
 
-	std::cout<<"# Iteration "<<(iteration+1)<<". Threshold = (";
+	std::cout<<"# Iteration "<<(iteration+1)<<":"<<std::endl;
+	std::cout<<"# logw = "<<logw<<", threshold = (";
 	for(size_t i=0; i<(threshold.size()-1); i++)
 		std::cout<<threshold[i]<<", ";
 	std::cout<<threshold[threshold.size()-1]<<")."<<std::endl;
