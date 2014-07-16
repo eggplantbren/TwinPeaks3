@@ -16,7 +16,7 @@ int main()
 	Sampler<MyModel> s(100, 1000);
 	s.initialise();
 
-	for(int i=0; i<1000; i++)
+	for(int i=0; i<20000; i++)
 		s.update();
 
 	return 0;
