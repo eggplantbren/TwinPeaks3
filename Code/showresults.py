@@ -16,17 +16,21 @@ logW = logw + 10*scalars[:,0] + scalars[:,1]
 
 # Normaliser
 logZ = logsumexp(logW)
-print('log(Z) = {logZ}'.format(logZ=logZ))
 
 # Posterior weights, normalised
 logWW = logW - logZ
 ess = exp(-sum(exp(logWW)*logWW))
 
+# Information
+H = sum(exp(logWW)*(logWW - logw))
+
+print('log(Z) = {logZ}'.format(logZ=logZ))
+print('H = {H} nats'.format(H=H))
+
 plot(exp(logWW))
 ylabel('Weight wrt canonical distribution')
 title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
 show()
-
 
 ## Now do it all again with the thinned samples
 #scalars = loadtxt('scalars_thinned.txt')
