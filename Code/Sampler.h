@@ -58,7 +58,7 @@ void Sampler<Type>::initialise()
 	double tot = 0.;
 	for(size_t i=0; i<direction.size(); i++)
 	{
-		direction[i] = exp(2.*DNest3::randn());
+		direction[i] = exp(3.*DNest3::randn());
 		tot += direction[i];
 	}
 	for(size_t i=0; i<direction.size(); i++)
