@@ -17,8 +17,6 @@ class MyModel
 		void compute_scalars();	
 		std::vector<double> scalars;
 
-		std::vector<double> threshold;
-
 	public:
 		MyModel();
 

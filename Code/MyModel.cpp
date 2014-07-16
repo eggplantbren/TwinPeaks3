@@ -10,7 +10,6 @@ using namespace DNest3;
 MyModel::MyModel()
 :params(100)
 ,scalars(2)
-,threshold(2)
 {
 
 }
