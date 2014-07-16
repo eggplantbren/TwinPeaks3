@@ -1,4 +1,5 @@
 #include "MyModel.h"
+#include <cassert>
 #include <cmath>
 #include <RandomNumberGenerator.h>
 #include <Utils.h>
@@ -9,6 +10,7 @@ using namespace DNest3;
 MyModel::MyModel()
 :params(100)
 ,scalars(2)
+,threshold(2)
 {
 
 }
@@ -22,7 +24,7 @@ void MyModel::from_prior()
 
 double MyModel::perturb()
 {
-	int reps = 1 + (randomU() <= 0.5)?(0):(1 + randInt(9));
+	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(9)));
 
 	for(int i=0; i<reps; i++)
 	{
@@ -44,6 +46,17 @@ void MyModel::compute_scalars()
 		scalars[0] += -pow(params[i] - 0.5, 2);
 		scalars[1] += -pow(sin(4.*M_PI*params[i]), 2);
 	}
+}
+
+bool MyModel::is_above(const vector<double>& threshold) const
+{
+	assert(scalars.size() == threshold.size());
+	for(size_t i=0; i<scalars.size(); i++)
+	{
+		if(scalars[i] < threshold[i])
+			return false;
+	}
+	return true;
 }
 
 ostream& operator << (ostream& out, const MyModel& m)

@@ -1,4 +1,4 @@
-CFLAGS = -O2 -Wall -Wextra -ansi -pedantic
+CFLAGS = -O2 -Wall -Wextra -ansi -pedantic -DNDEBUG
 LIBS =  -ldnest3 -lgsl -lgslcblas -lboost_system -lboost_thread
 
 default:
