@@ -53,7 +53,7 @@ void Sampler<Type>::initialise()
 	// Generate direction
 	direction.resize(particles[0].get_scalars().size());
 	double tot = 0.;
-	double sig = 3.;
+	double sig = 5.*DNest3::randomU();
 	for(size_t i=0; i<direction.size(); i++)
 	{
 		direction[i] = exp(sig*DNest3::randn());
