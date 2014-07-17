@@ -53,7 +53,7 @@ void Sampler<Type>::initialise()
 	// Generate direction
 	direction.resize(particles[0].get_scalars().size());
 	double tot = 0.;
-	double sig = 4.*DNest3::randomU();
+	double sig = 3.;
 	for(size_t i=0; i<direction.size(); i++)
 	{
 		direction[i] = exp(sig*DNest3::randn());
@@ -114,13 +114,13 @@ void Sampler<Type>::update()
 	std::cout<<threshold[threshold.size()-1]<<")."<<std::endl;
 	std::cout<<"# Evolving...";
 
-	// Copy a survivor
-	int which;
-	do
-	{
-		which = DNest3::randInt(particles.size());
-	}while(which == worst);
-	particles[worst] = particles[which];
+//	// Copy a survivor
+//	int which;
+//	do
+//	{
+//		which = DNest3::randInt(particles.size());
+//	}while(which == worst);
+//	particles[worst] = particles[which];
 
 	// Evolve the particle
 	int accepts = 0;
