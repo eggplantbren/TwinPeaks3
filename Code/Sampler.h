@@ -114,6 +114,14 @@ void Sampler<Type>::update()
 	std::cout<<threshold[threshold.size()-1]<<")."<<std::endl;
 	std::cout<<"# Evolving...";
 
+	// Copy a survivor
+	int which;
+	do
+	{
+		which = DNest3::randInt(particles.size());
+	}while(which == worst);
+	particles[worst] = particles[which];
+
 	// Evolve the particle
 	int accepts = 0;
 	for(int i=0; i<mcmc_steps; i++)
