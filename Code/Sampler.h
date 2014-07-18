@@ -11,7 +11,7 @@ class Sampler
 {
 	private:
 		std::vector<Type> particles;
-		std::vector<double> threshold;
+		std::vector< std::vector<double> > threshold;
 		std::vector<double> direction;
 
 		int mcmc_steps, thin;

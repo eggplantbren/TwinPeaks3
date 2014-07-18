@@ -28,11 +28,16 @@ class SimpleExample
 
 		// Are all scalars greater than or equal to the threshold
 		// values?
-		bool is_above(const std::vector<double>& threshold) const;
+		bool is_above(const std::vector< std::vector<double> >&
+					threshold) const;
 
 		// Getter
 		const std::vector<double>& get_scalars() const
 		{ return scalars; }
+
+		// Another getter
+		const std::vector<double>& get_tiebreakers() const
+		{ return tiebreakers; }
 
 		friend std::ostream& operator << (std::ostream& out,
 							const SimpleExample& m);

@@ -68,12 +68,13 @@ void SimpleExample::compute_scalars()
 	}
 }
 
-bool SimpleExample::is_above(const vector<double>& threshold) const
+bool SimpleExample::is_above(const vector< vector<double> >& threshold) const
 {
 	assert(scalars.size() == threshold.size());
 	for(size_t i=0; i<scalars.size(); i++)
 	{
-		if(scalars[i] < threshold[i])
+		if((scalars[i] < threshold[i][0]) ||
+			((scalars[i] == threshold[i][0] && tiebreakers[i] < threshold[i][1])))
 			return false;
 	}
 	return true;

@@ -6,6 +6,7 @@
 template<class Type>
 Sampler<Type>::Sampler(int num_particles, int mcmc_steps, int thin)
 :particles(num_particles)
+,threshold(particles[0].get_scalars().size(), std::vector<double>(2))
 ,mcmc_steps(mcmc_steps)
 ,thin(thin)
 ,iteration(0)
@@ -17,9 +18,17 @@ template<class Type>
 void Sampler<Type>::initialise()
 {
 	for(size_t i=0; i<particles.size(); i++)
+	{
 		particles[i].from_prior();
+		particles[i].from_prior_tiebreakers();
+	}
 
-	threshold.assign(particles[0].get_scalars().size(), -1E300);
+	// Set initial threshold
+	for(size_t i=0; i<threshold.size(); i++)
+	{
+		threshold[i][0] = -1E300;
+		threshold[i][1] = 0.;
+	}
 
 	// Generate direction
 	direction.resize(particles[0].get_scalars().size());
@@ -76,13 +85,18 @@ void Sampler<Type>::update()
 	scalars_thinned_file.close(); logw_thinned_file.close(); sample_file.close();
 
 	// Set the new threshold
-	threshold[which_scalar] = particles[worst].get_scalars()[which_scalar];
+	threshold[which_scalar][0] = particles[worst].get_scalars()[which_scalar];
+	threshold[which_scalar][1] = particles[worst].get_tiebreakers()[which_scalar];
 
 	std::cout<<"# Iteration "<<(iteration+1)<<":"<<std::endl;
 	std::cout<<"# logw = "<<logw<<", threshold = (";
-	for(size_t i=0; i<(threshold.size()-1); i++)
-		std::cout<<threshold[i]<<", ";
-	std::cout<<threshold[threshold.size()-1]<<")."<<std::endl;
+	for(size_t i=0; i<threshold.size(); i++)
+	{
+		std::cout<<threshold[i][0];
+		if(i != (threshold.size()-1))
+			std::cout<<", ";
+	}
+	std::cout<<")."<<std::endl;
 	std::cout<<"# Evolving...";
 
 //	// Copy a survivor
@@ -99,6 +113,7 @@ void Sampler<Type>::update()
 	{
 		Type proposal = particles[worst];
 		double logH = proposal.perturb();
+		logH += proposal.perturb_tiebreakers();
 		if(proposal.is_above(threshold) &&
 				DNest3::randomU() <= exp(logH))
 		{
@@ -118,8 +133,18 @@ int Sampler<Type>::find_worst(int which_scalar) const
 	int worst = 0;
 	for(size_t i=0; i<particles.size(); i++)
 	{
+		bool is_worse = false;
 		if(particles[i].get_scalars()[which_scalar] <
 				particles[worst].get_scalars()[which_scalar])
+			is_worse = true;
+
+		if(particles[i].get_scalars()[which_scalar] ==
+				particles[worst].get_scalars()[which_scalar])
+			if(particles[i].get_tiebreakers()[which_scalar] <
+				particles[worst].get_tiebreakers()[which_scalar])
+			is_worse = true;
+
+		if(is_worse)
 			worst = i;
 	}
 	return worst;
