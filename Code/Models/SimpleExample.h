@@ -8,36 +8,21 @@
 
 #include <vector>
 #include <ostream>
+#include "Model.h"
 
-class SimpleExample
+class SimpleExample:public Model
 {
 	private:
 		std::vector<double> params;
 
 		void compute_scalars();	
-		std::vector<double> scalars, tiebreakers;
 
 	public:
 		SimpleExample();
+		~SimpleExample();
 
 		void from_prior();
 		double perturb();
-
-		void from_prior_tiebreakers();
-		double perturb_tiebreakers();
-
-		// Are all scalars greater than or equal to the threshold
-		// values?
-		bool is_above(const std::vector< std::vector<double> >&
-					threshold) const;
-
-		// Getter
-		const std::vector<double>& get_scalars() const
-		{ return scalars; }
-
-		// Another getter
-		const std::vector<double>& get_tiebreakers() const
-		{ return tiebreakers; }
 
 		friend std::ostream& operator << (std::ostream& out,
 							const SimpleExample& m);
