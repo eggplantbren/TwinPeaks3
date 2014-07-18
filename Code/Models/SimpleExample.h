@@ -15,13 +15,16 @@ class SimpleExample
 		std::vector<double> params;
 
 		void compute_scalars();	
-		std::vector<double> scalars;
+		std::vector<double> scalars, tiebreakers;
 
 	public:
 		SimpleExample();
 
 		void from_prior();
 		double perturb();
+
+		void from_prior_tiebreakers();
+		double perturb_tiebreakers();
 
 		// Are all scalars greater than or equal to the threshold
 		// values?
