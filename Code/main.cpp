@@ -33,7 +33,7 @@ int main()
 	Sampler<SimpleExample> s(100, 1000, 100);
 	s.initialise();
 
-	for(int i=0; i<20000; i++)
+	for(int i=0; i<10000; i++)
 		s.update();
 
 	return 0;
