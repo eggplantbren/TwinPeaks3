@@ -88,7 +88,16 @@ void Sampler<Type>::update()
 	threshold[which_scalar][0] = particles[worst].get_scalars()[which_scalar];
 	threshold[which_scalar][1] = particles[worst].get_tiebreakers()[which_scalar];
 
-	std::cout<<"# Iteration "<<(iteration+1)<<":"<<std::endl;
+	std::cout<<"# Iteration "<<(iteration+1)<<" of run with direction = (";
+	for(size_t i=0; i<direction.size(); i++)
+	{
+		std::cout<<direction[i];
+		if(i == direction.size() - 1)
+			std::cout<<")."<<std::endl;
+		else
+			std::cout<<", ";
+	}
+
 	std::cout<<"# logw = "<<logw<<", threshold = (";
 	for(size_t i=0; i<threshold.size(); i++)
 	{
