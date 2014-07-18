@@ -9,7 +9,7 @@ using namespace std;
 
 Potts::Potts()
 :Model(2)
-,x(100, vector<int>(100))
+,x(50, vector<int>(50))
 {
 
 }

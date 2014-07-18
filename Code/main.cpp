@@ -33,7 +33,7 @@ int main()
 	Sampler<Potts> s(100, 500, 2000);
 	s.initialise();
 
-	for(int i=0; i<200000; i++)
+	for(int i=0; i<100000; i++)
 		s.update();
 
 	return 0;
