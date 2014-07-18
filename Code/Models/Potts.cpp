@@ -9,7 +9,7 @@ using namespace std;
 
 Potts::Potts()
 :Model(2)
-,x(32, vector<int>(32))
+,x(100, vector<int>(100))
 {
 
 }
@@ -50,7 +50,7 @@ void Potts::compute_score()
 			for(int k=0; k<4; k++)
 				if(x[i][j] == x[ii[k]][jj[k]])
 					score++;
-			score2 += ((int)i - (int)j)*x[i][j];
+			score2 += 100*x[i][j]*cos(4.*M_PI*j/x[0].size());
 		}
 	}
 }
@@ -88,7 +88,7 @@ double Potts::perturb()
 		for(int k=0; k<4; k++)
 			if(x[i][j] == x[ii[k]][jj[k]])
 				score--;
-		score2 -= ((int)i - (int)j)*x[i][j];
+		score2 -= 100*x[i][j]*cos(4.*M_PI*j/x[0].size());
 
 		// Perturb the cell
 		x[i][j] = randInt(num_colors);
@@ -97,7 +97,7 @@ double Potts::perturb()
 		for(int k=0; k<4; k++)
 			if(x[i][j] == x[ii[k]][jj[k]])
 				score++;
-		score2 += ((int)i - (int)j)*x[i][j];
+		score2 += 100*x[i][j]*cos(4.*M_PI*j/x[0].size());
 	}
 
 	compute_scalars();
