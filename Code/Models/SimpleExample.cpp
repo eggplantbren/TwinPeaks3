@@ -1,4 +1,4 @@
-#include "MyModel.h"
+#include "SimpleExample.h"
 #include <cassert>
 #include <cmath>
 #include <RandomNumberGenerator.h>
@@ -7,21 +7,21 @@
 using namespace std;
 using namespace DNest3;
 
-MyModel::MyModel()
+SimpleExample::SimpleExample()
 :params(100)
 ,scalars(2)
 {
 
 }
 
-void MyModel::from_prior()
+void SimpleExample::from_prior()
 {
 	for(size_t i=0; i<params.size(); i++)
 		params[i] = randomU();
 	compute_scalars();
 }
 
-double MyModel::perturb()
+double SimpleExample::perturb()
 {
 	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(99)));
 
@@ -36,7 +36,7 @@ double MyModel::perturb()
 	return 0.;
 }
 
-void MyModel::compute_scalars()
+void SimpleExample::compute_scalars()
 {
 	scalars[0] = 0.;
 	scalars[1] = 0.;
@@ -47,7 +47,7 @@ void MyModel::compute_scalars()
 	}
 }
 
-bool MyModel::is_above(const vector<double>& threshold) const
+bool SimpleExample::is_above(const vector<double>& threshold) const
 {
 	assert(scalars.size() == threshold.size());
 	for(size_t i=0; i<scalars.size(); i++)
@@ -58,7 +58,7 @@ bool MyModel::is_above(const vector<double>& threshold) const
 	return true;
 }
 
-ostream& operator << (ostream& out, const MyModel& m)
+ostream& operator << (ostream& out, const SimpleExample& m)
 {
 	for(size_t i=0; i<m.params.size(); i++)
 		out<<m.params[i]<<' ';

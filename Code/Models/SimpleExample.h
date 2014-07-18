@@ -1,5 +1,5 @@
-#ifndef _MyModel_
-#define _MyModel_
+#ifndef _SimpleExample_
+#define _SimpleExample_
 
 /*
 * An object of this class represents a
@@ -9,7 +9,7 @@
 #include <vector>
 #include <ostream>
 
-class MyModel
+class SimpleExample
 {
 	private:
 		std::vector<double> params;
@@ -18,7 +18,7 @@ class MyModel
 		std::vector<double> scalars;
 
 	public:
-		MyModel();
+		SimpleExample();
 
 		void from_prior();
 		double perturb();
@@ -32,10 +32,10 @@ class MyModel
 		{ return scalars; }
 
 		friend std::ostream& operator << (std::ostream& out,
-							const MyModel& m);
+							const SimpleExample& m);
 };
 
-std::ostream& operator << (std::ostream& out, const MyModel& m);
+std::ostream& operator << (std::ostream& out, const SimpleExample& m);
 
 #endif
 

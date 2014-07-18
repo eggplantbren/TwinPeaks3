@@ -2,7 +2,7 @@ CFLAGS = -m64 -Ofast -flto -march=native -funroll-loops -Wall -Wextra -ansi -ped
 LIBS =  -ldnest3 -lgsl -lgslcblas -lboost_system -lboost_thread
 
 default:
-	g++ $(CFLAGS) -c *.cpp
+	g++ $(CFLAGS) -c *.cpp Models/*.cpp
 	g++ -o main *.o $(LIBS)
 	rm -f *.o
 
