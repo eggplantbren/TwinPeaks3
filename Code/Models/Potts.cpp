@@ -48,9 +48,14 @@ void Potts::compute_score()
 			jj[3] = mod(j - 1, static_cast<int>(x[i].size()));
 
 			for(int k=0; k<4; k++)
+			{
 				if(x[i][j] == x[ii[k]][jj[k]])
+				{
 					score++;
-			score2 += 100*x[i][j]*cos(4.*M_PI*j/x[0].size());
+					if(k >= 2)
+						score2++;
+				}
+			}
 		}
 	}
 }
@@ -86,18 +91,27 @@ double Potts::perturb()
 
 		// Calculate negative part of delta score
 		for(int k=0; k<4; k++)
+		{
 			if(x[i][j] == x[ii[k]][jj[k]])
+			{
 				score--;
-		score2 -= 100*x[i][j]*cos(4.*M_PI*j/x[0].size());
-
+				if(k >= 2)
+					score2--;
+			}
+		}
 		// Perturb the cell
 		x[i][j] = randInt(num_colors);
 
 		// Calculate positive part of delta score
 		for(int k=0; k<4; k++)
+		{
 			if(x[i][j] == x[ii[k]][jj[k]])
+			{
 				score++;
-		score2 += 100*x[i][j]*cos(4.*M_PI*j/x[0].size());
+				if(k >= 2)
+					score2++;
+			}
+		}
 	}
 
 	compute_scalars();
