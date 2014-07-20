@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <RandomNumberGenerator.h>
 #include "Sampler.h"
-#include "Models/Potts.h"
+#include "Models/SimpleExample.h"
 
 using namespace std;
 using namespace DNest3;
@@ -32,10 +32,10 @@ int main()
 
 	for(int k=0; k<100; k++)
 	{
-		Sampler<Potts> s(100, 500, 2000);
+		Sampler<SimpleExample> s(100, 200, 5000);
 		s.initialise();
 
-		for(int i=0; i<100000; i++)
+		for(int i=0; i<50000; i++)
 			s.update();
 	}
 
