@@ -64,7 +64,7 @@ void Sampler<Type>::update()
 	int worst = find_worst(which_scalar);
 
 	// Write out its prior weight and scalars
-	double logw = iteration*log((double)particles.size()/(particles.size()+1));
+	double logw = -(double)(iteration+1)/particles.size();//*log((double)particles.size()/(particles.size()+1));
 	logw_file<<logw<<std::endl;
 	for(size_t i=0; i<particles[worst].get_scalars().size();  i++)
 		scalars_file<<particles[worst].get_scalars()[i]<<' ';
@@ -109,12 +109,15 @@ void Sampler<Type>::update()
 	std::cout<<"# Evolving...";
 
 	// Copy a survivor
-	int which;
-	do
+	if(particles.size() != 1)
 	{
-		which = DNest3::randInt(particles.size());
-	}while(which == worst);
-	particles[worst] = particles[which];
+		int which;
+		do
+		{
+			which = DNest3::randInt(particles.size());
+		}while(which == worst);
+		particles[worst] = particles[which];
+	}
 
 	// Evolve the particle
 	int accepts = 0;
