@@ -108,13 +108,13 @@ void Sampler<Type>::update()
 	std::cout<<")."<<std::endl;
 	std::cout<<"# Evolving...";
 
-//	// Copy a survivor
-//	int which;
-//	do
-//	{
-//		which = DNest3::randInt(particles.size());
-//	}while(which == worst);
-//	particles[worst] = particles[which];
+	// Copy a survivor
+	int which;
+	do
+	{
+		which = DNest3::randInt(particles.size());
+	}while(which == worst);
+	particles[worst] = particles[which];
 
 	// Evolve the particle
 	int accepts = 0;
