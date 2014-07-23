@@ -1,6 +1,9 @@
 from pylab import *
 from postprocess import logsumexp
 
+# Lagrange multipliers/inverse temperatures/whatever you want to call them
+L1, L2 = 10., 1.
+
 # First calculate things about the scalars (e.g. the normalising constant)
 scalars = loadtxt('scalars.txt')
 logw = loadtxt('logw.txt')
@@ -12,7 +15,7 @@ logw = logw[0:smallest]
 logw = logw - logsumexp(logw)
 
 # Posterior weights, unnormalised
-logW = logw + 10*scalars[:,0] + scalars[:,1]
+logW = logw + L1*scalars[:,0] + L2*scalars[:,1]
 
 # Normaliser
 logZ = logsumexp(logW)
