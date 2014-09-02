@@ -14,6 +14,11 @@ model = "model
     # H as output variable
     #y[i] ~ dnorm(48.4834, 1/sigma[i]^2)
   }
+
+  # Predict the results of an accurate run
+  log_sigma_new <- A*log(100) + B*log(1000) + C
+  sigma_new <- exp(log_sigma_new)
+  y_new ~ dnorm(-209.053, 1/sigma_new^2)
 }
 "
 
@@ -24,7 +29,7 @@ data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
 # data = list(walkers=data[,1], reps=data[,2], y=data[,5], N=length(data[,4]))
 
 # Variables to monitor
-variable_names = c('A', 'B', 'C')
+variable_names = c('A', 'B', 'C', 'y_new')
 
 # How many burn-in steps?
 burn_in = 1000
