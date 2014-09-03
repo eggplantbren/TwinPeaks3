@@ -5,12 +5,16 @@ model = "model
   B ~ dunif(-1000, 1000)
   C ~ dunif(-1000, 1000)
 
+  bias0 ~ dunif(-1000, 1000)
+  slope ~ dunif(-10, 0)
+
   for(i in 1:N)
   {
+    bias[i] <- bias0*walkers[i]^slope
     log_sigma[i] <- A*log(walkers[i]) + B*log(reps[i]) + C
     sigma[i] <- exp(log_sigma[i])
     # log(Z) as output variable
-    y[i] ~ dnorm(-209.053, 1/sigma[i]^2)
+    y[i] ~ dnorm(-209.053 + bias[i], 1/sigma[i]^2)
     # H as output variable
     #y[i] ~ dnorm(48.4834, 1/sigma[i]^2)
   }
@@ -29,7 +33,7 @@ data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
 # data = list(walkers=data[,1], reps=data[,2], y=data[,5], N=length(data[,4]))
 
 # Variables to monitor
-variable_names = c('A', 'B', 'C', 'y_new')
+variable_names = c('A', 'B', 'C', 'bias0', 'slope', 'y_new')
 
 # How many burn-in steps?
 burn_in = 1000
