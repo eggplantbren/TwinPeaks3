@@ -92,7 +92,7 @@ make_list <- function(draw)
 results = make_list(draw)
 
 # Plot for posterior predictive check
-plot(data$y, lwd=5, col='black', type='l')
+plot(data$y, lwd=5, col='black', type='l', ylim=c(-230, -180))
 for(i in 1:20)
 {
   index = 1 + floor(steps/thin*runif(1))
