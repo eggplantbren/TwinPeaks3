@@ -92,13 +92,11 @@ make_list <- function(draw)
 results = make_list(draw)
 
 # Plot for posterior predictive check
-plot(results$y_copy[100,], type='l', col='red', ylim=c(-220, -190))
-lines(results$y_copy[200,], col='red')
-lines(results$y_copy[300,], col='red')
-lines(results$y_copy[400,], col='red')
-lines(results$y_copy[500,], col='red')
-lines(results$y_copy[600,], col='red')
-lines(results$y_copy[700,], col='red')
-lines(results$y_copy[800,], col='red')
-lines(results$y_copy[900,], col='red')
-lines(data$y, col='black', lwd=5)
+plot(data$y, lwd=5, col='black', type='l')
+for(i in 1:20)
+{
+  index = 1 + floor(steps/thin*runif(1))
+  lines(results$y_copy[index, ], col='red')
+}
+
+
