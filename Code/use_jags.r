@@ -27,6 +27,10 @@ model = "model
 "
 
 data = as.matrix(read.table('results.txt'))
+
+# Cull runs with < 3 walkers or reps
+#data = data[data[,1] >= 3 & data[,2] >= 3, ]
+
 # log(Z) as output variable
 data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
 # H as output variable
