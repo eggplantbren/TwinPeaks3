@@ -64,6 +64,9 @@ for i in xrange(0, 101):
     H[i, j] = sum(exp(logWW)*(logWW - logw))
   print(i+1)
 
+logZ[ess < 5] = nan
+H[ess < 5] = nan
+
 figure(1)
 subplot(1, 2, 1)
 imshow(logZ, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())))
@@ -75,7 +78,7 @@ subplot(1, 2, 2)
 imshow(H, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())))
 xlabel('ln($T_1$)')
 ylabel('ln($T_2$)')
-title('H, max={m}'.format(m=H.max()))
+title('H, max={m}'.format(m=H[logical_not(isnan(H))].max()))
 
 figure(2)
 imshow(ess, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())))
