@@ -17,6 +17,9 @@ model = "model
     y[i] ~ dnorm(-209.053 + bias[i], 1/sigma[i]^2)
     # H as output variable
     #y[i] ~ dnorm(48.4834, 1/sigma[i]^2)
+
+    # Duplicate data for posterior predictive check
+    y_copy[i] ~ dnorm(-209.053 + bias[i], 1/sigma[i]^2)
   }
 
   # Predict the results of an accurate run
@@ -29,7 +32,7 @@ model = "model
 data = as.matrix(read.table('results.txt'))
 
 # Cull runs with < 3 walkers or reps
-#data = data[data[,1] >= 3 & data[,2] >= 3, ]
+data = data[data[,1] >= 3 & data[,2] >= 3, ]
 
 # log(Z) as output variable
 data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
@@ -37,7 +40,7 @@ data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
 # data = list(walkers=data[,1], reps=data[,2], y=data[,5], N=length(data[,4]))
 
 # Variables to monitor
-variable_names = c('A', 'B', 'C', 'bias0', 'slope', 'y_new')
+variable_names = c('A', 'B', 'C', 'bias0', 'slope', 'y_new', 'y_copy')
 
 # How many burn-in steps?
 burn_in = 1000
@@ -87,3 +90,15 @@ make_list <- function(draw)
 	return(results)
 }
 results = make_list(draw)
+
+# Plot for posterior predictive check
+plot(results$y_copy[100,], type='l', col='red', ylim=c(-220, -190))
+lines(results$y_copy[200,], col='red')
+lines(results$y_copy[300,], col='red')
+lines(results$y_copy[400,], col='red')
+lines(results$y_copy[500,], col='red')
+lines(results$y_copy[600,], col='red')
+lines(results$y_copy[700,], col='red')
+lines(results$y_copy[800,], col='red')
+lines(results$y_copy[900,], col='red')
+lines(data$y, col='black', lwd=5)
