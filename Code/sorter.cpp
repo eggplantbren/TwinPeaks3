@@ -25,6 +25,8 @@ class Point
 		}
 
 		friend bool operator < (const Point& p1, const Point& p2);
+		friend bool operator > (const Point& p1, const Point& p2);
+		friend bool operator == (const Point& p1, const Point& p2);
 		friend ostream& operator << (ostream& out, const Point& p);
 };
 
@@ -46,6 +48,24 @@ bool operator < (const Point& p1, const Point& p2)
 			return false;
 	return true;
 }
+
+//bool operator > (const Point& p1, const Point& p2)
+//{
+//	if(p1.run == p2.run)
+//		return p1.step_within_run > p2.step_within_run;
+
+//	for(size_t i=0; i<p1.scalars.size(); i++)
+//		if(p1.scalars[i] < p2.scalars[i])
+//			return false;
+//	return true;
+//}
+
+
+//bool operator == (const Point& p1, const Point& p2)
+//{
+//	return !(p1 < p2 || p1 > p2);
+//}
+
 
 /************************************************************/
 

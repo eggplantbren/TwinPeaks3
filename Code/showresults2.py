@@ -9,14 +9,21 @@ L1, L2 = 10., 1.
 
 scalars = loadtxt('sorted.txt')
 
-plot(scalars[:,0], scalars[:,1], 'bo', alpha=0.2)
-show()
-
 steps = 200
 runs = scalars.shape[0]//steps
 
 logX = log(rand(runs, steps)).cumsum(axis=1).flatten()
 logX = sort(logX)[::-1]
+
+for k in xrange(0, 10000):
+  i = randint(scalars.shape[0])
+  j = randint(scalars.shape[1])
+  if scalars[i, 0] > scalars[j, 0] and scalars[i, 1] > scalars[j, 1] and logX[i] > logX[j]:
+    print('Inconsistency', i, j)
+
+s = logX - logX.min()
+scatter(scalars[:,0], scalars[:,1], s=s, alpha=0.1)
+show()
 
 # Prior weights, normalised
 logw = logX - logsumexp(logX)
