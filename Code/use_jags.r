@@ -5,21 +5,14 @@ model = "model
   B ~ dunif(-1000, 1000)
   C ~ dunif(-1000, 1000)
 
-  bias0 ~ dunif(-1000, 1000)
-  slope ~ dunif(-10, 0)
-
   for(i in 1:N)
   {
-    bias[i] <- bias0*walkers[i]^slope
     log_sigma[i] <- A*log(walkers[i]) + B*log(reps[i]) + C
     sigma[i] <- exp(log_sigma[i])
     # log(Z) as output variable
-    y[i] ~ dnorm(-209.053 + bias[i], 1/sigma[i]^2)
+    y[i] ~ dnorm(-209.053, 1/sigma[i]^2)
     # H as output variable
     #y[i] ~ dnorm(48.4834, 1/sigma[i]^2)
-
-    # Duplicate data for posterior predictive check
-    y_copy[i] ~ dnorm(-209.053 + bias[i], 1/sigma[i]^2)
   }
 
   # Predict the results of an accurate run
@@ -32,7 +25,7 @@ model = "model
 data = as.matrix(read.table('results.txt'))
 
 # Cull runs with < 3 walkers or reps
-data = data[data[,1] >= 3 & data[,2] >= 3, ]
+#data = data[data[,1] >= 3 & data[,2] >= 3, ]
 
 # log(Z) as output variable
 data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
@@ -40,7 +33,7 @@ data = list(walkers=data[,1], reps=data[,2], y=data[,4], N=length(data[,4]))
 # data = list(walkers=data[,1], reps=data[,2], y=data[,5], N=length(data[,4]))
 
 # Variables to monitor
-variable_names = c('A', 'B', 'C', 'bias0', 'slope', 'y_new', 'y_copy')
+variable_names = c('A', 'B', 'C', 'y_new')
 
 # How many burn-in steps?
 burn_in = 1000
@@ -90,13 +83,4 @@ make_list <- function(draw)
 	return(results)
 }
 results = make_list(draw)
-
-# Plot for posterior predictive check
-plot(data$y, lwd=5, col='black', type='l', ylim=c(-230, -180))
-for(i in 1:20)
-{
-  index = 1 + floor(steps/thin*runif(1))
-  lines(results$y_copy[index, ], col='red')
-}
-
 
