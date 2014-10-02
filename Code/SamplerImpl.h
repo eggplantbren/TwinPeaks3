@@ -66,9 +66,6 @@ void Sampler<Type>::update()
 	// Write out its prior weight and scalars
 	double logw = -(double)(iteration+1)/particles.size();//*log((double)particles.size()/(particles.size()+1));
 	logw_file<<logw<<std::endl;
-	for(size_t i=0; i<particles[worst].get_scalars().size();  i++)
-		scalars_file<<particles[worst].get_scalars()[i]<<' ';
-	scalars_file<<std::endl;
 
 	// Save to thinned files with probability 1/thin
 	if(DNest3::randomU() <= 1./thin)
@@ -81,7 +78,7 @@ void Sampler<Type>::update()
 	}
 
 	// Close files
-	logw_file.close(); scalars_file.close();
+	logw_file.close();
 	scalars_thinned_file.close(); logw_thinned_file.close(); sample_file.close();
 
 	// Set the new threshold
@@ -97,6 +94,12 @@ void Sampler<Type>::update()
 		else
 			std::cout<<", ";
 	}
+
+	
+	for(size_t i=0; i<threshold.size();  i++)
+		scalars_file<<threshold[i][0]<<' ';
+	scalars_file<<std::endl;
+	scalars_file.close();
 
 	std::cout<<"# logw = "<<logw<<", threshold = (";
 	for(size_t i=0; i<threshold.size(); i++)
