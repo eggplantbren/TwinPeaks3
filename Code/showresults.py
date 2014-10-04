@@ -1,4 +1,5 @@
 from pylab import *
+import scipy
 from postprocess import logsumexp
 
 # Lagrange multipliers/inverse temperatures/whatever you want to call them
@@ -11,29 +12,50 @@ smallest = min([scalars.shape[0], logw.size])
 scalars = scalars[0:smallest, :]
 logw = logw[0:smallest]
 
-# Prior weights, normalised
-logw = logw - logsumexp(logw)
+steps = 200
+walkers = 1
+reps = logw.size//steps
 
-# Posterior weights, unnormalised
-logW = logw + L1*scalars[:,0] + L2*scalars[:,1]
+tries = 50
+logZ = array([])
+H = array([])
 
-# Normaliser
-logZ = logsumexp(logW)
+ion()
+hold(False)
+for k in xrange(0, tries):
 
-# Posterior weights, normalised
-logWW = logW - logZ
-ess = exp(-sum(exp(logWW)*logWW))
+	for i in xrange(0, reps):
+	  logw[i*steps:(i+1)*steps] = cumsum(log(scipy.random.beta(walkers, 1, size=steps)))
+	if logw.size % steps != 0:
+	  logw[reps*steps:] = cumsum(log(scipy.random.beta(walkers, 1, size=logw.size % steps)))
 
-# Information
-H = sum(exp(logWW)*(logWW - logw))
+	# Prior weights, normalised
+	logw = logw - logsumexp(logw)
 
-print('log(Z) = {logZ}'.format(logZ=logZ))
-print('H = {H} nats'.format(H=H))
+	# Posterior weights, unnormalised
+	logW = logw + L1*scalars[:,0] + L2*scalars[:,1]
 
-plot(exp(logWW))
-ylabel('Weight wrt canonical distribution')
-title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
+	# Normaliser
+	logZ = hstack([logZ, logsumexp(logW)])
+
+	# Posterior weights, normalised
+	logWW = logW - logZ[-1]
+	ess = exp(-sum(exp(logWW)*logWW))
+
+	# Information
+	H = hstack([H, sum(exp(logWW)*(logWW - logw))])
+
+	plot(exp(logWW))
+	ylabel('Weight wrt canonical distribution')
+	title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
+	draw()
+
+print('log(Z) = {logZ} +- {s}'.format(logZ=logZ.mean(), s=logZ.std()))
+print('H = {H} +- {s} nats'.format(H=H.mean(), s=H.std()))
+
+ioff()
 show()
+
 
 
 # Calculate log(Z) and H for some canonical distributions
