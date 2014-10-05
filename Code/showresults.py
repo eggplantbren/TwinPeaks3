@@ -40,8 +40,8 @@ show()
 
 
 # Calculate log(Z) and H for some canonical distributions
-T1 = exp(linspace(-3., 10., 101))
-T2 = exp(linspace(-3., 10., 101))
+T1 = exp(linspace(-1.204, 10., 101))
+T2 = exp(linspace(-1.204, 10., 101))
 [T1, T2] = meshgrid(T1, T2)
 T2 = T2[::-1, :]
 logZ = T1.copy()
@@ -91,23 +91,12 @@ title('ESS, max = {m}'.format(m=ess.max()))
 
 show()
 
-## Now do it all again with the thinned samples
-#scalars = loadtxt('scalars_thinned.txt')
-#logw = loadtxt('logw_thinned.txt')
-#smallest = min([scalars.shape[0], logw.size])
-#scalars = scalars[0:smallest, :]
-#logw = logw[0:smallest]
-
-## Prior weights, normalised
-#logw = logw - logsumexp(logw)
-
-## Posterior weights, unnormalised
-#logW = logw + 10*scalars[:,0] + scalars[:,1]
-
-## Normaliser
-#logZ = logsumexp(logW)
-
-## Posterior weights, normalised
-#logWW = logW - logZ
-#ess = exp(-sum(exp(logWW)*logWW))
+true_logZ = loadtxt('true_logZ.txt')
+true_H = loadtxt('true_H.txt')
+error = logZ - true_logZ
+lowest = error[logical_not(isnan(error))].min()
+highest = error[logical_not(isnan(error))].max()
+imshow(error/sqrt(true_H))
+title('{a}, {b}'.format(a=lowest, b=highest))
+show()
 
