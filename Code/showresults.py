@@ -2,8 +2,8 @@ from pylab import *
 import scipy
 from postprocess import logsumexp
 
-# Lagrange multipliers/inverse temperatures/whatever you want to call them
-L1, L2 = 10., 1.
+# Temperatures
+T1, T2 = 0.3, 0.3
 
 # First calculate things about the scalars (e.g. the normalising constant)
 scalars = loadtxt('scalars.txt')
@@ -12,55 +12,36 @@ smallest = min([scalars.shape[0], logw.size])
 scalars = scalars[0:smallest, :]
 logw = logw[0:smallest]
 
-steps = 200
-walkers = 1
-reps = logw.size//steps
+# Prior weights, normalised
+logw = logw - logsumexp(logw)
 
-tries = 50
-logZ = array([])
-H = array([])
+# Posterior weights, unnormalised
+logW = logw + scalars[:,0]/T1 + scalars[:,1]/T2
 
-ion()
-hold(False)
-for k in xrange(0, tries):
+# Normaliser
+logZ = logsumexp(logW)
 
-	for i in xrange(0, reps):
-	  logw[i*steps:(i+1)*steps] = cumsum(log(scipy.random.beta(walkers, 1, size=steps)))
-	if logw.size % steps != 0:
-	  logw[reps*steps:] = cumsum(log(scipy.random.beta(walkers, 1, size=logw.size % steps)))
+# Posterior weights, normalised
+logWW = logW - logZ
+ess = exp(-sum(exp(logWW)*logWW))
 
-	# Prior weights, normalised
-	logw = logw - logsumexp(logw)
+# Information
+H = sum(exp(logWW)*(logWW - logw))
 
-	# Posterior weights, unnormalised
-	logW = logw + L1*scalars[:,0] + L2*scalars[:,1]
+print('log(Z) = {logZ}'.format(logZ=logZ))
+print('H = {H} nats'.format(H=H))
 
-	# Normaliser
-	logZ = hstack([logZ, logsumexp(logW)])
+plot(exp(logWW))
+ylabel('Weight wrt canonical distribution')
+title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
 
-	# Posterior weights, normalised
-	logWW = logW - logZ[-1]
-	ess = exp(-sum(exp(logWW)*logWW))
-
-	# Information
-	H = hstack([H, sum(exp(logWW)*(logWW - logw))])
-
-	plot(exp(logWW))
-	ylabel('Weight wrt canonical distribution')
-	title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
-	draw()
-
-print('log(Z) = {logZ} +- {s}'.format(logZ=logZ.mean(), s=logZ.std()))
-print('H = {H} +- {s} nats'.format(H=H.mean(), s=H.std()))
-
-ioff()
 show()
 
 
 
 # Calculate log(Z) and H for some canonical distributions
-T1 = exp(linspace(-2., 10., 101))
-T2 = exp(linspace(-2., 10., 101))
+T1 = exp(linspace(-3., 10., 101))
+T2 = exp(linspace(-3., 10., 101))
 [T1, T2] = meshgrid(T1, T2)
 T2 = T2[::-1, :]
 logZ = T1.copy()

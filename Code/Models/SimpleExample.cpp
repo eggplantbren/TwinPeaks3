@@ -9,7 +9,7 @@ using namespace DNest3;
 
 SimpleExample::SimpleExample()
 :Model(2)
-,params(200)
+,params(1000)
 {
 
 }
