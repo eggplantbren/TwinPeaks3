@@ -55,6 +55,18 @@ $\lambda$s.
 \section{Nested sampling}
 
 
+\section{Demonstration Example}
+The prior is a uniform distribution over the $n$-dimensional unit hypercube:
+\begin{eqnarray}
+p(\mathbf{x}) &=& 1
+\end{eqnarray}
+as long as $x_i \in [0, 1]$ for all $i$. The scalars are:
+\begin{eqnarray}
+S_1(\mathbf{x}) &=& -\sum_{i=1}^n \left(x_i - 0.5\right)^2\\
+S_2(\mathbf{x}) &=& -\sum_{i=1}^n \sin^2\left(4\pi x_i\right)
+\end{eqnarray}
+
+For this section, we used $n=1000$ dimensions.
 
 \section{Example: Potts model with some embellishments}
 TBD
