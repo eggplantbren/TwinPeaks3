@@ -14,6 +14,8 @@ int main()
 	directories.push_back(string("10.4"));
 	directories.push_back(string("10.5"));
 	directories.push_back(string("10.6"));
+	directories.push_back(string("10.7"));
+	directories.push_back(string("10.8"));
 
 	fstream fout1("logw.txt", ios::out);
 	fstream fout2("scalars.txt", ios::out);
