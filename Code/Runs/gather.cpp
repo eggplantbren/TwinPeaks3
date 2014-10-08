@@ -21,6 +21,7 @@ int main()
 	// Temperatures
 	double T1 = 0.3; double T2 = 0.3;
 	double log_numerator = -1E300; double log_denominator = -1E300;
+	bool save = false;
 
 	vector<string> directories;
 	directories.push_back(string("10.1"));
@@ -32,8 +33,12 @@ int main()
 	directories.push_back(string("10.7"));
 	directories.push_back(string("10.8"));
 
-	fstream fout1("logw.txt", ios::out);
-	fstream fout2("scalars.txt", ios::out);
+	fstream fout1, fout2;
+	if(save)
+	{
+		fout1.open("logw.txt", ios::out);
+		fout2.open("scalars.txt", ios::out);
+	}
 
 	int k = 0;
 	for(size_t i=0; i<directories.size(); i++)
@@ -47,8 +52,11 @@ int main()
 		double temp1, temp2, temp3;
 		while(fin1>>temp1 && fin2>>temp2 && fin2>>temp3)
 		{
-			fout1<<temp1<<endl;
-			fout2<<temp2<<' '<<temp3<<endl;
+			if(save)
+			{
+				fout1<<temp1<<endl;
+				fout2<<temp2<<' '<<temp3<<endl;
+			}
 
 			log_numerator = logsumexp(log_numerator, temp1 + temp2/T1 + temp3/T2);
 			log_denominator = logsumexp(log_denominator, temp1);
@@ -61,8 +69,11 @@ int main()
 		cout<<"# Processed "<<k<<" points."<<endl;
 	}
 
-	fout1.close();
-	fout2.close();
+	if(save)
+	{
+		fout1.close();
+		fout2.close();
+	}
 
 	cout<<setprecision(8)<<"# ln(Z) = "<<(log_numerator - log_denominator)<<endl;
 
