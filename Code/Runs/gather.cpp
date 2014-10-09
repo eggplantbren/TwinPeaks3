@@ -20,7 +20,16 @@ int main()
 {
 	// Temperatures
 	double T1 = 0.3; double T2 = 0.3;
-	double log_numerator = -1E300; double log_denominator = -1E300;
+
+	// Normalising constant for prior weights
+	double logC = -1E300;
+
+	// Unnormalised posterior (logw + logl)
+	double logP = -1E300;
+
+	// For the information
+	double logQ = -1E300;
+
 	bool save = false;
 
 	vector<string> directories;
@@ -30,8 +39,6 @@ int main()
 	directories.push_back(string("10.4"));
 	directories.push_back(string("10.5"));
 	directories.push_back(string("10.6"));
-	directories.push_back(string("10.7"));
-	directories.push_back(string("10.8"));
 
 	fstream fout1, fout2;
 	if(save)
@@ -58,8 +65,8 @@ int main()
 				fout2<<temp2<<' '<<temp3<<endl;
 			}
 
-			log_numerator = logsumexp(log_numerator, temp1 + temp2/T1 + temp3/T2);
-			log_denominator = logsumexp(log_denominator, temp1);
+			logC = logsumexp(logC, temp1);
+			logP = logsumexp(logP, temp1 + temp2/T1 + temp3/T2);
 			k++;
 		}
 
@@ -75,7 +82,8 @@ int main()
 		fout2.close();
 	}
 
-	cout<<setprecision(8)<<"# ln(Z) = "<<(log_numerator - log_denominator)<<endl;
+	cout<<setprecision(8);
+	cout<<"# ln(Z) = "<<(logP - logC)<<endl;
 
 	return 0;
 }
