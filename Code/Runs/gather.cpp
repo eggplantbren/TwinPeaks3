@@ -98,7 +98,7 @@ int main()
 
 	cout<<setprecision(8);
 	cout<<"# ln(Z) = "<<logZ<<endl;
-	cout<<"# H = "<<H<<endl;
+	cout<<"# H = "<<H<<" nats."<<endl;
 
 	return 0;
 }
