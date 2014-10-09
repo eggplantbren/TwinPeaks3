@@ -24,11 +24,8 @@ int main()
 	// Normalising constant for prior weights
 	double logC = -1E300;
 
-	// Unnormalised posterior (logw + logl)
-	double logP = -1E300;
-
-	// For the information
-	double logQ = -1E300;
+	// Prior weights (relative) and 'likelihoods'
+	vector<double> logw, logL;
 
 	bool save = false;
 
@@ -66,14 +63,16 @@ int main()
 			}
 
 			logC = logsumexp(logC, temp1);
-			logP = logsumexp(logP, temp1 + temp2/T1 + temp3/T2);
+			logw.push_back(temp1);
+			logL.push_back(temp2/T1 + temp3/T2);
+
 			k++;
 		}
 
 		fin1.close();
 		fin2.close();
 
-		cout<<"# Processed "<<k<<" points."<<endl;
+		cout<<"# Loaded "<<k<<" points."<<endl;
 	}
 
 	if(save)
@@ -82,8 +81,24 @@ int main()
 		fout2.close();
 	}
 
+	// Calculate log(Z) and H
+	double logZ = -1E300;
+	for(size_t i=0; i<logL.size(); i++)
+		logZ = logsumexp(logZ, (logw[i] - logC) + logL[i]);
+
+	double H = 0.;
+	double logP;
+	for(size_t i=0; i<logL.size(); i++)
+	{
+		// Posterior weight
+		logP = logw[i] - logC + logL[i] - logZ;
+		H += exp(logP)*(logL[i] - logZ);
+	}
+
+
 	cout<<setprecision(8);
-	cout<<"# ln(Z) = "<<(logP - logC)<<endl;
+	cout<<"# ln(Z) = "<<logZ<<endl;
+	cout<<"# H = "<<H<<endl;
 
 	return 0;
 }
