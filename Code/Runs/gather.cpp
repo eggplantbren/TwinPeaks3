@@ -20,7 +20,7 @@ double logsumexp(double x1, double x2)
 int main()
 {
 	// Temperatures
-	double T1 = 0.3; double T2 = 0.3;
+	double T1 = 0.1; double T2 = 1.;
 
 	// Normalising constant for prior weights
 	double logC = -1E300;
@@ -28,7 +28,7 @@ int main()
 	// Prior weights (relative) and 'likelihoods'
 	vector<double> logw, logL;
 
-	bool save = false;
+	bool save = true;
 
 	vector<string> directories;
 	directories.push_back(string("mcmc_2000/8.1"));

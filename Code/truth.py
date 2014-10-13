@@ -7,8 +7,8 @@ def truth(T1, T2, do_plot=False):
   Z = trapz(p, x=x)
   H = trapz(p/Z*log(p/Z), x=x)
 
-  logZ = 1000*log(Z)
-  H *= 1000
+  logZ = 200*log(Z)
+  H *= 200
 
   if do_plot:
     plot(x, p)
@@ -49,7 +49,7 @@ def grid():
   return [logZ, H]
 
 if __name__ == '__main__':
-  truth(0.3, 0.3, do_plot=True)
+  truth(0.1, 1., do_plot=True)
   [logZ, H] = grid()
 
   savetxt('true_logZ.txt', logZ)
