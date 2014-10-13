@@ -119,6 +119,7 @@ int main()
 	for(size_t i=0; i<Z.size(); i++)
 		ENR += -Z[i]*log(Z[i] + 1E-300);
 	ENR = exp(ENR);
+	cout<<"# Number of runs = "<<Z.size()<<"."<<endl;
 	cout<<"# Effective number of contributing runs = "<<ENR<<"."<<endl;
 
 	
