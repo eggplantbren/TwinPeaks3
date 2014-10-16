@@ -33,7 +33,7 @@ double SimpleExample::perturb()
 	for(int i=0; i<reps; i++)
 		change[randInt(params.size())] = true;
 
-	for(int i=0; i<reps; i++)
+	for(int i=0; i<params.size(); i++)
 	{
 		if(change[i])
 		{
