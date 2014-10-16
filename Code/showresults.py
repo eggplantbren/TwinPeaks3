@@ -3,7 +3,7 @@ import scipy
 from postprocess import logsumexp
 
 # Temperatures
-T1, T2 = 0.3, 0.3
+T1, T2 = 0.1, 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
 scalars = loadtxt('scalars.txt')
