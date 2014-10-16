@@ -29,12 +29,17 @@ void SimpleExample::from_prior()
 double SimpleExample::perturb()
 {
 	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(99)));
+	vector<bool> change(params.size(), false);
+	for(int i=0; i<reps; i++)
+		change[randInt(params.size())] = true;
 
 	for(int i=0; i<reps; i++)
 	{
-		int which = randInt(params.size());
-		params[which] += randh();
-		wrap(params[which], 0., 1.);
+		if(change[i])
+		{
+			params[i] += randh();
+			wrap(params[i], 0., 1.);
+		}
 	}
 	compute_scalars();
 
