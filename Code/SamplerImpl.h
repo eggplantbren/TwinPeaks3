@@ -4,9 +4,11 @@
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles, int mcmc_steps, int thin)
+Sampler<Type>::Sampler(int num_particles, int num_steps,
+				int mcmc_steps, int thin)
 :particles(num_particles)
 ,threshold(particles[0].get_scalars().size(), std::vector<double>(2))
+,num_steps(num_steps)
 ,mcmc_steps(mcmc_steps)
 ,thin(thin)
 ,iteration(0)
@@ -140,6 +142,13 @@ void Sampler<Type>::update()
 	std::cout<<std::endl<<std::endl<<std::endl;
 
 	iteration++;
+}
+
+template<class Type>
+void Sampler<Type>::run()
+{
+	for(int i=0; i<num_steps; i++)
+		update();
 }
 
 template<class Type>
