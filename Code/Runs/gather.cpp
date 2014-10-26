@@ -31,13 +31,7 @@ int main()
 	bool save = true;
 
 	vector<string> directories;
-	directories.push_back(string("mcmc_2000/8.1"));
-	directories.push_back(string("mcmc_2000/8.2"));
-	directories.push_back(string("mcmc_2000/8.3"));
-	directories.push_back(string("mcmc_2000/8.4"));
-	directories.push_back(string("mcmc_2000/8.5"));
-	directories.push_back(string("mcmc_2000/8.6"));
-	directories.push_back(string("mcmc_2000/8.7"));
+	directories.push_back(string(".."));
 
 	fstream fout1, fout2;
 	if(save)
