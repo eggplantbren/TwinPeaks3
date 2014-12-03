@@ -1,38 +1,24 @@
 #using PyCall
 #@pyimport matplotlib.pyplot as plt
 
-# Load the files
-scalars = transpose(readdlm("scalars.txt")) # Transpose for faster access
-logw = vec(readdlm("logw.txt"))
-
-# Truncate if necessary
-N = minimum([size(scalars)[2], size(logw)[1]])
-scalars = scalars[:, 1:N]
-logw = logw[1:N]
-
-# Which run each distribution belongs to
-run_id = ones(Int64, N)
-for i in 2:N
-  if logw[i] == -1.
-    run_id[i] = run_id[i-1] + 1
-  else
-    run_id[i] = run_id[i-1]
-  end
-end
-
 # Generate logX values from the prior (i.e. not taking into account any
 # inter-run comparisons)
-logX = zeros(N)
-for i in 1:N
-  if logw[i] == -1.
-    logX[i] = log(rand())
-  else
-    logX[i] = logX[i-1] + log(rand())
+function starting_point(N)
+  logX = zeros(N)
+  for i in 1:N
+    if logw[i] == -1.
+      logX[i] = log(rand())
+    else
+      logX[i] = logX[i-1] + log(rand())
+    end
   end
+  return logX
 end
 
 # Gibbs sample one value
-function update!(logx::Array{Float64, 1}, ii::Int64)
+function update!(logx::Array{Float64, 1}, ii::Int64, N::Int64,
+                                scalars::Array{Float64, 2},
+                                run_id::Array{Int64, 1})
   # Generate proposal
   proposal = 0.
 
@@ -94,17 +80,44 @@ function update!(logx::Array{Float64, 1}, ii::Int64)
   return inconsistency
 end
 
-function update_all!(logx::Array{Float64, 1})
+function update_all!(logx::Array{Float64, 1}, N::Int64,
+                                scalars::Array{Float64, 2},
+                                run_id::Array{Int64, 1})
   total_inconsistency = 0
   for i in 1:N
-    total_inconsistency += update!(logx, i)
+    total_inconsistency += update!(logx, i, N, scalars, run_id)
     print('.')
   end
   return total_inconsistency
 end
 
-for i in 1:100
-  inconsistency = update_all!(logX)
+###################################################
+# MAIN CODE
+###################################################
+
+# Load the files
+scalars = transpose(readdlm("scalars.txt")) # Transpose for faster access
+logw = vec(readdlm("logw.txt"))
+
+# Truncate if necessary
+N = minimum([size(scalars)[2], size(logw)[1]])
+scalars = scalars[:, 1:N]
+logw = logw[1:N]
+
+# Which run each distribution belongs to
+run_id = ones(Int64, N)
+for i in 2:N
+  if logw[i] == -1.
+    run_id[i] = run_id[i-1] + 1
+  else
+    run_id[i] = run_id[i-1]
+  end
+end
+
+logX = starting_point(N)
+
+for i in 1:1000000
+  inconsistency = update_all!(logX, N, scalars, run_id)
   println(i, " ", inconsistency)
   writedlm("logX.txt", logX)
 end
