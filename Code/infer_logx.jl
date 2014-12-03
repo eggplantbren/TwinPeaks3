@@ -98,6 +98,7 @@ function update_all!(logx::Array{Float64, 1})
   total_inconsistency = 0
   for i in 1:N
     total_inconsistency += update!(logx, i)
+    print('.')
   end
   return total_inconsistency
 end
@@ -105,7 +106,6 @@ end
 for i in 1:100
   inconsistency = update_all!(logX)
   println(i, " ", inconsistency)
+  writedlm("logX.txt", logX)
 end
-
-writedlm("logX.txt", logX)
 
