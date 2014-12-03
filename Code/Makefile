@@ -5,5 +5,6 @@ OBJECTS = Gravity.o Model.o Potts.o SimpleExample.o
 default:
 	g++ $(CFLAGS) -c *.cpp Models/*.cpp
 	g++ -o main main.o $(OBJECTS) $(LIBS)
+	g++ -o infer_logx infer_logx.o $(OBJECTS) $(LIBS)
 	rm -f *.o
 
