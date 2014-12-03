@@ -30,9 +30,9 @@ int main()
 	RandomNumberGenerator::initialise_instance();
 	RandomNumberGenerator::get_instance().set_seed(time(0));
 
-	for(int k=0; k<100; k++)
+	for(int k=0; k<1; k++)
 	{
-		Sampler<SimpleExample> s(8, 8*100, 2000, 5000);
+		Sampler<SimpleExample> s(1, 1*120, 30000, 5000);
 		s.initialise();
 		s.run();
 	}
