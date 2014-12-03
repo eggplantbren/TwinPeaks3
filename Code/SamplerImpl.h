@@ -55,6 +55,8 @@ void Sampler<Type>::update()
 	std::fstream logw_thinned_file("logw_thinned.txt", std::ios::out|std::ios::app);
 	std::fstream sample_file("sample.txt", std::ios::out|std::ios::app);
 
+	scalars_file<<std::setprecision(10);
+
 	// Choose a scalar
 	int which_scalar;
 	do
