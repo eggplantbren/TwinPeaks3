@@ -1,48 +1,17 @@
-using PyCall
-@pyimport matplotlib.pyplot as plt
+#using PyCall
+#@pyimport matplotlib.pyplot as plt
 
-# Generate initial guesses for logX to initialise the MCMC.
-function starting_point(N::Int64, run_id::Array{Int64, 1})
-  print("Generating initial guess...")
+# Generate logX values from the prior (i.e. not taking into account any
+# inter-run comparisons)
+function starting_point(N)
   logX = zeros(N)
-
-  # Assign first run
-  logX[1] = log(rand())
-  k = 2
-  while run_id[k] == 1
-    logX[k] = logX[k-1] + log(rand())
-    k += 1
-  end
-
-  for i in k:N
-    # Limits
-    upper = 0.
-    lower = -1E300
-    if run_id[i-1] == run_id[i]
-      upper = logX[i-1]
-    end
-
-    for j in 1:(i-1)
-      if run_id[j] != run_id[i]
-        # If this other distribution is exterior, can reduce 'upper'
-        if all(scalars[:, i] .>= scalars[:, j]) && logX[j] < upper
-          upper = logX[j]
-        end
-
-        # If this other distribution is interior, can increase 'lower'
-        if all(scalars[:, i] .<= scalars[:, j]) && logX[j] > lower
-          lower = logX[j]
-        end
-      end
-    end
-
-    if lower == -1E300
-      logX[i] = upper + log(rand())
+  for i in 1:N
+    if logw[i] == -1.
+      logX[i] = log(rand())
     else
-      logX[i] = lower + (upper - lower)*rand()
+      logX[i] = logX[i-1] + log(rand())
     end
   end
-  println("done.")
   return logX
 end
 
@@ -145,7 +114,7 @@ for i in 2:N
   end
 end
 
-logX = starting_point(N, run_id)
+logX = starting_point(N)
 
 for i in 1:1000000
   inconsistency = update_all!(logX, N, scalars, run_id)
