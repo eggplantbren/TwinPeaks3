@@ -121,11 +121,11 @@ class Assignment
 			double upper = 0.;
 
 			// Lower limit -- next point in same run (if it exists)
-  			if( (i != data.N) &&
+  			if( (i != (data.N-1)) &&
 					(data.run_id[i+1] == data.run_id[i]))
     				lower = logX[i+1];
 			// Upper limit -- previous point in same run (if it exists)
-  			if( (i != 1) &&
+  			if( (i != 0) &&
 					(data.run_id[i-1] == data.run_id[i]))
     				upper = logX[i-1];
 
@@ -199,7 +199,7 @@ int main()
 	Assignment assignment(data);
 	assignment.initialise();
 
-	for(int i=0; i<100000000; i++)
+	for(int i=0; i<10000000; i++)
 	{
 		cout<<assignment.update_all()<<endl;
 		assignment.save();
