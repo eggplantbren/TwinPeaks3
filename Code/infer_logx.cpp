@@ -199,7 +199,7 @@ int main()
 	Assignment assignment(data);
 	assignment.initialise();
 
-	for(int i=0; i<10000000; i++)
+	for(int i=0; i<100; i++)
 	{
 		cout<<assignment.update_all()<<endl;
 		assignment.save();
