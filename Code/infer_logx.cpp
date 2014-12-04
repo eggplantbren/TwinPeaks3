@@ -210,7 +210,7 @@ int main()
 			when_finished = i;
 		i++;
 		cout<<i<<' '<<inconsistency<<endl;
-		if(i > 1.2*when_finished)
+		if(i > (1 + 1.2*when_finished))
 			break;
 	}
 	return 0;
