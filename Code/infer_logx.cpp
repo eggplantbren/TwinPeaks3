@@ -206,11 +206,12 @@ int main()
 	{
 		inconsistency = assignment.update_all();
 		assignment.save();
+		i++;
+
 		if(when_finished == -1 && inconsistency == 0)
 			when_finished = i;
-		i++;
 		cout<<i<<' '<<inconsistency<<endl;
-		if(i > (1 + 1.2*when_finished))
+		if(when_finished != -1 && i > (1 + 1.2*when_finished))
 			break;
 	}
 	return 0;
