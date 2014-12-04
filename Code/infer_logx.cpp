@@ -199,10 +199,19 @@ int main()
 	Assignment assignment(data);
 	assignment.initialise();
 
-	for(int i=0; i<100; i++)
+	int inconsistency;
+	int when_finished = -1;
+	int i=0;
+	while(true)
 	{
-		cout<<assignment.update_all()<<endl;
+		inconsistency = assignment.update_all();
 		assignment.save();
+		if(when_finished == -1 && inconsistency == 0)
+			when_finished = i;
+		i++;
+		cout<<i<<' '<<inconsistency<<endl;
+		if(i > 1.2*when_finished)
+			break;
 	}
 	return 0;
 }
