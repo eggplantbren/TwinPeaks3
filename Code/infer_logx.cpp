@@ -103,11 +103,7 @@ class Assignment
 		{
 			int total = 0;
 			for(int i=0; i<data.N; i++)
-			{
 				total += update(i);
-				cout<<"."<<flush;
-			}
-			cout<<endl;
 			return total;
 		}
 
