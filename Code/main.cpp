@@ -15,6 +15,8 @@ int main()
 	RandomNumberGenerator::get_instance().set_seed(time(0));
 
 	Sampler<SimpleExample> sampler(10);
+	sampler.initialise();
+	sampler.explore();
 
 	return 0;
 }
