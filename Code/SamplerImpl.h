@@ -7,6 +7,7 @@ template<class Type>
 Sampler<Type>::Sampler(int num_particles)
 :num_particles(num_particles)
 ,particles(num_particles)
+,log_prior_mass(0.)
 {
 
 }
@@ -21,6 +22,10 @@ void Sampler<Type>::initialise()
 	}
 
 	thresholds.clear();
+
+	// Open output file
+	std::fstream fout("output.txt", std::ios::out);
+	fout.close();
 }
 
 template<class Type>
@@ -83,6 +88,25 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	std::cout<<"# New threshold = ";
 	for(size_t i=0; i<keep[which].size(); i++)
 		std::cout<<keep[which][i]<<' ';
+	std::cout<<std::endl;
+
+	// Write out dead points
+	double log_dead_mass = log(frac_below[which]) + log_prior_mass;
+	std::fstream fout("output.txt", std::ios::out|std::ios::app);
+	for(size_t i=0; i<keep.size(); i++)
+	{
+		if(int(i) != which && is_below(keep[i], keep[which]))
+		{
+			fout<<(log_dead_mass - log(keep.size()*frac_below[which]))<<' ';
+			for(size_t j=0; j<keep[i].size(); j++)
+				fout<<keep[i][j]<<' ';
+			fout<<std::endl;
+		}
+	}
+	fout.close();
+
+	log_prior_mass = DNest3::logdiffexp(log_prior_mass, log_dead_mass);
+	std::cout<<"# log(remaining prior mass) = "<<log_prior_mass<<std::endl;
 	std::cout<<std::endl;
 }
 

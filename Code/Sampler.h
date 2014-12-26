@@ -16,6 +16,7 @@ class Sampler
 		std::vector<Type> particles;
 
 		std::vector< std::vector<double> > thresholds;
+		double log_prior_mass;
 
 		bool is_below(const Type& particle, int threshold) const;
 		bool is_below(const std::vector<double>& s1,
