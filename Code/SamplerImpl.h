@@ -38,6 +38,56 @@ void Sampler<Type>::initialise()
 	fout.close();
 }
 
+// Exploration just to ensure everything's above all thresholds
+template<class Type>
+void Sampler<Type>::refresh()
+{
+	const int steps = 10000;
+
+	std::vector<int> bad(num_particles);
+	for(int i=0; i<num_particles; i++)
+		bad[i] = badness(particles[i]);
+
+	for(int i=0; i<steps; i++)
+	{
+		int which = DNest3::randInt(num_particles);
+		Type proposal = particles[which];
+		double logH = proposal.perturb();
+		int proposal_badness = badness(proposal);
+
+		if(proposal_badness <= bad[which] &&
+				DNest3::randomU() <= exp(logH))
+		{
+			particles[which] = proposal;
+			bad[which] = proposal_badness;
+		}
+	}
+
+	// Make sure they're not all bad
+	bool all_bad = true;
+	for(int i=0; i<num_particles; i++)
+		if(bad[i] == 0)
+			all_bad = false;
+
+	if(all_bad)
+		std::cerr<<"# WARNING: All particles are bad."<<std::endl;
+
+	// Resample any bad points by copying good ones
+	int copy;
+	for(int i=0; i<num_particles; i++)
+	{
+		if(bad[i] > 0)
+		{
+			do
+			{
+				copy = DNest3::randInt(num_particles);
+			}while(bad[copy] > 0);
+			particles[i] = particles[copy];
+		}
+	}
+}
+
+
 template<class Type>
 void Sampler<Type>::explore()
 {

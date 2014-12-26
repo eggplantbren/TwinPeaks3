@@ -33,6 +33,7 @@ class Sampler
 
 		void initialise();
 		void explore();
+		void refresh();
 
 		static bool greater(const std::vector<double>& s1,
 					const std::vector<double>& s2);

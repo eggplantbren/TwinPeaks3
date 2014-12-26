@@ -16,7 +16,9 @@ int main()
 
 	Sampler<SimpleExample> sampler(10);
 	sampler.initialise();
+
 	sampler.explore();
+	sampler.refresh();
 
 	return 0;
 }
