@@ -13,6 +13,16 @@ Sampler<Type>::Sampler(int num_particles)
 }
 
 template<class Type>
+int Sampler<Type>::badness(const Type& particle) const
+{
+	int count = 0;
+	for(size_t i=0; i<thresholds.size(); i++)
+		if(is_below(particle.get_scalars(), thresholds[i]))
+			count++;
+	return count;
+}
+
+template<class Type>
 void Sampler<Type>::initialise()
 {
 	for(size_t i=0; i<particles.size(); i++)
