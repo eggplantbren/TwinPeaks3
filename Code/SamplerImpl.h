@@ -87,6 +87,19 @@ void Sampler<Type>::refresh()
 	}
 }
 
+template<class Type>
+void Sampler<Type>::remove_redundant_thresholds()
+{
+	top:
+	for(size_t i=0; i<thresholds.size()-1; i++)
+	{
+		if(is_below(thresholds[i], thresholds.back()))
+		{
+			thresholds.erase(thresholds.begin() + i);
+			goto top;
+		}
+	}
+}
 
 template<class Type>
 void Sampler<Type>::explore()
@@ -172,5 +185,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	std::cout<<"# Peeling away "<<frac_below[which]<<" of the remaining prior mass."<<std::endl;
 	std::cout<<"# log(remaining prior mass) = "<<log_prior_mass<<std::endl;
 	std::cout<<std::endl;
+
+	remove_redundant_thresholds();
 }
 
