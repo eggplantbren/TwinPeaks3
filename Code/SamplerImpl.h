@@ -42,7 +42,7 @@ void Sampler<Type>::initialise()
 template<class Type>
 void Sampler<Type>::refresh()
 {
-	const int steps = 100000;
+	const int steps = 10000;
 
 	std::vector<int> bad(num_particles);
 	for(int i=0; i<num_particles; i++)
@@ -91,13 +91,14 @@ void Sampler<Type>::refresh()
 template<class Type>
 void Sampler<Type>::explore()
 {
-	const int steps = 100000;
+	const int steps = 50000;
 	const int skip = 10;
 	std::vector< std::vector<double> > keep(steps/skip);
 
 	for(int i=0; i<steps; i++)
 	{
 		int which = DNest3::randInt(num_particles);
+
 		Type proposal = particles[which];
 		double logH = proposal.perturb();
 		int proposal_badness = badness(proposal);
@@ -127,7 +128,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 						keep)
 {
 	int which = 0;		// Closest element to 1-exp(-1)
-	double diff = 1E300;	// Distance from 0.1
+	double diff = 1E300;	// Distance from 0.05
 
 	std::vector<double> frac_below(keep.size());
 	for(size_t i=0; i<keep.size(); i++)
@@ -139,16 +140,17 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 				frac_below[i] += is_below(keep[j], keep[i]);
 		}
 		frac_below[i] /= (keep.size() - 1);
-		if(fabs(frac_below[i] - 0.1) < diff)
+		if(fabs(frac_below[i] - 0.05) < diff)
 		{
 			which = i;
-			diff = fabs(frac_below[i] - 0.1);
+			diff = fabs(frac_below[i] - 0.05);
 		}
 	}
 
 	std::cout<<"# New threshold = ";
 	for(size_t i=0; i<keep[which].size(); i++)
 		std::cout<<keep[which][i]<<' ';
+	std::cout<<"."<<std::endl;
 	thresholds.push_back(keep[which]);
 
 	// Write out dead points

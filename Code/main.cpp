@@ -14,7 +14,7 @@ int main()
 	RandomNumberGenerator::initialise_instance();
 	RandomNumberGenerator::get_instance().set_seed(time(0));
 
-	Sampler<SimpleExample> sampler(10);
+	Sampler<SimpleExample> sampler(100);
 	sampler.initialise();
 
 	for(int i=0; i<1000; i++)
