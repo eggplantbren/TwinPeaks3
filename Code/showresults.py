@@ -35,6 +35,21 @@ print('H = {H} nats'.format(H=H))
 plot(exp(logWW))
 ylabel('Weight wrt canonical distribution')
 title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
-
 show()
+
+# Resample to uniform weight
+N = int(ess)
+posterior_sample = zeros((N, scalars.shape[1]))
+w = exp(logWW)/max(exp(logWW))
+for i in xrange(0, N):
+  while True:
+    which = randint(scalars.shape[0])
+    if rand() <= w[which]:
+      break
+    posterior_sample[i,:] = scalars[which,:]
+
+plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=1)
+savetxt("posterior_sample.txt", posterior_sample)
+show()
+
 
