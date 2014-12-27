@@ -46,7 +46,7 @@ for i in xrange(0, N):
     which = randint(scalars.shape[0])
     if rand() <= w[which]:
       break
-    posterior_sample[i,:] = scalars[which,:]
+  posterior_sample[i,:] = scalars[which,:]
 
 plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=1)
 savetxt("posterior_sample.txt", posterior_sample)
