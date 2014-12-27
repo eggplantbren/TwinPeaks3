@@ -169,6 +169,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	// Write out dead points
 	double log_dead_mass = log(frac_below[which]) + log_prior_mass;
 	std::fstream fout("output.txt", std::ios::out|std::ios::app);
+	fout<<std::setprecision(10);
 	for(size_t i=0; i<keep.size(); i++)
 	{
 		if(int(i) != which && is_below(keep[i], keep[which]))
