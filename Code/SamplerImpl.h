@@ -85,6 +85,7 @@ void Sampler<Type>::refresh()
 
 	// Resample any bad points by copying good ones
 	int copy;
+	need_refresh.clear();
 	for(int i=0; i<num_particles; i++)
 	{
 		if(bad[i] > 0)
@@ -94,8 +95,28 @@ void Sampler<Type>::refresh()
 				copy = DNest3::randInt(num_particles);
 			}while(bad[copy] > 0);
 			particles[i] = particles[copy];
+			bad[i] = bad[copy];
+			need_refresh.push_back(i);
 		}
 	}
+
+	// Evolve any copied particles
+	for(int i=0; i<steps; i++)
+	{
+		which = need_refresh[DNest3::randInt(need_refresh.size())];
+
+		proposal = particles[which];
+		logH = proposal.perturb();
+		proposal_badness = badness(proposal);
+
+		if(proposal_badness <= bad[which] &&
+				DNest3::randomU() <= exp(logH))
+		{
+			particles[which] = proposal;
+			bad[which] = proposal_badness;
+		}
+	}
+
 }
 
 template<class Type>
@@ -115,28 +136,10 @@ void Sampler<Type>::remove_redundant_thresholds()
 template<class Type>
 void Sampler<Type>::explore()
 {
-	const int steps = 10000;
-	const int skip = 10;
-	std::vector< std::vector<double> > keep(steps/skip);
+	std::vector< std::vector<double> > keep(num_particles);
 
-	int which;
-	Type proposal;
-	double logH;
-	int proposal_badness;
-	for(int i=0; i<steps; i++)
-	{
-		which = DNest3::randInt(num_particles);
-
-		proposal = particles[which];
-		logH = proposal.perturb();
-		proposal_badness = badness(proposal);
-
-		if(DNest3::randomU() <= exp(logH) && proposal_badness == 0)
-			particles[which] = proposal;
-
-		if(i%skip == 0)
-			keep[i/skip] = particles[which].get_scalars();
-	}
+	for(int i=0; i<num_particles; i++)
+		keep[i] = particles[i].get_scalars();
 
 	create_threshold(keep);
 }
