@@ -6,8 +6,9 @@ from postprocess import logsumexp
 T1, T2 = 0.1, 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
-scalars = loadtxt('scalars.txt')
-logw = loadtxt('logw.txt')
+output = loadtxt('output.txt')
+scalars = output[:,1:]
+logw = output[:,0]
 smallest = min([scalars.shape[0], logw.size])
 scalars = scalars[0:smallest, :]
 logw = logw[0:smallest]

@@ -17,8 +17,11 @@ int main()
 	Sampler<SimpleExample> sampler(10);
 	sampler.initialise();
 
-	sampler.explore();
-	sampler.refresh();
+	for(int i=0; i<1000; i++)
+	{
+		sampler.explore();
+		sampler.refresh();
+	}
 
 	return 0;
 }

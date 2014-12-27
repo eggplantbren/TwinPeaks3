@@ -42,7 +42,7 @@ void Sampler<Type>::initialise()
 template<class Type>
 void Sampler<Type>::refresh()
 {
-	const int steps = 10000;
+	const int steps = 100000;
 
 	std::vector<int> bad(num_particles);
 	for(int i=0; i<num_particles; i++)
@@ -91,7 +91,7 @@ void Sampler<Type>::refresh()
 template<class Type>
 void Sampler<Type>::explore()
 {
-	const int steps = 10000;
+	const int steps = 100000;
 	const int skip = 10;
 	std::vector< std::vector<double> > keep(steps/skip);
 
@@ -100,8 +100,9 @@ void Sampler<Type>::explore()
 		int which = DNest3::randInt(num_particles);
 		Type proposal = particles[which];
 		double logH = proposal.perturb();
+		int proposal_badness = badness(proposal);
 
-		if(DNest3::randomU() <= exp(logH))
+		if(DNest3::randomU() <= exp(logH) && proposal_badness == 0)
 			particles[which] = proposal;
 
 		if(i%skip == 0)
@@ -126,7 +127,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 						keep)
 {
 	int which = 0;		// Closest element to 1-exp(-1)
-	double diff = 1E300;	// Distance from 1-exp(-1)
+	double diff = 1E300;	// Distance from 0.1
 
 	std::vector<double> frac_below(keep.size());
 	for(size_t i=0; i<keep.size(); i++)
@@ -138,17 +139,17 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 				frac_below[i] += is_below(keep[j], keep[i]);
 		}
 		frac_below[i] /= (keep.size() - 1);
-		if(fabs(frac_below[i] - (1. - exp(-1.))) < diff)
+		if(fabs(frac_below[i] - 0.1) < diff)
 		{
 			which = i;
-			diff = fabs(frac_below[i] - (1. - exp(-1.)));
+			diff = fabs(frac_below[i] - 0.1);
 		}
 	}
 
 	std::cout<<"# New threshold = ";
 	for(size_t i=0; i<keep[which].size(); i++)
 		std::cout<<keep[which][i]<<' ';
-	std::cout<<std::endl;
+	thresholds.push_back(keep[which]);
 
 	// Write out dead points
 	double log_dead_mass = log(frac_below[which]) + log_prior_mass;
@@ -166,6 +167,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	fout.close();
 
 	log_prior_mass = DNest3::logdiffexp(log_prior_mass, log_dead_mass);
+	std::cout<<"# Peeling away "<<frac_below[which]<<" of the remaining prior mass."<<std::endl;
 	std::cout<<"# log(remaining prior mass) = "<<log_prior_mass<<std::endl;
 	std::cout<<std::endl;
 }
