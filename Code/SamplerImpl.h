@@ -42,18 +42,33 @@ void Sampler<Type>::initialise()
 template<class Type>
 void Sampler<Type>::refresh()
 {
-	const int steps = 10000;
+	const int steps = 1000;
 
-	std::vector<int> bad(num_particles);
+	std::vector<int> bad(num_particles), flag(num_particles);
+	int count = 0;
 	for(int i=0; i<num_particles; i++)
+	{
 		bad[i] = badness(particles[i]);
+		flag[i] = bad[i];
+		if(flag[i] != 0)
+			count++;
+	}
+	if(count == 0)
+		return;
 
+	int which, proposal_badness;
+	Type proposal;
+	double logH;
 	for(int i=0; i<steps; i++)
 	{
-		int which = DNest3::randInt(num_particles);
-		Type proposal = particles[which];
-		double logH = proposal.perturb();
-		int proposal_badness = badness(proposal);
+		do
+		{
+			which = DNest3::randInt(num_particles);
+		}while(flag[which] == 0);
+
+		proposal = particles[which];
+		logH = proposal.perturb();
+		proposal_badness = badness(proposal);
 
 		if(proposal_badness <= bad[which] &&
 				DNest3::randomU() <= exp(logH))
@@ -104,7 +119,7 @@ void Sampler<Type>::remove_redundant_thresholds()
 template<class Type>
 void Sampler<Type>::explore()
 {
-	const int steps = 50000;
+	const int steps = 10000;
 	const int skip = 10;
 	std::vector< std::vector<double> > keep(steps/skip);
 
@@ -153,10 +168,10 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 				frac_below[i] += is_below(keep[j], keep[i]);
 		}
 		frac_below[i] /= (keep.size() - 1);
-		if(fabs(frac_below[i] - 0.05) < diff)
+		if(fabs(frac_below[i] - 0.01) < diff)
 		{
 			which = i;
-			diff = fabs(frac_below[i] - 0.05);
+			diff = fabs(frac_below[i] - 0.01);
 		}
 	}
 
