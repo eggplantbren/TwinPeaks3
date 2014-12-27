@@ -119,13 +119,17 @@ void Sampler<Type>::explore()
 	const int skip = 10;
 	std::vector< std::vector<double> > keep(steps/skip);
 
+	int which;
+	Type proposal;
+	double logH;
+	int proposal_badness;
 	for(int i=0; i<steps; i++)
 	{
-		int which = DNest3::randInt(num_particles);
+		which = DNest3::randInt(num_particles);
 
-		Type proposal = particles[which];
-		double logH = proposal.perturb();
-		int proposal_badness = badness(proposal);
+		proposal = particles[which];
+		logH = proposal.perturb();
+		proposal_badness = badness(proposal);
 
 		if(DNest3::randomU() <= exp(logH) && proposal_badness == 0)
 			particles[which] = proposal;
