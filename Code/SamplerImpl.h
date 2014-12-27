@@ -44,16 +44,15 @@ void Sampler<Type>::refresh()
 {
 	const int steps = 1000;
 
-	std::vector<int> bad(num_particles), flag(num_particles);
-	int count = 0;
+	std::vector<int> bad(num_particles);
+	std::vector<int> need_refresh;
 	for(int i=0; i<num_particles; i++)
 	{
 		bad[i] = badness(particles[i]);
-		flag[i] = bad[i];
-		if(flag[i] != 0)
-			count++;
+		if(bad[i] != 0)
+			need_refresh.push_back(i);
 	}
-	if(count == 0)
+	if(need_refresh.size() == 0)
 		return;
 
 	int which, proposal_badness;
@@ -61,10 +60,7 @@ void Sampler<Type>::refresh()
 	double logH;
 	for(int i=0; i<steps; i++)
 	{
-		do
-		{
-			which = DNest3::randInt(num_particles);
-		}while(flag[which] == 0);
+		which = need_refresh[DNest3::randInt(need_refresh.size())];
 
 		proposal = particles[which];
 		logH = proposal.perturb();
