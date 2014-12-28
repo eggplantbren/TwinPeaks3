@@ -14,10 +14,10 @@ int main()
 	RandomNumberGenerator::initialise_instance();
 	RandomNumberGenerator::get_instance().set_seed(time(0));
 
-	Sampler<SimpleExample> sampler(1000);
+	Sampler<SimpleExample> sampler(1000, 1000, 0.01);
 	sampler.initialise();
 
-	for(int i=0; i<10000; i++)
+	for(int i=0; i<1000000; i++)
 	{
 		sampler.explore();
 		sampler.refresh();

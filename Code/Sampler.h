@@ -12,7 +12,9 @@ template<class Type>
 class Sampler
 {
 	private:
-		int num_particles;
+		const int num_particles, steps;
+		const double peel_factor;
+
 		std::vector<Type> particles;
 
 		std::vector< std::vector<double> > thresholds;
@@ -29,7 +31,7 @@ class Sampler
 		void remove_redundant_thresholds();
 
 	public:
-		Sampler(int num_particles);
+		Sampler(int num_particles, int steps, double peel_factor);
 
 		void initialise();
 		void explore();

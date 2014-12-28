@@ -4,8 +4,10 @@
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles)
+Sampler<Type>::Sampler(int num_particles, int steps, double peel_factor)
 :num_particles(num_particles)
+,steps(steps)
+,peel_factor(peel_factor)
 ,particles(num_particles)
 ,log_prior_mass(0.)
 {
@@ -42,8 +44,6 @@ void Sampler<Type>::initialise()
 template<class Type>
 void Sampler<Type>::refresh()
 {
-	const int steps = 1000;
-
 	std::vector<int> bad(num_particles);
 	std::vector<int> need_refresh;
 	for(int i=0; i<num_particles; i++)
@@ -159,7 +159,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 						keep)
 {
 	int which = 0;		// Closest element to 1-exp(-1)
-	double diff = 1E300;	// Distance from 0.05
+	double diff = 1E300;	// Distance from peel_factor
 
 	std::vector<double> frac_below(keep.size());
 	for(size_t i=0; i<keep.size(); i++)
@@ -171,10 +171,10 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 				frac_below[i] += is_below(keep[j], keep[i]);
 		}
 		frac_below[i] /= (keep.size() - 1);
-		if(fabs(frac_below[i] - 0.01) < diff)
+		if(fabs(frac_below[i] - peel_factor) < diff)
 		{
 			which = i;
-			diff = fabs(frac_below[i] - 0.01);
+			diff = fabs(frac_below[i] - peel_factor);
 		}
 	}
 
