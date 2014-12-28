@@ -26,10 +26,11 @@ def canonical_properties(temperature1, temperature2):
 
   # Posterior weights, normalised
   logWW = logW - logZ
-  ess = exp(-sum(exp(logWW)*logWW))
+  WW = exp(logWW)
+  ess = exp(-sum(WW*logWW))
 
   # Information
-  H = sum(exp(logWW)*(logWW - logw))
+  H = sum(WW*(logWW - logw))
   return [logZ, H, logWW, ess]
 
 [logZ, H, logWW, ess] = canonical_properties(T1, T2)
@@ -58,24 +59,29 @@ savetxt("posterior_sample.txt", posterior_sample)
 show()
 
 # Get partition function and entropy
-N = 31
-T1 = 10.**linspace(-1., 5., N)
+N = 51
+T1 = 10.**linspace(-2., 5., N)
 T2 = T1.copy()
 [T1, T2] = meshgrid(T1, T2)
 T2 = T2[::-1, :]
 
 logZ = zeros((N, N))
 H = zeros((N, N))
+depth = output[:,0].max() - output[:,0].min()
 
 for i in xrange(0, N):
   for j in xrange(0, N):
     [logZ[i,j], H[i,j], temp1, temp2] = canonical_properties(T1[i, j], T2[i, j])
+    # Blank out 'unreliable' results
+    if H[i, j] > 0.5*depth:
+      H[i, j] = NaN
+      logZ[i, j] = NaN
   print(i+1)
 
 subplot(1, 2, 1)
-imshow(logZ, interpolation='nearest')
+imshow(logZ, extent=(-2., 5., -2., 5.), interpolation='nearest')
 
 subplot(1, 2, 2)
-imshow(H, interpolation='nearest')
+imshow(H, extent=(-2., 5., -2., 5.), interpolation='nearest')
 show()
 
