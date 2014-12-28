@@ -16,18 +16,23 @@ logw = logw[0:smallest]
 # Prior weights, normalised
 logw = logw - logsumexp(logw)
 
-# Posterior weights, unnormalised
-logW = logw + scalars[:,0]/T1 + scalars[:,1]/T2
+# Evaluate normalising constant at any temperature
+def logZ(temperature1, temperature2):
+  # Posterior weights, unnormalised
+  logW = logw + scalars[:,0]/temperature1 + scalars[:,1]/temperature2
 
-# Normaliser
-logZ = logsumexp(logW)
+  # Normaliser
+  logZ = logsumexp(logW)
 
-# Posterior weights, normalised
-logWW = logW - logZ
-ess = exp(-sum(exp(logWW)*logWW))
+  # Posterior weights, normalised
+  logWW = logW - logZ
+  ess = exp(-sum(exp(logWW)*logWW))
 
-# Information
-H = sum(exp(logWW)*(logWW - logw))
+  # Information
+  H = sum(exp(logWW)*(logWW - logw))
+  return [logZ, H, logWW, ess]
+
+[logZ, H, logWW, ess] = logZ(T1, T2)
 
 print('log(Z) = {logZ}'.format(logZ=logZ))
 print('H = {H} nats'.format(H=H))
