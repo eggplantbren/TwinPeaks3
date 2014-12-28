@@ -2,7 +2,7 @@
 #define _Model_
 
 #include <vector>
-
+#include <ostream>
 /*
 * Abstract class defining what is needed to implement a model.
 * This will be like DNest. An object of a subclass represents a

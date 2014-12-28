@@ -4,10 +4,13 @@
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles, int steps, double peel_factor)
+Sampler<Type>::Sampler(int num_particles, int steps, double peel_factor,
+				int thin)
 :num_particles(num_particles)
 ,steps(steps)
+,thin(thin)
 ,peel_factor(peel_factor)
+,iterations(0)
 ,particles(num_particles)
 ,log_prior_mass(0.)
 {
@@ -35,8 +38,10 @@ void Sampler<Type>::initialise()
 
 	thresholds.clear();
 
-	// Open output file
+	// Open output files
 	std::fstream fout("output.txt", std::ios::out);
+	fout.close();
+	fout.open("sample.txt", std::ios::out);
 	fout.close();
 }
 
@@ -193,6 +198,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	double log_dead_mass = log(frac_below[which]) + log_prior_mass;
 	std::fstream fout("output.txt", std::ios::out|std::ios::app);
 	fout<<std::setprecision(10);
+	std::vector<int> dead;
 	for(size_t i=0; i<keep.size(); i++)
 	{
 		if(int(i) != which && is_below(keep[i], keep[which]))
@@ -201,6 +207,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 			for(size_t j=0; j<keep[i].size(); j++)
 				fout<<keep[i][j]<<' ';
 			fout<<std::endl;
+			dead.push_back(i);
 		}
 	}
 	fout.close();
@@ -208,6 +215,23 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	log_prior_mass = DNest3::logdiffexp(log_prior_mass, log_dead_mass);
 	std::cout<<"# Peeling away "<<frac_below[which]<<" of the remaining prior mass."<<std::endl;
 	std::cout<<"# log(remaining prior mass) = "<<log_prior_mass<<std::endl;
+
+	iterations++;
+	// Search for a bad particle to write to file, along with an importance
+	// weight
+	if(iterations%thin == 0)
+	{
+		fout.open("sample.txt", std::ios::out|std::ios::app);
+		if(dead.size() == 0)
+			std::cerr<<"# WARNING: Couldn't find a dead particle to write to disk."<<std::endl;
+		else
+		{
+			int which = DNest3::randInt(dead.size());
+			fout<<log_dead_mass<<' ';
+			fout<<particles[dead[which]]<<std::endl;
+		}
+		fout.close();
+	}
 
 	remove_redundant_thresholds();
 }
