@@ -60,15 +60,16 @@ void Sampler<Type>::refresh()
 		if(bad[i] != 0)
 			need_refresh.push_back(i);
 	}
-	if(need_refresh.size() == 0)
-		return;
 
 	int which, proposal_badness;
 	Type proposal;
 	double logH;
 	for(int i=0; i<steps; i++)
 	{
-		which = need_refresh[DNest3::randInt(need_refresh.size())];
+		if(need_refresh.size() == 0)
+			which = DNest3::randInt(num_particles);
+		else
+			which = need_refresh[DNest3::randInt(need_refresh.size())];
 
 		proposal = particles[which];
 		logH = proposal.perturb();
@@ -112,7 +113,10 @@ void Sampler<Type>::refresh()
 	// Evolve any copied particles
 	for(int i=0; i<steps; i++)
 	{
-		which = need_refresh[DNest3::randInt(need_refresh.size())];
+		if(need_refresh.size() == 0)
+			which = DNest3::randInt(num_particles);
+		else
+			which = need_refresh[DNest3::randInt(need_refresh.size())];
 
 		proposal = particles[which];
 		logH = proposal.perturb();
