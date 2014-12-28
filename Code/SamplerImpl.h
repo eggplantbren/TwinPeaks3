@@ -95,7 +95,7 @@ void Sampler<Type>::refresh()
 
 	// Resample any bad points by copying good ones
 	int copy;
-	need_refresh.clear();
+	std::vector<int> need_refresh2;
 	for(int i=0; i<num_particles; i++)
 	{
 		if(bad[i] > 0)
@@ -106,17 +106,19 @@ void Sampler<Type>::refresh()
 			}while(bad[copy] > 0);
 			particles[i] = particles[copy];
 			bad[i] = bad[copy];
-			need_refresh.push_back(i);
+			need_refresh2.push_back(i);
 		}
 	}
 
 	// Evolve any copied particles
 	for(int i=0; i<steps; i++)
 	{
-		if(need_refresh.size() == 0)
-			which = DNest3::randInt(num_particles);
-		else
+		if(need_refresh2.size() != 0)
+			which = need_refresh2[DNest3::randInt(need_refresh2.size())];
+		else if(need_refresh.size() != 0)
 			which = need_refresh[DNest3::randInt(need_refresh.size())];
+		else
+			which = DNest3::randInt(num_particles);
 
 		proposal = particles[which];
 		logH = proposal.perturb();
