@@ -44,6 +44,9 @@ void Sampler<Type>::initialise()
 template<class Type>
 void Sampler<Type>::refresh()
 {
+	std::cout<<"# Evolving particles..."<<std::flush;
+	int accepts = 0;
+
 	std::vector<int> bad(num_particles);
 	std::vector<int> need_refresh;
 	for(int i=0; i<num_particles; i++)
@@ -71,6 +74,7 @@ void Sampler<Type>::refresh()
 		{
 			particles[which] = proposal;
 			bad[which] = proposal_badness;
+			accepts++;
 		}
 	}
 
@@ -115,8 +119,9 @@ void Sampler<Type>::refresh()
 			particles[which] = proposal;
 			bad[which] = proposal_badness;
 		}
+		accepts++;
 	}
-
+	std::cout<<"done. Acceptance rate = "<<accepts<<"/"<<(2*steps)<<"."<<std::endl<<std::endl;
 }
 
 template<class Type>
@@ -181,7 +186,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	std::cout<<"# New threshold = ";
 	for(size_t i=0; i<keep[which].size(); i++)
 		std::cout<<keep[which][i]<<' ';
-	std::cout<<"."<<std::endl;
+	std::cout<<std::endl;
 	thresholds.push_back(keep[which]);
 
 	// Write out dead points
@@ -203,7 +208,6 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	log_prior_mass = DNest3::logdiffexp(log_prior_mass, log_dead_mass);
 	std::cout<<"# Peeling away "<<frac_below[which]<<" of the remaining prior mass."<<std::endl;
 	std::cout<<"# log(remaining prior mass) = "<<log_prior_mass<<std::endl;
-	std::cout<<std::endl;
 
 	remove_redundant_thresholds();
 }
