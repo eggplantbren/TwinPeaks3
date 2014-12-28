@@ -80,7 +80,7 @@ for i in xrange(0, N):
   for j in xrange(0, N):
     [logZ[i,j], H[i,j], temp1, temp2, exp1[i, j], exp2[i, j]] = canonical_properties(T1[i, j], T2[i, j])
     # Blank out 'unreliable' results
-    if H[i, j] > 0.5*depth:
+    if H[i, j] > depth/1.5:
       H[i, j] = NaN
       logZ[i, j] = NaN
       exp1[i, j] = NaN
@@ -88,19 +88,19 @@ for i in xrange(0, N):
   print(i+1)
 
 subplot(2, 2, 1)
-imshow(logZ, extent=(-2., 5., -2., 5.), interpolation='nearest')
+imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest')
 title('log(Z)')
 
 subplot(2, 2, 2)
-imshow(H, extent=(-2., 5., -2., 5.), interpolation='nearest')
+imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest')
 title('H')
 
 subplot(2, 2, 3)
-imshow(exp1, extent=(-2., 5., -2., 5.), interpolation='nearest')
+imshow(exp1, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest')
 title('<S1>')
 
 subplot(2, 2, 4)
-imshow(exp2, extent=(-2., 5., -2., 5.), interpolation='nearest')
+imshow(exp2, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest')
 title('<S2>')
 
 show()
