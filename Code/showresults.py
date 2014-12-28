@@ -31,9 +31,14 @@ def canonical_properties(temperature1, temperature2):
 
   # Information
   H = sum(WW*(logWW - logw))
-  return [logZ, H, logWW, ess]
 
-[logZ, H, logWW, ess] = canonical_properties(T1, T2)
+  # Expected values of scalars
+  exp1 = sum(WW*scalars[:,0])
+  exp2 = sum(WW*scalars[:,1])
+
+  return [logZ, H, logWW, ess, exp1, exp2]
+
+[logZ, H, logWW, ess, exp1, exp2] = canonical_properties(T1, T2)
 
 print('log(Z) = {logZ}'.format(logZ=logZ))
 print('H = {H} nats'.format(H=H))
@@ -67,21 +72,36 @@ T2 = T2[::-1, :]
 
 logZ = zeros((N, N))
 H = zeros((N, N))
+exp1 = zeros((N, N))
+exp2 = zeros((N, N))
 depth = output[:,0].max() - output[:,0].min()
 
 for i in xrange(0, N):
   for j in xrange(0, N):
-    [logZ[i,j], H[i,j], temp1, temp2] = canonical_properties(T1[i, j], T2[i, j])
+    [logZ[i,j], H[i,j], temp1, temp2, exp1[i, j], exp2[i, j]] = canonical_properties(T1[i, j], T2[i, j])
     # Blank out 'unreliable' results
     if H[i, j] > 0.5*depth:
       H[i, j] = NaN
       logZ[i, j] = NaN
+      exp1[i, j] = NaN
+      exp2[i, j] = NaN
   print(i+1)
 
-subplot(1, 2, 1)
+subplot(2, 2, 1)
 imshow(logZ, extent=(-2., 5., -2., 5.), interpolation='nearest')
+title('log(Z)')
 
-subplot(1, 2, 2)
+subplot(2, 2, 2)
 imshow(H, extent=(-2., 5., -2., 5.), interpolation='nearest')
+title('H')
+
+subplot(2, 2, 3)
+imshow(exp1, extent=(-2., 5., -2., 5.), interpolation='nearest')
+title('<S1>')
+
+subplot(2, 2, 4)
+imshow(exp2, extent=(-2., 5., -2., 5.), interpolation='nearest')
+title('<S2>')
+
 show()
 
