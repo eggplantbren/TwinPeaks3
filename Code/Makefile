@@ -1,6 +1,6 @@
 CFLAGS = -m64 -Ofast -flto -march=native -funroll-loops -Wall -Wextra -ansi -pedantic -DNDEBUG
 LIBS =  -ldnest3 -lgsl -lgslcblas -lboost_system -lboost_thread
-OBJECTS = Gravity.o Model.o Potts.o SimpleExample.o
+OBJECTS = Gravity.o Model.o Potts.o SimpleExample.o Atoms.o
 
 default:
 	g++ $(CFLAGS) -c *.cpp Models/*.cpp
