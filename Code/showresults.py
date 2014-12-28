@@ -17,7 +17,7 @@ logw = logw[0:smallest]
 logw = logw - logsumexp(logw)
 
 # Evaluate normalising constant at any temperature
-def logZ(temperature1, temperature2):
+def canonical_properties(temperature1, temperature2):
   # Posterior weights, unnormalised
   logW = logw + scalars[:,0]/temperature1 + scalars[:,1]/temperature2
 
@@ -32,7 +32,7 @@ def logZ(temperature1, temperature2):
   H = sum(exp(logWW)*(logWW - logw))
   return [logZ, H, logWW, ess]
 
-[logZ, H, logWW, ess] = logZ(T1, T2)
+[logZ, H, logWW, ess] = canonical_properties(T1, T2)
 
 print('log(Z) = {logZ}'.format(logZ=logZ))
 print('H = {H} nats'.format(H=H))
@@ -57,4 +57,25 @@ plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=1)
 savetxt("posterior_sample.txt", posterior_sample)
 show()
 
+# Get partition function and entropy
+N = 31
+T1 = 10.**linspace(-1., 5., N)
+T2 = T1.copy()
+[T1, T2] = meshgrid(T1, T2)
+T2 = T2[::-1, :]
+
+logZ = zeros((N, N))
+H = zeros((N, N))
+
+for i in xrange(0, N):
+  for j in xrange(0, N):
+    [logZ[i,j], H[i,j], temp1, temp2] = canonical_properties(T1[i, j], T2[i, j])
+  print(i+1)
+
+subplot(1, 2, 1)
+imshow(logZ, interpolation='nearest')
+
+subplot(1, 2, 2)
+imshow(H, interpolation='nearest')
+show()
 
