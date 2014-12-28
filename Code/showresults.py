@@ -88,19 +88,19 @@ for i in xrange(0, N):
   print(i+1)
 
 subplot(2, 2, 1)
-imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T1.min()), log10(T1.max())), interpolation='nearest')
+imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
 title('log(Z)')
 
 subplot(2, 2, 2)
-imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T1.min()), log10(T1.max())), interpolation='nearest')
+imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
 title('H')
 
 subplot(2, 2, 3)
-imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T1.min()), log10(T1.max())), interpolation='nearest')
+imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
 title('<S1>')
 
 subplot(2, 2, 4)
-imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T1.min()), log10(T1.max())), interpolation='nearest')
+imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
 title('<S2>')
 
 show()
