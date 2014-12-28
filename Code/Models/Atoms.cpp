@@ -7,7 +7,7 @@ using namespace std;
 using namespace DNest3;
 
 Atoms::Atoms()
-:Model(2), x(1000), y(1000)
+:Model(2), x(200), y(200)
 {
 
 }

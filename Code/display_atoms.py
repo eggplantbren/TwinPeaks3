@@ -7,9 +7,10 @@ ion()
 hold(False)
 for i in xrange(0, output.shape[0]):
 	model = output[i, 1:]
-	x, y = model[0:1000], model[1000:2000]
+	x, y = model[0:200], model[200:400]
 	plot(x, y, 'k.')
 	axis('scaled')
+	axis([0, 1, 0, 1])
 	title(i+1)
 	draw()
 
