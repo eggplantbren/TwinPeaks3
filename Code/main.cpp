@@ -17,7 +17,7 @@ int main()
 	Sampler<SimpleExample> sampler(1000, 1000, 0.01, 100);
 	sampler.initialise();
 
-	for(int i=0; i<1000000; i++)
+	while(true)
 	{
 		sampler.explore();
 		sampler.refresh();
