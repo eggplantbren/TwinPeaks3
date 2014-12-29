@@ -34,7 +34,7 @@ void Atoms::compute_scalars()
 	scalars[0] = -PE;
 	scalars[1] = 0.;
 	for(size_t i=0; i<x.size(); i++)
-		scalars[1] += -y[i];
+		scalars[1] += -0.5*pow(x[i] - 0.5, 2) - 0.5*pow(y[i] - 0.5, 2);
 //	scalars[1] /= x.size();
 }
 
