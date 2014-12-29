@@ -12,7 +12,7 @@ template<class Type>
 class Sampler
 {
 	private:
-		const int num_particles, steps, thin;
+		const int num_threads, num_particles, steps, thin;
 		const double peel_factor;
 
 		int iterations;
@@ -37,7 +37,7 @@ class Sampler
 		void remove_redundant_thresholds();
 
 	public:
-		Sampler(int num_particles, int steps, double peel_factor,
+		Sampler(int num_threads, int num_particles, int steps, double peel_factor,
 				int thin);
 
 		void initialise();

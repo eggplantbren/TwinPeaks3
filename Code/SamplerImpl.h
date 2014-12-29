@@ -4,9 +4,9 @@
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles, int steps, double peel_factor,
-				int thin)
-:num_particles(num_particles)
+Sampler<Type>::Sampler(int num_threads, int num_particles, int steps, 					double peel_factor, int thin)
+:num_threads(num_threads)
+,num_particles(num_particles)
 ,steps(steps)
 ,thin(thin)
 ,peel_factor(peel_factor)
