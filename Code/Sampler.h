@@ -19,16 +19,21 @@ class Sampler
 		std::vector<Type> particles;
 
 		std::vector< std::vector<double> > thresholds;
+		std::vector< std::vector<double> > thresholds_tiebreakers;
 		double log_prior_mass;
 
 		// How many of the thresholds is the particle below?
 		int badness(const Type& particle) const;
 		// Is s1 below s2?
 		bool is_below(const std::vector<double>& s1,
-				const std::vector<double>& s2) const;
+				const std::vector<double>& s2,
+				const std::vector<double>& tb1,
+				const std::vector<double>& tb2) const;
 
 		void create_threshold(const std::vector< std::vector<double> >&
-						keep);
+						keep,
+					const std::vector< std::vector<double> >&
+						tiebreakers);
 		void remove_redundant_thresholds();
 
 	public:
@@ -38,9 +43,6 @@ class Sampler
 		void initialise();
 		void explore();
 		void refresh();
-
-		static bool greater(const std::vector<double>& s1,
-					const std::vector<double>& s2);
 };
 
 #include "SamplerImpl.h"

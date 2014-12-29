@@ -22,7 +22,8 @@ int Sampler<Type>::badness(const Type& particle) const
 {
 	int count = 0;
 	for(size_t i=0; i<thresholds.size(); i++)
-		if(is_below(particle.get_scalars(), thresholds[i]))
+		if(is_below(particle.get_scalars(), thresholds[i],
+				particle.get_tiebreakers(), thresholds_tiebreakers[i]))
 			count++;
 	return count;
 }
@@ -37,6 +38,7 @@ void Sampler<Type>::initialise()
 	}
 
 	thresholds.clear();
+	thresholds_tiebreakers.clear();
 
 	// Open output files
 	std::fstream fout("output.txt", std::ios::out);
@@ -73,6 +75,7 @@ void Sampler<Type>::refresh()
 
 		proposal = particles[which];
 		logH = proposal.perturb();
+		proposal.perturb_tiebreakers();
 		proposal_badness = badness(proposal);
 
 		if(proposal_badness <= bad[which] &&
@@ -122,6 +125,7 @@ void Sampler<Type>::refresh()
 
 		proposal = particles[which];
 		logH = proposal.perturb();
+		proposal.perturb_tiebreakers();
 		proposal_badness = badness(proposal);
 
 		if(proposal_badness <= bad[which] &&
@@ -141,9 +145,10 @@ void Sampler<Type>::remove_redundant_thresholds()
 	top:
 	for(size_t i=0; i<thresholds.size()-1; i++)
 	{
-		if(is_below(thresholds[i], thresholds.back()))
+		if(is_below(thresholds[i], thresholds.back(), thresholds_tiebreakers[i], thresholds_tiebreakers.back()))
 		{
 			thresholds.erase(thresholds.begin() + i);
+			thresholds_tiebreakers.erase(thresholds_tiebreakers.begin() + i);
 			goto top;
 		}
 	}
@@ -153,26 +158,34 @@ template<class Type>
 void Sampler<Type>::explore()
 {
 	std::vector< std::vector<double> > keep(num_particles);
+	std::vector< std::vector<double> > keep_tiebreakers(num_particles);
 
 	for(int i=0; i<num_particles; i++)
+	{
 		keep[i] = particles[i].get_scalars();
+		keep_tiebreakers[i] = particles[i].get_tiebreakers();
+	}
 
-	create_threshold(keep);
+	create_threshold(keep, keep_tiebreakers);
 }
 
 template<class Type>
 bool Sampler<Type>::is_below(const std::vector<double>& s1,
-				const std::vector<double>& s2) const
+				const std::vector<double>& s2,
+				const std::vector<double>& tb1,
+				const std::vector<double>& tb2) const
 {
 	for(size_t i=0; i<s1.size(); i++)
-		if(s1[i] >= s2[i])
+		if(s1[i] >= s2[i] || (s1[i] == s2[i] && tb1[i] >= tb2[i]))
 			return false;
 	return true;
 }
 
 template<class Type>
 void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
-						keep)
+						keep,
+					const std::vector< std::vector<double> >&
+						keep_tiebreakers)
 {
 	int which = 0;		// Closest element to 1-exp(-1)
 	double diff = 1E300;	// Distance from peel_factor
@@ -184,7 +197,9 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 		for(size_t j=0; j<keep.size(); j++)
 		{
 			if(i != j)
-				frac_below[i] += is_below(keep[j], keep[i]);
+				frac_below[i] += is_below(keep[j], keep[i],
+							keep_tiebreakers[j],
+							keep_tiebreakers[i]);
 		}
 		frac_below[i] /= (keep.size() - 1);
 		if(fabs(frac_below[i] - peel_factor) < diff)
@@ -199,6 +214,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 		std::cout<<keep[which][i]<<' ';
 	std::cout<<std::endl;
 	thresholds.push_back(keep[which]);
+	thresholds_tiebreakers.push_back(keep_tiebreakers[which]);
 
 	// Write out dead points
 	double log_dead_mass = log(frac_below[which]) + log_prior_mass;
@@ -207,7 +223,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	std::vector<int> dead;
 	for(size_t i=0; i<keep.size(); i++)
 	{
-		if(int(i) != which && is_below(keep[i], keep[which]))
+		if(int(i) != which && is_below(keep[i], keep[which], keep_tiebreakers[i], keep_tiebreakers[which]))
 		{
 			fout<<(log_dead_mass - log(keep.size()*frac_below[which]))<<' ';
 			for(size_t j=0; j<keep[i].size(); j++)
