@@ -202,10 +202,10 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 							keep_tiebreakers[i]);
 		}
 		frac_below[i] /= (keep.size() - 1);
-		if(fabs(frac_below[i] - peel_factor) < diff)
+		if(fabs(log(frac_below[i]+1E-300) - log(peel_factor)) < diff)
 		{
 			which = i;
-			diff = fabs(frac_below[i] - peel_factor);
+			diff = fabs(log(frac_below[i]+1E-300) - log(peel_factor));
 		}
 	}
 
