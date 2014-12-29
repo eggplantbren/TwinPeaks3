@@ -105,3 +105,20 @@ title('<S2>')
 
 show()
 
+true_logZ = loadtxt('true_logZ.txt')
+true_H = loadtxt('true_H.txt')
+subplot(1,2,1)
+err1 = logZ - true_logZ
+good = logical_not(isnan(err1))
+imshow(err1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
+print(err1[good].min(), err1[good].max())
+
+subplot(1,2,2)
+err2 = (H - true_H)/true_H
+good = logical_not(isnan(err1))
+imshow(err2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
+print(err2[good].min(), err2[good].max())
+
+show()
+
+

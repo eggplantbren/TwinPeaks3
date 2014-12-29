@@ -20,15 +20,15 @@ def truth(T1, T2, do_plot=False):
 
 def grid():
   # Calculate log(Z) and H for some canonical distributions
-  T1 = exp(linspace(-1.204, 10., 101))
-  T2 = exp(linspace(-1.204, 10., 101))
+  T1 = 10.**(linspace(-2., 5., 51))
+  T2 = T1.copy()
   [T1, T2] = meshgrid(T1, T2)
   T2 = T2[::-1, :]
   logZ = T1.copy()
   H = T1.copy()
 
-  for i in xrange(0, 101):
-    for j in xrange(0, 101):
+  for i in xrange(0, 51):
+    for j in xrange(0, 51):
       [logZ[i, j], H[i, j]] = truth(T1[i, j], T2[i, j])
     print(i+1)
 
