@@ -4,17 +4,20 @@
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles, int steps, double peel_factor,
-				int thin)
-:num_particles(num_particles)
+Sampler<Type>::Sampler(int num_threads, int num_particles, int steps, 					double peel_factor, int thin)
+:num_threads(num_threads)
+,num_particles(num_particles)
 ,steps(steps)
 ,thin(thin)
 ,peel_factor(peel_factor)
+,rngs(num_threads)
 ,iterations(0)
 ,particles(num_particles)
 ,log_prior_mass(0.)
 {
-
+	// Initialise rngs
+	for(int i=0; i<num_threads; i++)
+		rngs[i] = gsl_rng_alloc(gsl_rng_mt19937);
 }
 
 template<class Type>
@@ -26,6 +29,13 @@ int Sampler<Type>::badness(const Type& particle) const
 				particle.get_tiebreakers(), thresholds_tiebreakers[i]))
 			count++;
 	return count;
+}
+
+template<class Type>
+Sampler<Type>::~Sampler()
+{
+	for(int i=0; i<num_threads; i++)
+		gsl_rng_free(rngs[i]);
 }
 
 template<class Type>
@@ -45,33 +55,26 @@ void Sampler<Type>::initialise()
 	fout.close();
 	fout.open("sample.txt", std::ios::out);
 	fout.close();
+
+	// Set rng seeds
+	for(int i=0; i<num_threads; i++)
+		gsl_rng_set(rngs[i], time(0) + 10*(i+1));
 }
 
-// Exploration just to ensure everything's above all thresholds
 template<class Type>
-void Sampler<Type>::refresh()
+void Sampler<Type>::runThread(int thread, const std::vector<int>& which_particles, std::vector<int>& bad, int& accepts)
 {
-	std::cout<<"# Evolving particles..."<<std::flush;
-	int accepts = 0;
-
-	std::vector<int> bad(num_particles);
-	std::vector<int> need_refresh;
-	for(int i=0; i<num_particles; i++)
-	{
-		bad[i] = badness(particles[i]);
-		if(bad[i] != 0)
-			need_refresh.push_back(i);
-	}
+	// Initialise thread-specific rng
+	DNest3::RandomNumberGenerator::initialise_instance();
+	DNest3::RandomNumberGenerator::get_instance().set_rng(rngs[thread]);
 
 	int which, proposal_badness;
 	Type proposal;
 	double logH;
+
 	for(int i=0; i<steps; i++)
 	{
-		if(need_refresh.size() == 0)
-			which = DNest3::randInt(num_particles);
-		else
-			which = need_refresh[DNest3::randInt(need_refresh.size())];
+		which = which_particles[DNest3::randInt(which_particles.size())];
 
 		proposal = particles[which];
 		logH = proposal.perturb();
@@ -86,6 +89,43 @@ void Sampler<Type>::refresh()
 			accepts++;
 		}
 	}
+
+	// Save thread-specific rng
+	gsl_rng_memcpy(rngs[thread], DNest3::RandomNumberGenerator::get_instance().get_rng());
+}
+
+// Exploration just to ensure everything's above all thresholds
+template<class Type>
+void Sampler<Type>::refresh()
+{
+	std::cout<<"# Evolving particles..."<<std::flush;
+
+	std::vector<int> bad(num_particles);
+	std::vector<int> need_refresh;
+	for(int i=0; i<num_particles; i++)
+	{
+		bad[i] = badness(particles[i]);
+		if(bad[i] != 0)
+			need_refresh.push_back(i);
+	}
+
+	// Divide up the work between the threads
+	std::vector< std::vector<int> > which_particles;
+	for(size_t i=0; i<need_refresh.size(); i++)
+	{
+		if(int(which_particles.size()) < num_threads)
+			which_particles.push_back(std::vector<int>());
+		which_particles[i%num_threads].push_back(need_refresh[i]);
+	}
+	std::vector<int> accepts(which_particles.size(), 0);
+
+	// Create the threads
+	boost::thread_group threads;
+	for(size_t i=0; i<which_particles.size(); i++)
+	{
+		threads.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, boost::ref(which_particles[i]), boost::ref(bad), boost::ref(accepts[i])));
+	}
+	threads.join_all();
 
 	// Make sure they're not all bad
 	bool all_bad = true;
@@ -98,7 +138,6 @@ void Sampler<Type>::refresh()
 
 	// Resample any bad points by copying good ones
 	int copy;
-	std::vector<int> need_refresh2;
 	for(int i=0; i<num_particles; i++)
 	{
 		if(bad[i] > 0)
@@ -109,34 +148,21 @@ void Sampler<Type>::refresh()
 			}while(bad[copy] > 0);
 			particles[i] = particles[copy];
 			bad[i] = bad[copy];
-			need_refresh2.push_back(i);
 		}
 	}
 
-	// Evolve any copied particles
-	for(int i=0; i<steps; i++)
+	// Create the threads
+	boost::thread_group threads2;
+	for(size_t i=0; i<which_particles.size(); i++)
 	{
-		if(need_refresh2.size() != 0)
-			which = need_refresh2[DNest3::randInt(need_refresh2.size())];
-		else if(need_refresh.size() != 0)
-			which = need_refresh[DNest3::randInt(need_refresh.size())];
-		else
-			which = DNest3::randInt(num_particles);
-
-		proposal = particles[which];
-		logH = proposal.perturb();
-		proposal.perturb_tiebreakers();
-		proposal_badness = badness(proposal);
-
-		if(proposal_badness <= bad[which] &&
-				DNest3::randomU() <= exp(logH))
-		{
-			particles[which] = proposal;
-			bad[which] = proposal_badness;
-			accepts++;
-		}
+		threads2.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, boost::ref(which_particles[i]), boost::ref(bad), boost::ref(accepts[i])));
 	}
-	std::cout<<"done. Acceptance rate = "<<accepts<<"/"<<(2*steps)<<"."<<std::endl<<std::endl;
+	threads2.join_all();
+
+	int total_accepts = 0;
+	for(size_t i=0; i<accepts.size(); i++)
+		total_accepts += accepts[i];
+	std::cout<<"done. Acceptance rate = "<<total_accepts<<"/"<<(2*steps*accepts.size())<<"."<<std::endl<<std::endl;
 }
 
 template<class Type>
