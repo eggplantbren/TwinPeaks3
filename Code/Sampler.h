@@ -15,6 +15,9 @@ class Sampler
 		const int num_threads, num_particles, steps, thin;
 		const double peel_factor;
 
+		// Thread-specific rngs
+		std::vector<gsl_rng*> rngs;
+
 		int iterations;
 		std::vector<Type> particles;
 
@@ -39,6 +42,7 @@ class Sampler
 	public:
 		Sampler(int num_threads, int num_particles, int steps, double peel_factor,
 				int thin);
+		~Sampler();
 
 		void initialise();
 		void explore();

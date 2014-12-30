@@ -10,11 +10,14 @@ Sampler<Type>::Sampler(int num_threads, int num_particles, int steps, 					doubl
 ,steps(steps)
 ,thin(thin)
 ,peel_factor(peel_factor)
+,rngs(num_threads)
 ,iterations(0)
 ,particles(num_particles)
 ,log_prior_mass(0.)
 {
-
+	// Initialise rngs
+	for(int i=0; i<num_threads; i++)
+		rngs[i] = gsl_rng_alloc(gsl_rng_mt19937);
 }
 
 template<class Type>
@@ -26,6 +29,13 @@ int Sampler<Type>::badness(const Type& particle) const
 				particle.get_tiebreakers(), thresholds_tiebreakers[i]))
 			count++;
 	return count;
+}
+
+template<class Type>
+Sampler<Type>::~Sampler()
+{
+	for(int i=0; i<num_threads; i++)
+		gsl_rng_free(rngs[i]);
 }
 
 template<class Type>
@@ -45,7 +55,12 @@ void Sampler<Type>::initialise()
 	fout.close();
 	fout.open("sample.txt", std::ios::out);
 	fout.close();
+
+	// Set rng seeds
+	for(int i=0; i<num_threads; i++)
+		gsl_rng_set(rngs[i], time(0) + 10*(i+1));
 }
+
 
 // Exploration just to ensure everything's above all thresholds
 template<class Type>
