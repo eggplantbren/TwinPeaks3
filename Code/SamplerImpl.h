@@ -78,6 +78,13 @@ void Sampler<Type>::refresh()
 			need_refresh.push_back(i);
 	}
 
+	// Divide up the work between the threads
+	std::vector< std::vector<int> > which_particles(num_threads);
+	for(size_t i=0; i<need_refresh.size(); i++)
+		which_particles[i%num_threads].push_back(need_refresh[i]);
+
+	// 
+
 	int which, proposal_badness;
 	Type proposal;
 	double logH;
