@@ -110,9 +110,13 @@ void Sampler<Type>::refresh()
 	}
 
 	// Divide up the work between the threads
-	std::vector< std::vector<int> > which_particles(num_threads);
+	std::vector< std::vector<int> > which_particles;
 	for(size_t i=0; i<need_refresh.size(); i++)
+	{
+		if(int(which_particles.size()) < num_threads)
+			which_particles.push_back(std::vector<int>());
 		which_particles[i%num_threads].push_back(need_refresh[i]);
+	}
 	std::vector<int> accepts(which_particles.size(), 0);
 
 	// Create the threads
