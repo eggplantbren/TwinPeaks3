@@ -119,7 +119,7 @@ void Sampler<Type>::refresh()
 	boost::thread_group threads;
 	for(size_t i=0; i<which_particles.size(); i++)
 	{
-		threads.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, which_particles[i], bad, accepts[i]));
+		threads.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, boost::ref(which_particles[i]), boost::ref(bad), boost::ref(accepts[i])));
 	}
 	threads.join_all();
 
@@ -151,7 +151,7 @@ void Sampler<Type>::refresh()
 	boost::thread_group threads2;
 	for(size_t i=0; i<which_particles.size(); i++)
 	{
-		threads2.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, which_particles[i], bad, accepts[i]));
+		threads2.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, boost::ref(which_particles[i]), boost::ref(bad), boost::ref(accepts[i])));
 	}
 	threads2.join_all();
 
