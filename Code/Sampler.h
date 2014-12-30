@@ -6,6 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <boost/thread.hpp>
 #include "Utils.h"
 
 template<class Type>
@@ -38,6 +39,8 @@ class Sampler
 					const std::vector< std::vector<double> >&
 						tiebreakers);
 		void remove_redundant_thresholds();
+		void runThread(int thread, const std::vector<int>& which_particles,
+				std::vector<int>& bad, int& accepts);
 
 	public:
 		Sampler(int num_threads, int num_particles, int steps, double peel_factor,
