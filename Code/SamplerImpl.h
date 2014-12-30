@@ -133,8 +133,8 @@ void Sampler<Type>::refresh()
 		{
 			particles[which] = proposal;
 			bad[which] = proposal_badness;
+			accepts++;
 		}
-		accepts++;
 	}
 	std::cout<<"done. Acceptance rate = "<<accepts<<"/"<<(2*steps)<<"."<<std::endl<<std::endl;
 }
