@@ -10,6 +10,8 @@ class Atoms:public Model
 		// Positions
 		std::vector<double> x, y;
 
+		std::vector< std::vector<double> > terms;
+
 		// Energy
 		long double PE;
 
@@ -17,7 +19,7 @@ class Atoms:public Model
 		void calculate_PE();
 
 		// Just a single pair
-		double calculate_PE(int i, int j);
+		void calculate_PE(int i, int j);
 		void compute_scalars();
 
 	public:
