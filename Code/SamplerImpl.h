@@ -202,7 +202,7 @@ bool Sampler<Type>::is_below(const std::vector<double>& s1,
 				const std::vector<double>& tb2) const
 {
 	for(size_t i=0; i<s1.size(); i++)
-		if(s1[i] >= s2[i] || (s1[i] == s2[i] && tb1[i] >= tb2[i]))
+		if(s1[i] > s2[i] || (s1[i] == s2[i] && tb1[i] > tb2[i]))
 			return false;
 	return true;
 }
