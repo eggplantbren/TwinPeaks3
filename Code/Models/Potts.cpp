@@ -71,6 +71,9 @@ double Potts::perturb()
 	// Which cell is being perturbed
 	int i, j;
 
+	// Value of proposal
+	int proposal;
+
 	// Coordinates of neighbouring cells
 	vector<int> ii(4); vector<int> jj(4);
 	for(int z=0; z<reps; z++)
@@ -100,7 +103,11 @@ double Potts::perturb()
 			}
 		}
 		// Perturb the cell
-		x[i][j] = randInt(num_colors);
+		do
+		{
+			proposal = randInt(num_colors);
+		}while(proposal == x[i][j]);
+		x[i][j] = proposal;
 
 		// Calculate positive part of delta score
 		for(int k=0; k<4; k++)
