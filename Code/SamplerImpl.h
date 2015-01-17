@@ -236,6 +236,13 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 			diff = fabs(log(frac_below[i]+1E-300) - log(peel_factor));
 		}
 	}
+	// All candidates to become the next rectangle
+	// Choose uniformly from them
+	std::vector<int> indices;
+	for(size_t i=0; i<keep.size(); i++)
+		if(fabs(log(frac_below[i]+1E-300) - log(peel_factor)) == diff)
+			indices.push_back(i);
+	which = indices[DNest3::randInt(indices.size())];
 
 	std::cout<<"# New threshold = ";
 	for(size_t i=0; i<keep[which].size(); i++)
