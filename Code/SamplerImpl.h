@@ -18,6 +18,7 @@ Sampler<Type>::Sampler(int num_threads, int num_particles, int steps, 					doubl
 	// Initialise rngs
 	for(int i=0; i<num_threads; i++)
 		rngs[i] = gsl_rng_alloc(gsl_rng_mt19937);
+	std::cout<<std::setprecision(8);
 }
 
 template<class Type>
