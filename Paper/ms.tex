@@ -42,7 +42,16 @@ the likelihood $L(\xx)$ that compress the prior mass by a
 factor that is approximately known.
 This enables the calculation of the marginal likelihood
 and properties of the posterior, or any other distribution that is intermediate
-between the prior and the posterior.
+between the prior and the posterior. For example, we might be interested in
+a ``power posterior'' where the likelihood is raised to a power $\beta$:
+\begin{eqnarray}
+p(\xx; \beta) &=& \frac{\pi(\xx)L(\xx)^\beta}{Z(\beta)}
+\end{eqnarray}
+The normalisation and posterior samples from this distribution can be obtained
+from the original Nested Sampling run. An example application, in the case of
+a Bayesian model with a ``gaussian noise'' assumption in the likelihood,
+computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
+posterior distribution would have been if the noise variance had been greater.
 
 Relative to alternative approaches such as annealing, Nested Sampling continues
 to work when the problem contains a {\it phase transition}.
@@ -60,31 +69,33 @@ p(\xx; \alpha_1, \alpha_2) &=& \frac{\pi(\xx)\exp\left[\alpha_1S_1(\xx)+\alpha_2
 {Z(\alpha_1, \alpha_2)}
 \end{eqnarray}
 
- For example, we might be interested in the
-properties of the canonical distributions
-$p(\mathbf{x} | \alpha, \beta) \propto \pi(\mathbf{x})\exp\left[\alpha f_1(\mathbf{x}) + \beta f_2(\mathbf{x})\right]$
-for many different values of $\alpha$ and $\beta$, including the
-normalisations or ``partition function'' $\mathcal{Z}(\alpha, \beta)$.
-This work describes
+If we were only interested in a single canonical distribution, for example
+with $\alpha_1 = 0.3$ and $\alpha_2 = 0.7$, we could estimate its normalising
+constant and by running standard Nested Sampling with ``likelihood''
+$L(\xx) = \exp\left[0.3S_1(\xx) + 0.7S_2(\xx)\right]$. However, usually we
+are interested in a range of values for $\alpha_1$ and $\alpha_2$, and we
+want to know the normalisation $Z(\alpha_1, \alpha_2)$, called the
+partition function. This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
 transitions.
 
-If the prior is $\pi(\mathbf{x})$, then a family of canonical
-probability distributions is given by
-\begin{eqnarray}
-p(\mathbf{x} | \lambda_1, ..., \lambda_n) = 
-\frac{\pi(\mathbf{x})\exp(-\sum_{i=1}^n \lambda_i f_i(\mathbf{x}))}
-{\mathcal{Z}(\lambda_1, ..., \lambda_n)}
-\end{eqnarray}
-This family of distributions arises from a MaxEnt update from the prior
-$\pi(\mathbf{x})$ if the expected values of the functions
-$\{f_i(\mathbf{x})\}$ are specified. In statistical mechanics it is useful to
-quantify the properties of
-$p(\mathbf{x} | \lambda_1, ..., \lambda_n)$ as a function of the
-$\lambda$s.
-
-\section{Nested sampling}
+\section{Properties of Nested sampling}
+We seek an algorithm for computing the partition function
+$Z(\alpha_1, \alpha_2)$ for a range of values of the $\alpha$s, from a single
+run. To be considered a variant of Nested Sampling, we require that the method
+satisfies the following requirements:
+\begin{itemize}
+\item The algorithm should begin with $n$ points drawn from the prior $\pi(\xx)$.
+\item The algorithm should seek to explore regions where the values of
+$S_1(\xx)$ and $S_2(\xx)$ are greater than what would be expected from the
+prior.
+\item The algorithm should try to move through a sequence of probability
+distributions whose enclosed prior masses are approximately known.
+\item The algorithm should be invariant to monotonic transformations of
+$S_1$ and $S_2$, i.e. it should only depend on rankings of $S_1$ and $S_2$
+values and not the values themselves.
+\end{itemize}
 
 
 \section{Demonstration Example}
