@@ -4,30 +4,63 @@
 \usepackage{dsfont}
 \usepackage[left=3cm,top=3cm,right=3cm]{geometry}
 
+\newcommand{\xx}{\mathbf{x}}	% The unknown parameters
+\newcommand{\dx}{d^N\mathbf{x}} % Volume element in parameter space
 \renewcommand{\topfraction}{0.85}
 \renewcommand{\textfraction}{0.1}
 \parindent=0cm
 
 \title{Nested sampling with multiple scalars}
-\author{Brendon J. Brewer}
-\date{\vspace{2cm}This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License. To view a copy of this license, visit {\tt http://creativecommons.org/licenses/by-sa/3.0/deed.en\_GB}.}
-
+\author{Brendon J. Brewer and Ewan Cameron}
 
 \begin{document}
 \maketitle
 
-\abstract{Nested Sampling is an effective and popular
-Monte Carlo algorithm for Bayesian computation. It is based on exploring the
-prior $\pi(\mathbf{x})$ and successively imposing constraints on the value of
-the likelihood $\mathcal{L}(\mathbf{x})$ that compress the prior mass by a
+\abstract{The abstract goes here.}
+
+\section{Introduction}
+Nested Sampling \citep{skilling} is an effective and popular
+Monte Carlo algorithm for Bayesian computation and statistical mechanics.
+In a Bayesian inference problem with unknown parameters denoted collectively
+by a vector $\mathbf{x}$, the
+posterior distribution for the parameters is
+\begin{eqnarray}
+p(\mathbf{x} | {\rm data}) &=&
+\frac{p(\mathbf{x})p({\rm data} | \mathbf{x})}{p(\rm data)}\\
+&=& \frac{\pi(\xx)L(\xx)}{Z}
+\end{eqnarray}
+where $\pi(\xx)$ is the prior distribution, $L(\xx)$ is the likelihood
+function, and $Z$ is the normalising constant, known as the
+``marginal likelihood'' or the ``evidence'':
+\begin{eqnarray}
+Z &=& \int \pi(\xx) L(\xx) \, \dx.
+\end{eqnarray}
+
+Nested Sampling begins by drawing particles from the
+prior $\pi(\xx)$ and successively imposing constraints on the value of
+the likelihood $L(\xx)$ that compress the prior mass by a
 factor that is approximately known.
 This enables the calculation of the marginal likelihood
-or evidence
-$\mathcal{Z} = \int \pi(\mathbf{x})\mathcal{L}(\mathbf{x}) \, d^N\mathbf{x}$ and
-properties of the posterior, or any other distribution that is intermediate
-between the prior and the posterior. However, in some inference and
+and properties of the posterior, or any other distribution that is intermediate
+between the prior and the posterior.
+
+Relative to alternative approaches such as annealing, Nested Sampling continues
+to work when the problem contains a {\it phase transition}.
+
+In some inference and
 statistical mechanics problems, there are two or more scalar functions of
-$\mathbf{x}$ that are relevant. For example, we might be interested in the
+$\xx$ that are relevant. Suppose our prior is $\pi(\xx)$ as before, and
+we obtain testable information that fixes the expected values of two scalar
+functions of $\xx$, $S_1(\xx)$ and $S_2(\xx)$. It is well known that the
+updated probability distribution that takes into account the constraints is
+of the ``canonical'' form:
+
+\begin{eqnarray}
+p(\xx; \alpha_1, \alpha_2) &=& \frac{\pi(\xx)\exp\left[\alpha_1S_1(\xx)+\alpha_2S_2(\xx)\right]}
+{Z(\alpha_1, \alpha_2)}
+\end{eqnarray}
+
+ For example, we might be interested in the
 properties of the canonical distributions
 $p(\mathbf{x} | \alpha, \beta) \propto \pi(\mathbf{x})\exp\left[\alpha f_1(\mathbf{x}) + \beta f_2(\mathbf{x})\right]$
 for many different values of $\alpha$ and $\beta$, including the
@@ -36,9 +69,7 @@ This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
 transitions.
-}
 
-\section{Introduction}
 If the prior is $\pi(\mathbf{x})$, then a family of canonical
 probability distributions is given by
 \begin{eqnarray}
@@ -71,6 +102,13 @@ For this section, we used $n=1000$ dimensions.
 
 \section{Example: Potts model with some embellishments}
 TBD
+
+\begin{thebibliography}{99}
+
+\bibitem[\protect\citeauthoryear{Skilling}{2006}]{skilling} Skilling, J., 2006, Nested Sampling for General Bayesian Computation, Bayesian Analysis 4, pp. 833-860.
+
+\end{thebibliography}
+
 
 \end{document}
 
