@@ -7,7 +7,7 @@ using namespace std;
 using namespace DNest3;
 
 Atoms::Atoms()
-:Model(2), x(200), y(200)
+:Model(2), x(200), y(200), z(200)
 ,terms(200, vector<double>(200))
 {
 
@@ -24,6 +24,7 @@ void Atoms::from_prior()
 	{
 		x[i] = randomU();
 		y[i] = randomU();
+		z[i] = randomU();
 	}
 
 	for(size_t i=0; i<terms.size(); i++)
@@ -37,10 +38,13 @@ void Atoms::from_prior()
 void Atoms::compute_scalars()
 {
 	scalars[0] = -PE;
-	double Lx, Ly;
+
+	double Lx, Ly, Lz;
 	Lx = *max_element(x.begin(), x.end());
 	Ly = *max_element(y.begin(), y.end());
-	scalars[1] = -log(Lx*Ly);
+	Lz = *max_element(z.begin(), z.end());
+
+	scalars[1] = -log(Lx*Ly*Lz);
 }
 
 void Atoms::calculate_PE()
@@ -53,8 +57,8 @@ void Atoms::calculate_PE()
 
 void Atoms::calculate_PE(int i, int j)
 {
-	double Rmsq = pow(0.01, 2);
-	double rsq = pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2);
+	double Rmsq = pow(0.05, 2);
+	double rsq = pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2) + pow(z[i] - z[j], 2);
 	terms[i][j] = pow(Rmsq/rsq, 6) - 2.*pow(Rmsq/rsq, 3);
 }
 
@@ -64,8 +68,10 @@ double Atoms::perturb()
 
 	x[which] += randh();
 	y[which] += randh();
+	z[which] += randh();
 	wrap(x[which], 0., 1.);
 	wrap(y[which], 0., 1.);
+	wrap(z[which], 0., 1.);
 
 	for(int i=0; i<which; i++)
 		calculate_PE(i, which);
@@ -86,6 +92,8 @@ std::ostream& operator << (std::ostream& out, const Atoms& a)
 		out<<a.x[i]<<' ';
 	for(size_t i=0; i<a.y.size(); i++)
 		out<<a.y[i]<<' ';
+	for(size_t i=0; i<a.z.size(); i++)
+		out<<a.z[i]<<' ';
 	return out;
 }
 

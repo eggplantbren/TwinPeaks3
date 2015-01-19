@@ -8,7 +8,7 @@ class Atoms:public Model
 {
 	private:
 		// Positions
-		std::vector<double> x, y;
+		std::vector<double> x, y, z;
 
 		std::vector< std::vector<double> > terms;
 
