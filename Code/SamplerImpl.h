@@ -25,10 +25,16 @@ template<class Type>
 int Sampler<Type>::badness(const Type& particle) const
 {
 	int count = 0;
-	for(size_t i=0; i<thresholds.size(); i++)
+	for(int i=int(thresholds.size())-1; i >= 0; i--)
+	{
 		if(is_below(particle.get_scalars(), thresholds[i],
 				particle.get_tiebreakers(), thresholds_tiebreakers[i]))
+		{
 			count++;
+			if(count == 2)
+				return count;
+		}
+	}
 	return count;
 }
 
@@ -291,6 +297,6 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 		fout.close();
 	}
 
-	remove_redundant_thresholds();
+//	remove_redundant_thresholds();
 }
 
