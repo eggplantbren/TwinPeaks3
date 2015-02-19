@@ -126,13 +126,13 @@ void Sampler<Type>::refresh()
 	}
 	std::vector<int> accepts(which_particles.size(), 0);
 
-	// Create the threads
-	boost::thread_group threads;
-	for(size_t i=0; i<which_particles.size(); i++)
-	{
-		threads.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, boost::ref(which_particles[i]), boost::ref(bad), boost::ref(accepts[i])));
-	}
-	threads.join_all();
+//	// Create the threads
+//	boost::thread_group threads;
+//	for(size_t i=0; i<which_particles.size(); i++)
+//	{
+//		threads.create_thread(boost::bind(&Sampler<Type>::runThread, this, i, boost::ref(which_particles[i]), boost::ref(bad), boost::ref(accepts[i])));
+//	}
+//	threads.join_all();
 
 	// Make sure they're not all bad
 	bool all_bad = true;
@@ -145,6 +145,7 @@ void Sampler<Type>::refresh()
 
 	// Resample any bad points by copying good ones
 	int copy;
+	int num_copied = 0;
 	for(int i=0; i<num_particles; i++)
 	{
 		if(bad[i] > 0)
@@ -155,6 +156,7 @@ void Sampler<Type>::refresh()
 			}while(bad[copy] > 0);
 			particles[i] = particles[copy];
 			bad[i] = bad[copy];
+			num_copied++;
 		}
 	}
 
@@ -169,7 +171,9 @@ void Sampler<Type>::refresh()
 	int total_accepts = 0;
 	for(size_t i=0; i<accepts.size(); i++)
 		total_accepts += accepts[i];
-	std::cout<<"done. Acceptance rate = "<<total_accepts<<"/"<<(2*steps*accepts.size())<<"."<<std::endl<<std::endl;
+
+	std::cout<<"done. Acceptance rate = "<<total_accepts<<"/"<<(steps*accepts.size())<<std::endl<<std::endl;
+	remove_redundant_thresholds();
 }
 
 template<class Type>
