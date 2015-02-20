@@ -7,8 +7,8 @@ def truth(T1, T2, do_plot=False):
   Z = trapz(p, x=x)
   H = trapz(p/Z*log(p/Z), x=x)
 
-  logZ = 200*log(Z)
-  H *= 200
+  logZ = 100*log(Z)
+  H *= 100
 
   if do_plot:
     plot(x, p)

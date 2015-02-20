@@ -9,7 +9,7 @@ using namespace DNest3;
 
 SimpleExample::SimpleExample()
 :Model(2)
-,params(200)
+,params(100)
 {
 
 }
@@ -28,7 +28,7 @@ void SimpleExample::from_prior()
 
 double SimpleExample::perturb()
 {
-	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(99)));
+	int reps = 1 + ((randomU() <= 0.5)?(0):(1 + randInt(9)));
 	vector<bool> change(params.size(), false);
 	for(int i=0; i<reps; i++)
 		change[randInt(params.size())] = true;
