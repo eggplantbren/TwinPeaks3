@@ -172,7 +172,7 @@ void Sampler<Type>::refresh()
 	for(size_t i=0; i<accepts.size(); i++)
 		total_accepts += accepts[i];
 
-	std::cout<<"done. Acceptance rate = "<<total_accepts<<"/"<<(steps*accepts.size())<<std::endl<<std::endl;
+	std::cout<<"done. Acceptance rate = "<<total_accepts<<"/"<<(steps*accepts.size())<<std::endl<<"."<<std::endl;
 	remove_redundant_thresholds();
 }
 
