@@ -271,7 +271,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 	{
 		if(int(i) != which && is_below(keep[i], keep[which], keep_tiebreakers[i], keep_tiebreakers[which]))
 		{
-			fout<<(log_dead_mass - log(keep.size()*frac_below[which]))<<' ';
+			fout<<(log_dead_mass - log((int(keep.size()) - 1)*frac_below[which]))<<' ';
 			for(size_t j=0; j<keep[i].size(); j++)
 				fout<<keep[i][j]<<' ';
 			fout<<std::endl;
