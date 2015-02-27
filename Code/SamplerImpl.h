@@ -279,6 +279,7 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 		}
 	}
 	fout.close();
+	dead.push_back(which);
 
 	log_prior_mass = DNest3::logdiffexp(log_prior_mass, log_dead_mass);
 	std::cout<<"# Peeling away "<<frac_below[which]<<" of the remaining prior mass."<<std::endl;
