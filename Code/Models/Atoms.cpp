@@ -7,8 +7,8 @@ using namespace std;
 using namespace DNest3;
 
 Atoms::Atoms()
-:Model(2), x(200), y(200), z(200)
-,terms(200, vector<double>(200))
+:Model(2), x(50), y(50), z(50)
+,terms(50, vector<double>(50))
 {
 
 }
@@ -38,13 +38,9 @@ void Atoms::from_prior()
 void Atoms::compute_scalars()
 {
 	scalars[0] = -PE;
-
-	double Lx, Ly, Lz;
-	Lx = *max_element(x.begin(), x.end());
-	Ly = *max_element(y.begin(), y.end());
-	Lz = *max_element(z.begin(), z.end());
-
-	scalars[1] = -log(Lx*Ly*Lz);
+	scalars[1] = 0.;
+	for(size_t i=0; i<x.size(); i++)
+		scalars[1] -= z[i];
 }
 
 void Atoms::calculate_PE()
