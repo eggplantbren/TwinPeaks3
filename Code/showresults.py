@@ -111,6 +111,8 @@ subplot(1,2,1)
 err1 = logZ - true_logZ
 good = logical_not(isnan(err1))
 imshow(err1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest')
+print("H_max = " + str(H[good].max()))
+
 print(err1[good].min(), err1[good].max())
 print(sqrt(mean((logZ[good] - true_logZ[good])**2)))
 
