@@ -61,13 +61,23 @@ void Atoms::calculate_PE(int i, int j)
 double Atoms::perturb()
 {
 	int which = randInt(x.size());
+	int what = randInt(3);
 
-	x[which] += randh();
-	y[which] += randh();
-	z[which] += randh();
-	wrap(x[which], 0., 1.);
-	wrap(y[which], 0., 1.);
-	wrap(z[which], 0., 1.);
+	if(what == 0)
+	{
+		x[which] += randh();
+		wrap(x[which], 0., 1.);
+	}
+	if(what == 1)
+	{
+		y[which] += randh();
+		wrap(y[which], 0., 1.);
+	}
+	if(what == 2)
+	{
+		z[which] += randh();
+		wrap(z[which], 0., 1.);
+	}
 
 	for(int i=0; i<which; i++)
 		calculate_PE(i, which);
