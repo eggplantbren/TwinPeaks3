@@ -42,6 +42,10 @@ class Sampler
 		void runThread(int thread, const std::vector<int>& which_particles,
 				std::vector<int>& bad, int& accepts);
 
+		double compute_frac_below(int i, const std::vector< std::vector<double> >& keep,
+						const std::vector< std::vector<double> >& tiebreakers) const;
+
+
 	public:
 		Sampler(int num_threads, int num_particles, int steps, double peel_factor,
 				int thin);

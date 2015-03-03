@@ -221,6 +221,23 @@ bool Sampler<Type>::is_below(const std::vector<double>& s1,
 }
 
 template<class Type>
+double Sampler<Type>::compute_frac_below(int i,
+			const std::vector< std::vector<double> >& keep,
+			const std::vector< std::vector<double> >& keep_tiebreakers) const
+{
+	double result = 0.;
+	for(size_t j=0; j<keep.size(); j++)
+	{
+		if(i != j)
+			result += is_below(keep[j], keep[i],
+						keep_tiebreakers[j],
+						keep_tiebreakers[i]);
+	}
+	result /= (keep.size() - 1);
+	return result;
+}
+
+template<class Type>
 void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 						keep,
 					const std::vector< std::vector<double> >&
@@ -231,22 +248,17 @@ void Sampler<Type>::create_threshold(const std::vector< std::vector<double> >&
 
 	std::vector<double> frac_below(keep.size());
 	for(size_t i=0; i<keep.size(); i++)
+		frac_below[i] = compute_frac_below(i, keep, keep_tiebreakers);
+
+	for(size_t i=0; i<keep.size(); i++)
 	{
-		frac_below[i] = 0.;
-		for(size_t j=0; j<keep.size(); j++)
-		{
-			if(i != j)
-				frac_below[i] += is_below(keep[j], keep[i],
-							keep_tiebreakers[j],
-							keep_tiebreakers[i]);
-		}
-		frac_below[i] /= (keep.size() - 1);
 		if(fabs(log(frac_below[i]+1E-300) - log(peel_factor)) < diff)
 		{
 			which = i;
 			diff = fabs(log(frac_below[i]+1E-300) - log(peel_factor));
 		}
 	}
+
 	// All candidates to become the next rectangle
 	// Choose uniformly from them
 	std::vector<int> indices;
