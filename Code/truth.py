@@ -20,7 +20,7 @@ def truth(T1, T2, do_plot=False):
 
 def grid():
   # Calculate log(Z) and H for some canonical distributions
-  T1 = 10.**(linspace(-2., 5., 51))
+  T1 = 10.**(linspace(-2.5, 5., 51))
   T2 = T1.copy()
   [T1, T2] = meshgrid(T1, T2)
   T2 = T2[::-1, :]

@@ -65,7 +65,7 @@ show()
 
 # Get partition function and entropy
 N = 51
-T1 = 10.**linspace(-2., 5., N)
+T1 = 10.**linspace(-2.5, 5., N)
 T2 = T1.copy()
 [T1, T2] = meshgrid(T1, T2)
 T2 = T2[::-1, :]
