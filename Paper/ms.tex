@@ -5,6 +5,7 @@
 \usepackage[left=3cm,top=3cm,right=3cm]{geometry}
 
 \newcommand{\xx}{\mathbf{x}}	% The unknown parameters
+\newcommand{\data}{\mathbf{D}}  % The data
 \newcommand{\dx}{d^N\mathbf{x}} % Volume element in parameter space
 \renewcommand{\topfraction}{0.85}
 \renewcommand{\textfraction}{0.1}
@@ -20,13 +21,16 @@
 
 \section{Introduction}
 Nested Sampling \citep{skilling} is an effective and popular
-Monte Carlo algorithm for Bayesian computation and statistical mechanics.
+Monte Carlo algorithm for Bayesian computation and
+statistical mechanics
+\citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
 In a Bayesian inference problem with unknown parameters denoted collectively
-by a vector $\mathbf{x}$, the
-posterior distribution for the parameters is
+by a vector $\xx$, the
+posterior distribution for the parameters given data $\data$ (and prior
+information $I$) is:
 \begin{eqnarray}
-p(\mathbf{x} | {\rm data}) &=&
-\frac{p(\mathbf{x})p({\rm data} | \mathbf{x})}{p(\rm data)}\\
+p(\xx | \data, I) &=&
+\frac{p(\xx | I)p(\data | \xx, I)}{p(\data | I)}\\
 &=& \frac{\pi(\xx)L(\xx)}{Z}
 \end{eqnarray}
 where $\pi(\xx)$ is the prior distribution, $L(\xx)$ is the likelihood
@@ -101,12 +105,12 @@ values and not the values themselves.
 \section{Demonstration Example}
 The prior is a uniform distribution over the $n$-dimensional unit hypercube:
 \begin{eqnarray}
-p(\mathbf{x}) &=& 1
+p(\xx) &=& 1
 \end{eqnarray}
 as long as $x_i \in [0, 1]$ for all $i$. The scalars are:
 \begin{eqnarray}
-S_1(\mathbf{x}) &=& -\sum_{i=1}^n \left(x_i - 0.5\right)^2\\
-S_2(\mathbf{x}) &=& -\sum_{i=1}^n \sin^2\left(4\pi x_i\right)
+S_1(\xx) &=& -\sum_{i=1}^n \left(x_i - 0.5\right)^2\\
+S_2(\xx) &=& -\sum_{i=1}^n \sin^2\left(4\pi x_i\right)
 \end{eqnarray}
 
 For this section, we used $n=1000$ dimensions.
@@ -115,6 +119,19 @@ For this section, we used $n=1000$ dimensions.
 TBD
 
 \begin{thebibliography}{99}
+
+\bibitem[Baldock et al.(2015)]{2015arXiv150303404B} Baldock, R.~J.~N., 
+P{\'a}rtay, L.~v.~B., Bart{\'o}k, A.~P., Payne, M.~C., Cs{\'a}nyi, G.\ 
+2015.\ Determining pressure-temperature phase diagrams of materials.\ ArXiv 
+e-prints arXiv:1503.03404. 
+
+\bibitem[P{\'a}rtay et al.(2014)]{2014PhRvE..89b2302P} P{\'a}rtay, L.~B., 
+Bart{\'o}k, A.~P., Cs{\'a}nyi, G.\ 2014.\ Nested sampling for materials: 
+The case of hard spheres.\ Physical Review E 89, 022302. 
+
+\bibitem[P{\'a}rtay et al.(2009)]{2009arXiv0906.3544P} P{\'a}rtay, L.~B., 
+Bart{\'o}k, A.~P., Cs{\'a}nyi, G.\ 2009.\ Efficient sampling of atomic 
+configurational spaces.\ ArXiv e-prints arXiv:0906.3544. 
 
 \bibitem[\protect\citeauthoryear{Skilling}{2006}]{skilling} Skilling, J., 2006, Nested Sampling for General Bayesian Computation, Bayesian Analysis 4, pp. 833-860.
 
