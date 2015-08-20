@@ -118,6 +118,23 @@ For this section, we used $n=1000$ dimensions.
 \section{Example: Potts model with some embellishments}
 TBD
 
+\section{A Diffusive Variant}
+Have one walker, or a few (not a large number).
+
+Explore the prior $\pi(\xx)$, and save sampled values of the scalars
+(thinned, presumably). As a function of position $(s_1, s_2)$ there is a well
+defined value of the cumulative prior mass
+\begin{eqnarray}
+M(s_1, s_2) &=& \int \pi(\xx)\mathds{1}\left(S_1(\xx) \leq s_1,
+S_2(\xx) \leq s_2\right)\, d\xx
+\end{eqnarray}
+which can be approximated in a Monte Carlo fashion by
+\begin{eqnarray}
+\hat{M}(s_1, s_2) &=& \frac{1}{N}\sum_{i=1}^N \mathds{1}\left(S_1^i \leq s_1,
+S_2^i \leq s_2\right)
+\end{eqnarray}
+
+
 \begin{thebibliography}{99}
 
 \bibitem[Baldock et al.(2015)]{2015arXiv150303404B} Baldock, R.~J.~N., 
