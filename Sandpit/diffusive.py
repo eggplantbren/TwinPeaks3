@@ -29,7 +29,7 @@ class Walker:
 		self.scalars[0] = -((self.x - 0.5)**2).sum()
 		self.scalars[1] = -(np.sin(4.*np.pi*self.x)**2).sum()
 
-	def update(self, mcmc_steps=1000):
+	def update(self, mcmc_steps=100):
 		accept = 0
 		walker = copy.deepcopy(self)
 		for i in range(0, mcmc_steps):
@@ -42,16 +42,32 @@ class Walker:
 				accept += 1
 		return walker
 
+# Calculate a corner mass
+def corner_mass(s, keep):
+	in_corner = np.logical_and(keep[:,0] < s[0], keep[:,1] < s[1])
+	return float(in_corner.sum())/(len(keep) - 1)
+
 if __name__ == '__main__':
 	walker = Walker()
+	walker.from_prior()
+
+	# Store scalars from the prior
+	keep = np.zeros((100, 2))
 
 	plt.ion()
 	plt.hold(True)
 	for i in range(0, 100):
 		walker = walker.update()
-		plt.plot(walker.scalars[0], walker.scalars[1], 'bo')
+		keep[i, :] = walker.scalars
+		plt.plot(walker.scalars[0], walker.scalars[1], 'bo', alpha=0.2)
+		plt.title(i+1)
 		plt.draw()
+
+	plt.plot(-8., -50., 'ro')
+	# Calculate corner mass
+	print(corner_mass(np.array([-8., -50.]), keep))
 
 	plt.ioff()
 	plt.show()
+
 
