@@ -110,7 +110,7 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 \abstract{The abstract goes here.}
 
 % Keywords: add 3 to 10 keywords
-\keyword{keyword; keyword; keyword}
+\keyword{nested sampling; bayesian computation; statistical mechanics}
 
 % The fields PACS, MSC, and JEL may be left empty or commented out if not applicable
 %\PACS{}
@@ -133,6 +133,7 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
+
 Nested Sampling \citep{skilling} is an effective and popular
 Monte Carlo algorithm for Bayesian computation and
 statistical mechanics
@@ -198,6 +199,7 @@ of Nested Sampling, such as the ability to cope with first-order phase
 transitions.
 
 \section{Properties of Nested sampling}
+
 We seek an algorithm for computing the partition function
 $Z(\alpha_1, \alpha_2)$ for a range of values of the $\alpha$s, from a single
 run. To be considered a variant of Nested Sampling, we require that the method
@@ -229,9 +231,11 @@ S_2(\xx) &=& -\sum_{i=1}^n \sin^2\left(4\pi x_i\right)
 For this section, we used $n=1000$ dimensions.
 
 \section{Example: Potts model with some embellishments}
+
 TBD
 
 \section{A Diffusive Variant}
+
 Have one walker, or a few (not a large number).
 
 Explore the prior $\pi(\xx)$, and save sampled values of the scalars
@@ -246,6 +250,12 @@ which can be approximated in a Monte Carlo fashion by
 \hat{M}(s_1, s_2) &=& \frac{1}{N}\sum_{i=1}^N \mathds{1}\left(S_1^i \leq s_1,
 S_2^i \leq s_2\right)
 \end{eqnarray}
+
+
+\acknowledgments{Acknowledgements}
+
+It is a pleasure to thank Gábor Csányi (Cambridge), Livia B. Pártay (Cambridge),
+and Robert Baldock (Cambridge) for valuable conversations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
