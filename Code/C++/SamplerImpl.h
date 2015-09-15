@@ -228,7 +228,7 @@ double Sampler<Type>::compute_frac_below(int i,
 	double result = 0.;
 	for(size_t j=0; j<keep.size(); j++)
 	{
-		if(i != j)
+		if(i != static_cast<int>(j))
 			result += is_below(keep[j], keep[i],
 						keep_tiebreakers[j],
 						keep_tiebreakers[i]);
