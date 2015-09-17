@@ -233,7 +233,7 @@ double Sampler<Type>::compute_frac_below(int i,
 						keep_tiebreakers[j],
 						keep_tiebreakers[i]);
 	}
-	result /= (keep.size() - 1);
+	result /= keep.size();
 	return result;
 }
 
