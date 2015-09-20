@@ -9,7 +9,7 @@ using namespace DNest3;
 
 SimpleExample::SimpleExample()
 :Model(2)
-,params(100)
+,params(20)
 {
 
 }
@@ -48,13 +48,23 @@ double SimpleExample::perturb()
 
 void SimpleExample::compute_scalars()
 {
-	scalars[0] = 0.;
-	scalars[1] = 0.;
+	double u = 0.01;
+	double v = 0.1;
+	double C = log(1.0/sqrt(2*M_PI));
+	double logl1 = 0;
+	double logl2 = 0;
+
 	for(size_t i=0; i<params.size(); i++)
 	{
-		scalars[0] += -pow(params[i] - 0.5, 2);
-		scalars[1] += -pow(sin(4.*M_PI*params[i]), 2);
+		logl1 += C - log(u) - 0.5*pow((params[i] - 0.0)/u, 2);
+		logl2 += C - log(v) - 0.5*pow(params[i]/v, 2);
 	}
+	logl1 += log(100.0);
+
+	scalars[0] = logsumexp(logl1, logl2);
+	scalars[1] = 0.;
+	for(size_t i=0; i<params.size(); i++)
+		scalars[1] += -pow(sin(4.*M_PI*params[i]), 2);
 }
 
 ostream& operator << (ostream& out, const SimpleExample& m)
