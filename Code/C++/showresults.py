@@ -59,7 +59,11 @@ for i in xrange(0, N):
       break
   posterior_sample[i,:] = scalars[which,:]
 
-plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=1)
+plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=5, alpha=0.5)
+hold(True)
+plot(scalars[:,0], scalars[:,1], 'r.', markersize=1, alpha=0.2)
+xlabel("Scalar 1")
+ylabel("Scalar 2")
 savetxt("posterior_sample.txt", posterior_sample)
 show()
 
