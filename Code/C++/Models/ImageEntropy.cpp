@@ -91,9 +91,31 @@ void ImageEntropy::compute_scalars()
 
 ostream& operator << (ostream& out, const ImageEntropy& m)
 {
+	vector< vector<double> > blurred = m.image;
+	m.psf.blur_image2(blurred);
+
+	// Find image total (use entropy of normalised image)
+	double tot = 0.;
+	for(size_t i=0; i<m.image.size(); i++)
+		for(size_t j=0; j<m.image[i].size(); j++)
+			tot += m.image[i][j];
+
+	// Find image entropy
+	double S = 0.;
+	for(size_t i=0; i<m.image.size(); i++)
+		for(size_t j=0; j<m.image[i].size(); j++)
+			S += -(m.image[i][j]/tot)*log(m.image[i][j]/tot + 1E-300);
+
+	// Log likelihood
+	double logL = 0.;
+	for(size_t i=0; i<m.image.size(); i++)
+		for(size_t j=0; j<m.image[i].size(); j++)
+			logL += -0.5*pow((ImageEntropy::data[i][j] - blurred[i][j])/0.2, 2);
+
 	for(size_t i=0; i<m.image.size(); i++)
 		for(size_t j=0; j<m.image[i].size(); j++)
 			out<<m.image[i][j]<<' ';
+	out<<logL<<' ';
 	return out;
 }
 
