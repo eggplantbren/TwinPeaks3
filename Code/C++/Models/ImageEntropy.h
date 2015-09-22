@@ -17,6 +17,7 @@ class ImageEntropy:public Model
 		// Data and PSF
 		static PSF psf;
 		static std::vector< std::vector<double> > data;
+		static PSF preblur;
 
 		std::vector< std::vector<double> > image;
 		void compute_scalars();	
