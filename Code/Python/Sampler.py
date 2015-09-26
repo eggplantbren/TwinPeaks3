@@ -28,8 +28,29 @@ class Sampler:
 		self.all_scalars = np.array(self.all_scalars)
 		return
 
+	@property
+	def rectangle_counts(self):
+		"""
+		Count how many walkers are within the rectangle
+		of each walker.
+		"""
+		counts = np.empty(self.num_particles, dtype='int64')
+		for i in range(0, self.num_particles):
+			counts[i] = np.sum(Sampler.is_in_rectangle\
+									(self.all_scalars, self.all_scalars[i]))
+		return counts
+
+	@staticmethod
+	def is_in_rectangle(scalars, rectangle):
+		"""
+		Rectangle should be a numpy array of length 2
+		Scalars can be of shape (a, 2)
+		Returns true for each row of 'scalars' that is within the rectangle
+		defined by 'rectangle'.
+		"""
+		return np.all(scalars < rectangle, axis=1)
 
 sampler = Sampler(1000)
 sampler.initialise()
-print(sampler.all_scalars.shape)
+print(sampler.rectangle_counts)
 
