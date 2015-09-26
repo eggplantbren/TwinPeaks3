@@ -21,8 +21,15 @@ class Sampler:
 		"""
 		Generate all the walkers from the prior
 		"""
-		for walker in Walkers:
+		self.all_scalars = []	# Values of scalars for all walkers
+		for walker in self.walkers:
 			walker.from_prior()
+			self.all_scalars.append(walker.scalars)
+		self.all_scalars = np.array(self.all_scalars)
 		return
 
+
+sampler = Sampler(1000)
+sampler.initialise()
+print(sampler.all_scalars.shape)
 

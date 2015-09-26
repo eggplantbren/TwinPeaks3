@@ -58,8 +58,8 @@ class Walker:
 		are IID in this problem so it's easy to numerically
 		compute the true partition function.
 		"""
-		s = np.array(2)
+		s = np.empty(2)
 		s[0] = -0.5*np.sum(self.x**2)
-		s[1] = -np.sum(np.sin(4.*np.pi*x)**2)
+		s[1] = -np.sum(np.sin(4.*np.pi*self.x)**2)
 		return s
 
