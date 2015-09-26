@@ -28,6 +28,18 @@ class Sampler:
 		self.all_scalars = np.array(self.all_scalars)
 		return
 
+	def do_iteration(self):
+		"""
+		Do an NS iteration
+		"""
+		counts = self.rectangle_counts
+
+		# Choose one with minimum count
+		temp = np.nonzero(counts == counts.min())[0]
+		which = temp[rng.randint(len(temp))]
+
+		print(counts[which])
+
 	@property
 	def rectangle_counts(self):
 		"""
@@ -52,5 +64,6 @@ class Sampler:
 
 sampler = Sampler(1000)
 sampler.initialise()
-print(sampler.rectangle_counts)
+sampler.do_iteration()
+
 
