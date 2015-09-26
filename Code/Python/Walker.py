@@ -29,6 +29,15 @@ class Walker:
 		"""
 		Calculate the scalar functions of interest
 		and return them in the form of a numpy array.
+		Current demo problem: the first scalar wants
+		the coordinates to cluster in a gaussian in
+		the center of the domain, and the second wants
+		them to have periodic density. The coordinates
+		are IID in this problem so it's easy to numerically
+		compute the true partition function.
 		"""
-		pass
+		s = np.array(2)
+		s[0] = -0.5*np.sum(self.x**2)
+		s[1] = -np.sum(np.sin(4.*np.pi*x)**2)
+		return s
 
