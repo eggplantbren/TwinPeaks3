@@ -16,13 +16,35 @@ class Walker:
 		"""
 		Generate coordinates/parameters from the prior
 		"""
-		self.x = rng.rand(10)
+		self.x = rng.rand(100)
 
 	def proposal(self):
 		"""
 		Do something to generate a Metropolis proposal
 		"""
-		pass
+		# Choose a probability from log p ~ uniform
+		p = 10.**(-3.*rng.rand())
+
+		# Move each coordinate with probability p
+		which = rng.rand(len(self.x)) < p
+
+		# Make sure we're at least moving one
+		num_moving = which.sum()
+		if num_moving == 0:
+			which[rng.randint(len(self.x))] = True
+			num_moving = 1
+
+		# Move using a heavy-tailed proposal
+		self.x[which] += 10.**(1.5 - 6.*rng.rand(num_moving))\
+								*rng.randn(num_moving)
+
+		# Mod into prior range
+		self.x = np.mod(self.x, 1.)
+
+		# Return zero -- in general return log of
+		# a factor that enforces detailed balance
+		# wrt the prior.
+		return 0.
 
 	@property
 	def scalars(self):
