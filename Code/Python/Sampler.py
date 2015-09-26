@@ -17,6 +17,10 @@ class Sampler:
 		self.num_particles = num_particles
 		self.walkers = [Walker() for i in range(0, num_particles)]
 
+		# Open and close output file to clear it
+		f = open('output.txt', 'w')
+		f.close()
+
 	def initialise(self):
 		"""
 		Generate all the walkers from the prior
@@ -34,11 +38,17 @@ class Sampler:
 		"""
 		counts = self.rectangle_counts
 
-		# Choose one with minimum count
+		# Choose one with minimum count to discard
 		temp = np.nonzero(counts == counts.min())[0]
 		which = temp[rng.randint(len(temp))]
 
-		print(counts[which])
+		# Write discarded particle info to disk
+		f = open('output.txt', 'wa')
+		string = ''
+		for s in self.all_scalars[which, :]:
+			string += str(s) + ' '
+		f.write(string + '\n')
+		f.close()
 
 	@property
 	def rectangle_counts(self):
