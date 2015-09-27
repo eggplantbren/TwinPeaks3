@@ -22,7 +22,7 @@ class Sampler:
 		f.close()
 
 		# Rectangles that have been forbidden so far
-		self.forbidden_rectangles = []
+		self.forbidden_rectangles = None
 
 		# Number of iterations done
 		self.iteration = 0
@@ -39,6 +39,7 @@ class Sampler:
 			walker.from_prior()
 			self.all_scalars.append(walker.scalars)
 		self.all_scalars = np.array(self.all_scalars)
+		self.forbidden_rectangles = np.empty((0, self.all_scalars.shape[1]))
 		return
 
 	def do_iteration(self):
@@ -69,13 +70,36 @@ class Sampler:
 		f.close()
 
 		# Forbid another rectangle
-		self.forbidden_rectangles.append(self.all_scalars[which, :])
+		self.forbidden_rectangles = np.hstack([self.forbidden_rectangles, \
+										self.all_scalars[which, :]])
 
 	def refresh_particle(self, which, mcmc_steps=1000):
 		"""
 		Replace a particle by cloning another and doing MCMC.
 		"""
-		pass
+		# Choose a particle to clone
+		copy = rng.randint(self.num_particles)
+		while copy == which:
+			copy = rng.randint(self.num_particles)
+
+		# Clone it
+		self.num_particles[which] = deepcopy(self.particles[copy])
+
+		# Do MCMC
+		num_accepted = 0
+		for i in range(0, mcmc_steps):
+			proposal = deepcopy(self.particles[which])
+			logH = proposal.proposal()
+
+			if rng.rand() <= np.exp(logH) and is_okay(proposal):
+				self.particles[which] = proposal
+				num_accepted += 1
+
+	def is_okay(self, particle)
+		"""
+		Return true if particle isn't within a forbidden rectangle.
+		"""
+		return np.any()
 
 	@property
 	def rectangle_counts(self):
