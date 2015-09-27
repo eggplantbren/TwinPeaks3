@@ -21,6 +21,15 @@ class Sampler:
 		f = open('output.txt', 'w')
 		f.close()
 
+		# Rectangles that have been forbidden so far
+		self.forbidden_rectangles = []
+
+		# Number of iterations done
+		self.iteration = 0
+
+		# Fraction of prior mass still in play
+		self.log_prior_mass = 0.
+
 	def initialise(self):
 		"""
 		Generate all the walkers from the prior
@@ -30,8 +39,6 @@ class Sampler:
 			walker.from_prior()
 			self.all_scalars.append(walker.scalars)
 		self.all_scalars = np.array(self.all_scalars)
-		self.iteration = 0
-		self.log_prior_mass = 0. # Fraction of prior mass still in play
 		return
 
 	def do_iteration(self):
@@ -44,24 +51,26 @@ class Sampler:
 		temp = np.nonzero(counts == counts.min())[0]
 		which = temp[rng.randint(len(temp))]
 
-		# Estimate the fraction of remaining prior mass being eliminated
-		frac = (1. + counts[which])/self.num_particles
+		if counts.min() != 0:
+			print("counts.min() != 0")
+
+		# Estimate the fraction of *remaining* prior mass being eliminated
+		frac = float(1 + counts[which])/self.num_particles
 
 		# Write discarded particle info to disk
 		# log prior mass estimate, then scalars
 		f = open('output.txt', 'a')
-		logw = np.log(float(self.iteration)/self.num_particles) + \
-				self.iteration*np.log(1. - np.log(float(self.iteration)/self.num_particles))
+		logw = np.log(frac) + self.log_prior_mass
 		line = str(logw)
 		for s in self.all_scalars[which, :]:
-			line += str(s) + ' '
+			line += ' ' + str(s)
 		f.write(line + '\n')
 		f.close()
 
 	@property
 	def rectangle_counts(self):
 		"""
-		Count how many walkers are within the rectangle
+		Count how many other walkers are within the rectangle
 		of each walker.
 		"""
 		counts = np.empty(self.num_particles, dtype='int64')
