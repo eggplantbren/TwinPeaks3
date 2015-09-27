@@ -30,6 +30,8 @@ class Sampler:
 			walker.from_prior()
 			self.all_scalars.append(walker.scalars)
 		self.all_scalars = np.array(self.all_scalars)
+		self.iteration = 0
+		self.log_prior_mass = 0. # Fraction of prior mass still in play
 		return
 
 	def do_iteration(self):
@@ -42,12 +44,18 @@ class Sampler:
 		temp = np.nonzero(counts == counts.min())[0]
 		which = temp[rng.randint(len(temp))]
 
+		# Estimate the fraction of remaining prior mass being eliminated
+		frac = (1. + counts[which])/self.num_particles
+
 		# Write discarded particle info to disk
-		f = open('output.txt', 'wa')
-		string = ''
+		# log prior mass estimate, then scalars
+		f = open('output.txt', 'a')
+		logw = np.log(float(self.iteration)/self.num_particles) + \
+				self.iteration*np.log(1. - np.log(float(self.iteration)/self.num_particles))
+		line = str(logw)
 		for s in self.all_scalars[which, :]:
-			string += str(s) + ' '
-		f.write(string + '\n')
+			line += str(s) + ' '
+		f.write(line + '\n')
 		f.close()
 
 	@property
