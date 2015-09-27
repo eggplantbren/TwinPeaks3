@@ -51,6 +51,7 @@ class Sampler:
 		temp = np.nonzero(counts == counts.min())[0]
 		which = temp[rng.randint(len(temp))]
 
+		# Need to figure out what happens in this case
 		if counts.min() != 0:
 			print("counts.min() != 0")
 
@@ -66,6 +67,15 @@ class Sampler:
 			line += ' ' + str(s)
 		f.write(line + '\n')
 		f.close()
+
+		# Forbid another rectangle
+		self.forbidden_rectangles.append(self.all_scalars[which, :])
+
+	def refresh_particle(self, which, mcmc_steps=1000):
+		"""
+		Replace a particle by cloning another and doing MCMC.
+		"""
+		pass
 
 	@property
 	def rectangle_counts(self):
