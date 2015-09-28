@@ -59,7 +59,7 @@ class Walker:
 		compute the true partition function.
 		"""
 		s = np.empty(2)
-		s[0] = -0.5*np.sum(self.x**2)
+		s[0] = -0.5*np.sum((self.x - 0.5)**2)
 		s[1] = -np.sum(np.sin(4.*np.pi*self.x)**2)
 		return s
 
