@@ -59,6 +59,9 @@ class Sampler:
 		# Estimate the fraction of *remaining* prior mass being eliminated
 		frac = float(1 + counts[which])/self.num_particles
 
+		# Copy out the scalars for returning purposes
+		keep = self.all_scalars[which, :].copy()
+
 		# Write discarded particle info to disk
 		# log prior mass estimate, then scalars
 		f = open('output.txt', 'a')
@@ -73,6 +76,7 @@ class Sampler:
 		self.forbidden_rectangles = np.vstack([self.forbidden_rectangles, \
 										self.all_scalars[which, :]])
 		self.refresh_particle(which)
+		return keep
 
 	def refresh_particle(self, which, mcmc_steps=1000):
 		"""
@@ -123,6 +127,14 @@ depth = 1000.
 sampler = Sampler(num_particles)
 sampler.initialise()
 
+plt.ion()
+plt.hold(True)
+
 for i in range(0, 10):#int(num_particles*depth))
-	sampler.do_iteration()
+	keep = sampler.do_iteration()
+
+	plt.plot(keep[0], keep[1], 'b.', alpha=0.2)
+	plt.draw()
+plt.ioff()
+plt.show()
 
