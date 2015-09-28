@@ -2,6 +2,8 @@
 Various useful functions
 """
 
+import numpy as np
+
 def logsumexp(values):
 	biggest = np.max(values)
 	x = values - biggest
