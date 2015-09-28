@@ -72,6 +72,7 @@ class Sampler:
 		# Forbid another rectangle
 		self.forbidden_rectangles = np.vstack([self.forbidden_rectangles, \
 										self.all_scalars[which, :]])
+		self.refresh_particle(which)
 
 	def refresh_particle(self, which, mcmc_steps=1000):
 		"""
@@ -83,16 +84,17 @@ class Sampler:
 			copy = rng.randint(self.num_particles)
 
 		# Clone it
-		self.num_particles[which] = deepcopy(self.particles[copy])
+		self.walkers[which] = deepcopy(self.walkers[copy])
 
 		# Do MCMC
 		num_accepted = 0
 		for i in range(0, mcmc_steps):
-			proposal = deepcopy(self.particles[which])
+			proposal = deepcopy(self.walkers[which])
 			logH = proposal.proposal()
 
-			if rng.rand() <= np.exp(logH) and is_okay(proposal):
-				self.particles[which] = proposal
+			if rng.rand() <= np.exp(logH) and not np.any\
+				(Sampler.is_in_rectangle(proposal.scalars, self.forbidden_rectangles)):
+				self.walkers[which] = proposal
 				num_accepted += 1
 
 	@property
@@ -115,7 +117,12 @@ class Sampler:
 		"""
 		return np.all(scalars < rectangle, axis=1)
 
-sampler = Sampler(1000)
+
+num_particles = 1000
+depth = 1000.
+sampler = Sampler(num_particles)
 sampler.initialise()
-sampler.do_iteration()
+
+for i in range(0, 10):#int(num_particles*depth))
+	sampler.do_iteration()
 
