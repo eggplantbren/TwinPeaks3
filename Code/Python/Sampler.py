@@ -56,6 +56,9 @@ class Sampler:
 		# Estimate the fraction of *remaining* prior mass being eliminated
 		frac = float(1 + counts[which])/self.num_particles
 
+		# Reduce prior mass remaining
+		self.log_prior_mass += np.log(1. - frac)
+
 		# Copy out the scalars for returning purposes
 		keep = self.all_scalars[which, :].copy()
 
