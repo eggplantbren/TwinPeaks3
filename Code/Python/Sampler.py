@@ -92,11 +92,15 @@ class Sampler:
 		for i in range(0, mcmc_steps):
 			proposal = deepcopy(self.walkers[which])
 			logH = proposal.proposal()
+			proposal_scalars = proposal.scalars
 
 			if rng.rand() <= np.exp(logH) and not np.any\
-				(Sampler.is_in_rectangle(proposal.scalars, self.forbidden_rectangles)):
+				(Sampler.is_in_rectangle\
+					(proposal_scalars, self.forbidden_rectangles)):
 				self.walkers[which] = proposal
+				self.all_scalars[which, :] = proposal_scalars
 				num_accepted += 1
+
 		print('Accepted {a}/{b}.'.format(a=num_accepted, b=mcmc_steps))
 
 	@property
@@ -120,7 +124,7 @@ class Sampler:
 		return np.all(scalars < rectangle, axis=1)
 
 
-num_particles = 1000
+num_particles = 100
 depth = 1000.
 sampler = Sampler(num_particles)
 sampler.initialise()
@@ -130,9 +134,9 @@ plt.hold(True)
 
 for i in range(0, 1000):#int(num_particles*depth))
 	keep = sampler.do_iteration()
-
-	plt.plot(keep[0], keep[1], 'b.', alpha=0.2)
+	plt.plot(keep[0], keep[1], 'b.')
 	plt.draw()
+
 plt.ioff()
 plt.show()
 
