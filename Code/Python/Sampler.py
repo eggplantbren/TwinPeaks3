@@ -70,7 +70,7 @@ class Sampler:
 		f.close()
 
 		# Forbid another rectangle
-		self.forbidden_rectangles = np.hstack([self.forbidden_rectangles, \
+		self.forbidden_rectangles = np.vstack([self.forbidden_rectangles, \
 										self.all_scalars[which, :]])
 
 	def refresh_particle(self, which, mcmc_steps=1000):
@@ -95,12 +95,6 @@ class Sampler:
 				self.particles[which] = proposal
 				num_accepted += 1
 
-	def is_okay(self, particle)
-		"""
-		Return true if particle isn't within a forbidden rectangle.
-		"""
-		return np.any()
-
 	@property
 	def rectangle_counts(self):
 		"""
@@ -116,15 +110,12 @@ class Sampler:
 	@staticmethod
 	def is_in_rectangle(scalars, rectangle):
 		"""
-		Rectangle should be a numpy array of length 2
-		Scalars can be of shape (a, 2)
-		Returns true for each row of 'scalars' that is within the rectangle
-		defined by 'rectangle'.
+		Is 'scalars' inside the rectangle defined by 'rectangle'?
+		Can vectorise on one argument or the other by passing in a 2D array.
 		"""
 		return np.all(scalars < rectangle, axis=1)
 
 sampler = Sampler(1000)
 sampler.initialise()
 sampler.do_iteration()
-
 
