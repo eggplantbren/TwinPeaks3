@@ -24,9 +24,6 @@ class Sampler:
 		# Rectangles that have been forbidden so far
 		self.forbidden_rectangles = None
 
-		# Number of iterations done
-		self.iteration = 0
-
 		# Fraction of prior mass still in play
 		self.log_prior_mass = 0.
 
@@ -100,6 +97,7 @@ class Sampler:
 				(Sampler.is_in_rectangle(proposal.scalars, self.forbidden_rectangles)):
 				self.walkers[which] = proposal
 				num_accepted += 1
+		print('Accepted {a}/{b}.'.format(a=num_accepted, b=mcmc_steps))
 
 	@property
 	def rectangle_counts(self):
@@ -130,7 +128,7 @@ sampler.initialise()
 plt.ion()
 plt.hold(True)
 
-for i in range(0, 10):#int(num_particles*depth))
+for i in range(0, 1000):#int(num_particles*depth))
 	keep = sampler.do_iteration()
 
 	plt.plot(keep[0], keep[1], 'b.', alpha=0.2)
