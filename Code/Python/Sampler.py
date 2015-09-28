@@ -135,7 +135,7 @@ sampler.initialise()
 plt.ion()
 plt.hold(True)
 
-for i in range(0, 1000):#int(num_particles*depth))
+for i in range(0, int(num_particles*depth)):
 	keep = sampler.do_iteration()
 	plt.plot(keep[0], keep[1], 'b.')
 	plt.draw()
