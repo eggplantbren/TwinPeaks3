@@ -198,16 +198,16 @@ updated probability distribution that takes into account the constraints is
 of the ``canonical'' form:
 
 \begin{eqnarray}
-p(\xx; \alpha_1, \alpha_2) &=& \frac{\pi(\xx)\exp\left[\alpha_1S_1(\xx)+\alpha_2S_2(\xx)\right]}
-{Z(\alpha_1, \alpha_2)}
+p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1S_1(\xx)+\beta_2S_2(\xx)\right]}
+{Z(\beta_1, \beta_2)}
 \end{eqnarray}
 
 If we were only interested in a single canonical distribution, for example
-with $\alpha_1 = 0.3$ and $\alpha_2 = 0.7$, we could estimate its normalising
+with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we could estimate its normalising
 constant and by running standard Nested Sampling with ``likelihood''
 $L(\xx) = \exp\left[0.3S_1(\xx) + 0.7S_2(\xx)\right]$. However, usually we
-are interested in a range of values for $\alpha_1$ and $\alpha_2$, and we
-want to know the normalisation $Z(\alpha_1, \alpha_2)$, called the
+are interested in a range of values for $\beta_1$ and $\beta_2$, and we
+want to know the normalisation $Z(\beta_1, \beta_2)$, called the
 partition function. This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
@@ -216,7 +216,7 @@ transitions.
 \section{Properties of Nested sampling}
 
 We seek an algorithm for computing the partition function
-$Z(\alpha_1, \alpha_2)$ for a range of values of the $\alpha$s, from a single
+$Z(\beta_1, \beta_2)$ for a range of values of the $\beta$s, from a single
 run. To be considered a variant of Nested Sampling, we require the method
 to satisfy the following requirements:
 \begin{enumerate}
