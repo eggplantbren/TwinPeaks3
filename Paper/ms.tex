@@ -134,7 +134,7 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 
 \section{Introduction}
 
-Nested Sampling \citep{skilling} is an effective and popular
+Nested Sampling \citep[NS][]{skilling} is an effective and popular
 Monte Carlo algorithm for Bayesian computation and
 statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
@@ -151,7 +151,7 @@ where $\pi(\xx)$ is the prior distribution, $L(\xx)$ is the likelihood
 function, and $Z$ is the normalising constant, known as the
 ``marginal likelihood'' or the ``evidence'':
 \begin{eqnarray}
-Z &=& \int \pi(\xx) L(\xx) \, \dx.
+Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
 It begins by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
@@ -159,6 +159,10 @@ the likelihood $L(\xx)$ that compress the prior mass by a
 factor that is approximately known.
 This enables the calculation of the marginal likelihood $Z$
 and properties of the posterior $\pi(\xx)L(\xx)/Z$.
+NS is required because Equation~\ref{eqn:evidence}
+is the expected value of $L$ with respect to a very heavy-tailed distribution
+(the prior for the $L$ value implied by $\pi(\xx)$). Hence, there is a strong
+connection between NS and ideas from rare event simulation \citep{walter}.
 
 NS also allows us to calculate the properties of any other distribution that
 is in some sense intermediate
@@ -178,7 +182,7 @@ to work when the problem contains a {\it phase transition}.
 In statistical mechanics, Equation~\ref{eqn:power_posterior} defines the
 family of {\it canonical distributions}, usually written as:
 \begin{eqnarray}
-p(\xx; \beta) &=& \frac{\pi(\xx)\exp[-\beta E(\xx)}{Z(\beta)}
+p(\xx; \beta) &=& \frac{\pi(\xx)\exp[-\beta E(\xx)]}{Z(\beta)}
 \end{eqnarray}
 where $E(\xx)$ is the energy function. In this context we usually want to
 compute $Z(\beta)$ as a function of $\beta$, which is called the
@@ -295,7 +299,7 @@ The authors declare no conflict of interest.
 \bibitem[Baldock et al.(2015)]{2015arXiv150303404B} Baldock, R.~J.~N., 
 P{\'a}rtay, L.~v.~B., Bart{\'o}k, A.~P., Payne, M.~C., Cs{\'a}nyi, G.\ 
 2015.\ Determining pressure-temperature phase diagrams of materials.\ ArXiv 
-e-prints arXiv:1503.03404. 
+e-prints arXiv: 1503.03404. 
 
 \bibitem[P{\'a}rtay et al.(2014)]{2014PhRvE..89b2302P} P{\'a}rtay, L.~B., 
 Bart{\'o}k, A.~P., Cs{\'a}nyi, G.\ 2014.\ Nested sampling for materials: 
@@ -303,9 +307,12 @@ The case of hard spheres.\ Physical Review E 89, 022302.
 
 \bibitem[P{\'a}rtay et al.(2009)]{2009arXiv0906.3544P} P{\'a}rtay, L.~B., 
 Bart{\'o}k, A.~P., Cs{\'a}nyi, G.\ 2009.\ Efficient sampling of atomic 
-configurational spaces.\ ArXiv e-prints arXiv:0906.3544. 
+configurational spaces.\ ArXiv e-prints arXiv: 0906.3544. 
 
 \bibitem[\protect\citeauthoryear{Skilling}{2006}]{skilling} Skilling, J., 2006, Nested Sampling for General Bayesian Computation, Bayesian Analysis 4, pp. 833-860.
+
+\bibitem[Walter(2015)]{walter}
+Walter, C.\ Point Process-based Monte Carlo estimation.\ arXiv: 1412.6368.
 %% Reference 1
 %\bibitem{ref-journal}
 %Lastname, F.; Author, T. The title of the cited article. {\em Journal Abbreviation} {\bf 2008}, {\em 10}, 142-149.
