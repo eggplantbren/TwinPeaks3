@@ -153,26 +153,36 @@ function, and $Z$ is the normalising constant, known as the
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.
 \end{eqnarray}
-
-Nested Sampling begins by drawing particles from the
+It begins by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by a
 factor that is approximately known.
-This enables the calculation of the marginal likelihood
-and properties of the posterior, or any other distribution that is intermediate
+This enables the calculation of the marginal likelihood $Z$
+and properties of the posterior $\pi(\xx)L(\xx)/Z$.
+
+NS also allows us to calculate the properties of any other distribution that
+is in some sense intermediate
 between the prior and the posterior. For example, we might be interested in
 a ``power posterior'' where the likelihood is raised to a power $\beta$:
 \begin{eqnarray}
-p(\xx; \beta) &=& \frac{\pi(\xx)L(\xx)^\beta}{Z(\beta)}
+p(\xx; \beta) &=& \frac{\pi(\xx)L(\xx)^\beta}{Z(\beta)}\label{eqn:power_posterior}
 \end{eqnarray}
 The normalisation and posterior samples from this distribution can be obtained
 from the original Nested Sampling run. An example application, in the case of
 a Bayesian model with a ``gaussian noise'' assumption in the likelihood,
 computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
 posterior distribution would have been if the noise variance had been greater.
-
 Relative to alternative approaches such as annealing, Nested Sampling continues
 to work when the problem contains a {\it phase transition}.
+
+In statistical mechanics, Equation~\ref{eqn:power_posterior} defines the
+family of {\it canonical distributions}, usually written as:
+\begin{eqnarray}
+p(\xx; \beta) &=& \frac{\pi(\xx)\exp[-\beta E(\xx)}{Z(\beta)}
+\end{eqnarray}
+where $E(\xx)$ is the energy function. In this context we usually want to
+compute $Z(\beta)$ as a function of $\beta$, which is called the
+{\it partition function}.
 
 In some inference and
 statistical mechanics problems, there are two or more scalar functions of
