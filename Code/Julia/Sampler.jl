@@ -35,12 +35,15 @@ end
 
 # Do an NS iteration
 function do_iteration!(sampler::Sampler)
+	counts = rectangle_counts(sampler)
+	
+
 	return nothing
 end
 
 # Count how many other walkers are within the rectangle of each walker.
 function rectangle_counts(sampler::Sampler)
-	counts = Array{Int64, sampler.num_walkers}
+	counts = Array(Int64, sampler.num_walkers)
 	for(i in 1:sampler.num_walkers)
 		counts[i] = 0
 		for(j in 1:sampler.num_walkers)
@@ -54,6 +57,6 @@ end
 # Is 'scalars' inside the rectangle defined by 'rectangle'?
 function is_in_rectangle(scalars::Array{Float64, 1},
 							rectangle::Array{Float64, 1})
-	return all(scalars < rectangle)
+	return all(scalars .< rectangle)
 end
 

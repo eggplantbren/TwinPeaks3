@@ -1,6 +1,6 @@
 include("Utils.jl")
 
-const num_scalars::Int64 = 2
+const num_scalars = 2
 
 # Walker class. Defines what problem we're solving.
 # An object of this class is a point in parameter space. 
