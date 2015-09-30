@@ -124,6 +124,11 @@ end
 # Is 'scalars' inside the rectangle defined by 'rectangle'?
 function is_in_rectangle(scalars::Array{Float64, 1},
 							rectangle::Array{Float64, 1})
-	return all(scalars .< rectangle)
+	for(i in 1:length(scalars))
+		if(scalars[i] >= rectangle[i])
+			return false
+		end
+	end
+	return true
 end
 

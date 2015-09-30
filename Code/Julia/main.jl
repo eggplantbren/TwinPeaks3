@@ -9,8 +9,9 @@ using PyCall
 plt.ion()
 plt.hold(true)
 
-while(true)
+for(i in 1:5000)
 	scalars = do_iteration!(sampler)
+
 	plt.plot(scalars[1], scalars[2], "b.")
 	plt.draw()
 end
