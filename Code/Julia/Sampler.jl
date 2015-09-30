@@ -71,9 +71,44 @@ function forbid_rectangle!(sampler::Sampler, scalars::Array{Float64, 1})
 	return nothing
 end
 
+# Is 'scalars' in the allowed region?
+function is_okay(sampler::Sampler, scalars::Array{Float64, 1})
+	for(i in 1:size(sampler.forbidden_rectangles)[2])
+		if(is_in_rectangle(scalars, sampler.forbidden_rectangles[:,i]))
+			return false
+		end
+	end
+	return true
+end
+
 # Do MCMC to replace one of the walkers
-function refresh_walker!(sampler::Sampler, which::Int64)
-	return nothing
+function refresh_walker!(sampler::Sampler, which::Int64,
+									mcmc_steps::Int64=1000)
+	# Choose a particle to clone
+	copy = rand(1:sampler.num_walkers)
+	while copy == which
+		copy = rand(1:sampler.num_walkers)
+	end
+
+	# Clone it
+	sampler.walkers[which] = deepcopy(sampler.walkers[copy])
+
+	# Do MCMC
+	num_accepted = 0
+	for(i in 1:mcmc_steps)
+		proposal = deepcopy(sampler.walkers[which])
+		logH = proposal!(proposal)
+
+		if((rand() <= exp(logH)) & is_okay(sampler, proposal.scalars))
+			sampler.walkers[which] = proposal
+			num_accepted += 1
+		end
+	end
+
+	println("Iteration ", sampler.iteration+1, ", accepted ", num_accepted, "/",
+						mcmc_steps)
+
+	sampler.iteration += 1
 end
 
 # Count how many other walkers are within the rectangle of each walker.
