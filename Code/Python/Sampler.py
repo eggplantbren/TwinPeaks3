@@ -37,6 +37,7 @@ class Sampler:
 			self.all_scalars.append(walker.scalars)
 		self.all_scalars = np.array(self.all_scalars)
 		self.forbidden_rectangles = np.empty((0, self.all_scalars.shape[1]))
+		self.iteration = 0
 		return
 
 	def do_iteration(self):
@@ -105,7 +106,8 @@ class Sampler:
 				self.all_scalars[which, :] = proposal_scalars
 				num_accepted += 1
 
-		print('Accepted {a}/{b}.'.format(a=num_accepted, b=mcmc_steps))
+		print('Iteration {i}. Accepted {a}/{b}.'.format(i=(self.iteration+1), a=num_accepted, b=mcmc_steps))
+		self.iteration += 1
 
 	@property
 	def rectangle_counts(self):
