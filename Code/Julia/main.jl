@@ -13,7 +13,7 @@ for(i in 1:5000)
 	scalars = do_iteration!(sampler)
 
 	plt.plot(scalars[1], scalars[2], "b.")
-	if(rem(i, 10) == 0)
+	if(rem(i, 100) == 0)
 		plt.draw()
 	end
 end

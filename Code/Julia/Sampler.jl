@@ -41,6 +41,19 @@ function initialise!(sampler::Sampler)
 	return nothing
 end
 
+# Remove redundant rectangles (only works well if run each iteration)
+function prune_rectangles!(sampler::Sampler)
+	n = size(sampler.forbidden_rectangles)[2]
+	keep = fill(true, n)
+	for(i in 1:(n-1))
+		if(is_in_rectangle(sampler.forbidden_rectangles[:,i],
+							sampler.forbidden_rectangles[:,n]))
+			keep[i] = false
+		end
+	end
+	sampler.forbidden_rectangles = sampler.forbidden_rectangles[:, keep]
+end
+
 # Do an NS iteration
 function do_iteration!(sampler::Sampler)
 	counts = rectangle_counts(sampler)
@@ -52,22 +65,24 @@ function do_iteration!(sampler::Sampler)
 	# Retain its scalars
 	scalars = sampler.walkers[which].scalars
 
-	# Write its scalars
+	# Estimate the fraction of *remaining* prior mass being eliminated
+	frac = (1 + counts[which])/sampler.num_walkers
+
+	# Write log(prior mass) and scalars
 	f = open("output.txt", "a")
+	print(f, log(frac) + sampler.log_prior_mass, " ")
 	for(s in scalars)
 		print(f, s, " ")
 	end
 	print(f, "\n")
 	close(f)
 
-	# Estimate the fraction of *remaining* prior mass being eliminated
-	frac = (1 + counts[which])/sampler.num_walkers
-
 	# Reduce prior mass remaining
 	sampler.log_prior_mass += log(1.0 - frac)
 
 	# Forbid another rectangle
 	forbid_rectangle!(sampler, scalars)
+	prune_rectangles!(sampler)
 
 	# Refresh discarded walker
 	refresh_walker!(sampler, which)
