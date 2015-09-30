@@ -20,17 +20,14 @@ class Sampler
 		int num_particles;
 		std::vector<MyModel> particles;
 
+		// Number of equilibration steps
+		int mcmc_steps;
+
 		// Whether from_prior has been called on all the particles
 		bool initialised;
 
 		// Count number of iterations done
 		int iteration;
-
-		// Number of equilibration steps
-		int mcmc_steps;
-
-		// Output file streams
-		std::ofstream sample_file, sample_info_file;
 
 		// Method to write a particular particle (and its info) to disk
 		void write_output(int index);
@@ -42,7 +39,7 @@ class Sampler
 
 	public:
 		// Constructor
-		Sampler(int num_particles, int mcmc_steps);
+		Sampler(const RNG& rng, int num_particles, int mcmc_steps);
 
 		// Set RNG seed
 		void set_rng_seed(unsigned int seed);
