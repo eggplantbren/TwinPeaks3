@@ -36,10 +36,39 @@ end
 # Do an NS iteration
 function do_iteration!(sampler::Sampler)
 	counts = rectangle_counts(sampler)
-	
 
+	# Choose one with minimum count to discard
+	temp = find(counts .== 0)
+	which = temp[rand(1:length(temp))]
+
+	# Retain its scalars
+	scalars = sampler.walkers[which].scalars
+
+	# Estimate the fraction of *remaining* prior mass being eliminated
+	frac = (1 + counts[which])/sampler.num_walkers
+
+	# Reduce prior mass remaining
+	sampler.log_prior_mass += log(1.0 - frac)
+
+	# Forbid another rectangle
+	forbid_rectangle!(sampler, scalars)
+
+	# Refresh discarded walker
+	refresh_walker!(sampler, which)
+
+	return scalars
+end
+
+# Add an extra rectangle to the list of forbidden ones
+function forbid_rectangle!(sampler::Sampler, scalars::Array{Float64, 1})
 	return nothing
 end
+
+# Do MCMC to replace one of the walkers
+function refresh_walker!(sampler::Sampler, which::Int64)
+	return nothing
+end
+
 
 # Count how many other walkers are within the rectangle of each walker.
 function rectangle_counts(sampler::Sampler)
