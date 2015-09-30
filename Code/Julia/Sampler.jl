@@ -33,6 +33,11 @@ function initialise!(sampler::Sampler)
 		sampler.walkers[i] = Walker()
 		from_prior!(sampler.walkers[i])
 	end
+
+	# Open and close output file to clear it
+	f = open("output.txt", "w")
+	close(f)
+
 	return nothing
 end
 
@@ -46,6 +51,14 @@ function do_iteration!(sampler::Sampler)
 
 	# Retain its scalars
 	scalars = sampler.walkers[which].scalars
+
+	# Write its scalars
+	f = open("output.txt", "a")
+	for(s in scalars)
+		print(f, s, " ")
+	end
+	print(f, "\n")
+	close(f)
 
 	# Estimate the fraction of *remaining* prior mass being eliminated
 	frac = (1 + counts[which])/sampler.num_walkers
