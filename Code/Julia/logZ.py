@@ -3,6 +3,7 @@ Load output.txt and compute logZ
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from Utils import logsumexp
 
 # Load the data
@@ -23,6 +24,13 @@ def H(temperatures):
 				- logZ(temperatures)
 	return np.sum(np.exp(logp)*(logp - output[:,0]))
 
-print('log(Z) = {a}'.format(a=logZ([0.1, 1.])))
-print('H = {h}'.format(h=H([0.1, 1.])))
+temperatures = [0.1, 1.]
+
+print('log(Z) = {a}'.format(a=logZ(temperatures)))
+print('H = {h}'.format(h=H(temperatures)))
+
+logp = output[:,0] + output[:,1]/temperatures[0] + output[:,2]/temperatures[1]\
+				- logZ(temperatures)
+plt.plot(np.exp(logp - logp.max()))
+plt.show()
 
