@@ -20,6 +20,9 @@ class Sampler
 		int num_particles;
 		std::vector<MyModel> particles;
 
+		// Forbidden rectangles
+		std::vector< std::vector<double> > rects;
+
 		// Number of equilibration steps
 		int mcmc_steps;
 
@@ -67,6 +70,8 @@ class Sampler
 		RNG get_rng() const
 		{ return rng; }
 };
+
+#include "SamplerImpl.h"
 
 #endif
 

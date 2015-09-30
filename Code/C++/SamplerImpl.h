@@ -5,7 +5,7 @@
 #include "Utils.h"
 
 template<class MyModel>
-Sampler<Model>::Sampler(const RNG& rng, int num_particles, int mcmc_steps)
+Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps)
 :rng(rng)
 ,num_particles(num_particles)
 ,particles(num_particles)
@@ -26,6 +26,41 @@ template<class MyModel>
 void Sampler<MyModel>::initialise()
 {
 	for(MyModel& p: particles)
-		p.from_prior();
+		p.from_prior(rng);
+}
+
+template<class MyModel>
+void Sampler<MyModel>::do_iteration()
+{
+	// Calculate how many particles are in the rectangle of each particle
+	std::vector<int> counts(num_particles, 0);
+	std::vector<int> indices; // Save counts==0 indices
+	for(int i=0; i<num_particles; i++)
+	{
+		for(int j=0; j<num_particles; j++)
+		{
+			counts[i] += is_in_rectangle(particles[j].get_scalars(),
+								particles[i].get_scalars());
+		}
+		if(counts[i] == 0)
+			indices.push_back(i);
+	}
+
+	// Choose an index, to become the discarded particle
+	int which = indices[rng.rand_int(indices.size())];
+
+	
+}
+
+template<class MyModel>
+bool Sampler<MyModel>::is_in_rectangle(const std::vector<double>& s,
+										const std::vector<double>& rect)
+{
+	for(size_t i=0; i<s.size(); i++)
+	{
+		if(s[i] >= rect[i])
+			return false;
+	}
+	return true;
 }
 
