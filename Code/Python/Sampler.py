@@ -129,20 +129,23 @@ class Sampler:
 		"""
 		return np.all(scalars < rectangle, axis=1)
 
+if __name__ == '__main__':
+	num_particles = 100
+	depth = 50.			# How far to go
+	sampler = Sampler(num_particles)
+	sampler.initialise()
 
-num_particles = 100
-depth = 1000.
-sampler = Sampler(num_particles)
-sampler.initialise()
+	plt.ion()
+	plt.hold(True)
 
-plt.ion()
-plt.hold(True)
+	for i in range(0, int(num_particles*depth)):
+		keep = sampler.do_iteration()
+		plt.plot(keep[0], keep[1], 'b.')
+		plt.xlabel('Scalar 1')
+		plt.ylabel('Scalar 2')
+		plt.title('Discarded Points')
+		plt.draw()
 
-for i in range(0, int(num_particles*depth)):
-	keep = sampler.do_iteration()
-	plt.plot(keep[0], keep[1], 'b.')
-	plt.draw()
-
-plt.ioff()
-plt.show()
+	plt.ioff()
+	plt.show()
 

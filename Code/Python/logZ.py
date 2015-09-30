@@ -23,6 +23,6 @@ def H(temperatures):
 				- logZ(temperatures)
 	return np.sum(np.exp(logp)*(logp - output[:,0]))
 
-print(logZ([0.1, 1.]))
-print(H([0.1, 1.]))
+print('log(Z) = {a}'.format(a=logZ([0.1, 1.])))
+print('H = {h}'.format(h=H([0.1, 1.])))
 
