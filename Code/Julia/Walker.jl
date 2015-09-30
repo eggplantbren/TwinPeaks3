@@ -31,7 +31,7 @@ end
 # Calculate the scalars
 function calculate_scalars!(walker::Walker)
 	walker.scalars[1] = -sum((walker.params - 0.5).^2)
-	walker.scalars[2] = -sum(4.*pi*walker.params.^2)
+	walker.scalars[2] = -sum(sin(4.*pi*walker.params).^2)
 	return nothing
 end
 

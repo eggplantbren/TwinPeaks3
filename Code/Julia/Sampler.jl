@@ -1,5 +1,8 @@
 include("Walker.jl")
 
+using PyCall
+@pyimport matplotlib.pyplot as plt
+
 # An object of this class is a sampler.
 type Sampler
 	# Number of walkers
@@ -61,12 +64,6 @@ end
 
 # Add an extra rectangle to the list of forbidden ones
 function forbid_rectangle!(sampler::Sampler, scalars::Array{Float64, 1})
-	# See if it's redundant. If it is, don't do anything
-	for(i in 1:size(sampler.forbidden_rectangles)[2])
-		if(is_in_rectangle(scalars, sampler.forbidden_rectangles[:,i]))
-			return nothing
-		end
-	end
 	sampler.forbidden_rectangles = hcat(sampler.forbidden_rectangles, scalars)
 	return nothing
 end
@@ -117,8 +114,8 @@ function rectangle_counts(sampler::Sampler)
 	for(i in 1:sampler.num_walkers)
 		counts[i] = 0
 		for(j in 1:sampler.num_walkers)
-			counts[i] += is_in_rectangle(sampler.walkers[i].scalars,
-											sampler.walkers[j].scalars)
+			counts[i] += is_in_rectangle(sampler.walkers[j].scalars,
+											sampler.walkers[i].scalars)
 		end
 	end
 	return counts
