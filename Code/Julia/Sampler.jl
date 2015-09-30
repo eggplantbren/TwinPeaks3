@@ -61,6 +61,13 @@ end
 
 # Add an extra rectangle to the list of forbidden ones
 function forbid_rectangle!(sampler::Sampler, scalars::Array{Float64, 1})
+	# See if it's redundant. If it is, don't do anything
+	for(i in 1:size(sampler.forbidden_rectangles)[2])
+		if(is_in_rectangle(scalars, sampler.forbidden_rectangles[:,i]))
+			return nothing
+		end
+	end
+	sampler.forbidden_rectangles = hcat(sampler.forbidden_rectangles, scalars)
 	return nothing
 end
 
@@ -68,7 +75,6 @@ end
 function refresh_walker!(sampler::Sampler, which::Int64)
 	return nothing
 end
-
 
 # Count how many other walkers are within the rectangle of each walker.
 function rectangle_counts(sampler::Sampler)
