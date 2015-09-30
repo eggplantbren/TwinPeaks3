@@ -4,26 +4,14 @@
 
 #include <iostream>
 #include <ctime>
+#include "RNG.h"
 #include "Sampler.h"
 
 using namespace std;
 
-int main(int argc, char** argv)
+int main()
 {
-	/*
-
-	// Create a sampler
-	Sampler<SpikeSlab> sampler(100, 1000);
-	sampler.clear_output_files();
-
-	// Seed its random number generator
-	// Use system time if no seed given on command line
-	sampler.set_rng_seed((argc == 1)?(time(0)):(atoi(argv[1])));
-
-	// Do some iterations
-	sampler.run(100*100);
-
-	*/
+	RNG rng;
 
 	return 0;
 }

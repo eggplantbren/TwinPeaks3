@@ -19,8 +19,6 @@ class Sampler
 		// The particles, and information about them
 		int num_particles;
 		std::vector<MyModel> particles;
-		std::vector<double> log_likelihoods;
-		std::vector<double> tiebreakers;
 
 		// Whether from_prior has been called on all the particles
 		bool initialised;
@@ -31,23 +29,16 @@ class Sampler
 		// Number of equilibration steps
 		int mcmc_steps;
 
-		// Results based on deterministic approximation
-		// log(X)
-		// log prior mass (Skilling version),
-		// log prior mass (Walter version),
-		// log evidence, and information (Skilling versions)
-		double logX, log_prior_mass1, log_prior_mass2, logZ, H;
-
 		// Output file streams
 		std::ofstream sample_file, sample_info_file;
 
 		// Method to write a particular particle (and its info) to disk
 		void write_output(int index);
 
-		// Function to determine whether one (likelihood, tiebreaker)
-		// pair is below another
-		static bool is_below(double log_likelihood1, double tiebreaker1,
-									double log_likelihood2, double tiebreaker2);
+		// Function to determine whether a point is within another point's
+		// rectangle.
+		static bool is_in_rectangle(const std::vector<double>& s1,
+									const std::vector<double>& s2);
 
 	public:
 		// Constructor
@@ -78,14 +69,7 @@ class Sampler
 		{ this->rng = rng; }
 		RNG get_rng() const
 		{ return rng; }
-
-		// More getters
-		double get_logZ() const
-		{ return logZ; }
-		double get_H() const
-		{ return H; }
 };
 
-#include "SamplerImpl.h"
 #endif
 
