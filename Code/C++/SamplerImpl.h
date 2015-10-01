@@ -52,13 +52,68 @@ void Sampler<MyModel>::do_iteration()
 	// Choose an index, to become the discarded particle
 	int which = indices[rng.rand_int(indices.size())];
 
+	// Append its scalars to the forbidden rectangles
+	rects.push_back(particles[which].get_scalars());
+
+	// Assign prior weight
+	double logw = log(1./num_particles) + iteration*log(1. - 1./num_particles);
+
 	// Write it out to an output file
 	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
-	const std::vector<double>& scalars = particles[which].get_scalars();
-	for(double s: scalars)
+	fout<<logw<<' ';
+	for(double s: particles[which].get_scalars())
 		fout<<s<<' ';
 	fout<<std::endl;
 	fout.close();
+
+	// Do MCMC to generate a new particle
+	refresh_particle(which);
+	iteration++;
+}
+
+template<class MyModel>
+void Sampler<MyModel>::refresh_particle(int which)
+{
+	// Choose a particle to clone
+	int copy;
+	do
+	{
+		copy = rng.rand_int(num_particles);
+	}
+	while(copy == which && num_particles > 1);
+
+	// Clone it
+	particles[which] = particles[copy];
+
+	// Do the MCMC
+	MyModel proposal;
+	double logH;
+	int accepted = 0;
+	for(int i=0; i<mcmc_steps; i++)
+	{
+		proposal = particles[which];
+		logH = proposal.perturb(rng);
+
+		if(rng.rand() <= exp(logH) && is_okay(proposal.get_scalars()))
+		{
+			particles[which] = proposal;
+			accepted++;
+		}
+	}
+
+	std::cout<<"# Iteration "<<(iteration+1)<<". ";
+	std::cout<<"Accepted "<<accepted<<"/"<<mcmc_steps<<"."<<std::endl;
+}
+
+template<class MyModel>
+bool Sampler<MyModel>::is_okay(const std::vector<double>& s)
+{
+	for(size_t i=0; i<rects.size(); i++)
+	{
+		if(is_in_rectangle(s, rects[i]))
+			return false;
+	}
+	return true;
 }
 
 template<class MyModel>

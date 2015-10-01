@@ -32,8 +32,11 @@ class Sampler
 		// Count number of iterations done
 		int iteration;
 
-		// Method to write a particular particle (and its info) to disk
-		void write_output(int index);
+		// Do MCMC to equilibrate a particle
+		void refresh_particle(int which);
+
+		// Check s against rects
+		bool is_okay(const std::vector<double>& s);
 
 		// Function to determine whether a point is within another point's
 		// rectangle.
