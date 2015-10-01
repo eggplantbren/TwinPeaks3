@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <limits>
+#include <fstream>
 #include "Utils.h"
 
 template<class MyModel>
@@ -13,7 +14,9 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps)
 ,initialised(false)
 ,iteration(0)
 {
-
+	// Open and close output file to clear it
+	std::fstream fout("sample_info.txt", std::ios::out);
+	fout.close();
 }
 
 template<class MyModel>
@@ -49,7 +52,13 @@ void Sampler<MyModel>::do_iteration()
 	// Choose an index, to become the discarded particle
 	int which = indices[rng.rand_int(indices.size())];
 
-	
+	// Write it out to an output file
+	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
+	const std::vector<double>& scalars = particles[which].get_scalars();
+	for(double s: scalars)
+		fout<<s<<' ';
+	fout<<std::endl;
+	fout.close();
 }
 
 template<class MyModel>
