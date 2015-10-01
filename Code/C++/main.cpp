@@ -12,13 +12,17 @@ using namespace std;
 
 int main()
 {
+	// Make an RNG
 	RNG rng;
+	rng.set_seed(ctime(0));
 
-	Sampler<SimpleExample> sampler(rng, 100, 5000);
+	// Create a sampler
+	Sampler<SimpleExample> sampler(rng, 1000, 5000);
 	sampler.initialise();
 
-
-	sampler.do_iteration();
+	// Do NS indefinitely
+	while(true)
+		sampler.do_iteration();
 
 	return 0;
 }
