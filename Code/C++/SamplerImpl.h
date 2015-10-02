@@ -60,7 +60,7 @@ void Sampler<MyModel>::do_iteration()
 	int which = indices[rng.rand_int(indices.size())];
 
 	// Append its scalars to the forbidden rectangles
-	rects.push_back(particles[which].get_scalars());
+	rects.push_front(particles[which].get_scalars());
 	prune_rectangles();
 
 	// Assign prior weight
