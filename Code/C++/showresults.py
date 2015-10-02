@@ -1,5 +1,5 @@
 """
-Load output.txt and compute logZ
+Load sample_info.txt and compute logZ
 """
 
 import numpy as np
@@ -25,4 +25,10 @@ def H(temperatures):
 
 print('log(Z) = {a}'.format(a=logZ([0.1, 1.])))
 print('H = {h}'.format(h=H([0.1, 1.])))
+
+import matplotlib.pyplot as plt
+plt.plot(output[:,1], output[:,2], 'b.', markersize=1)
+plt.xlabel('Scalar 1')
+plt.ylabel('Scalar 2')
+plt.show()
 
