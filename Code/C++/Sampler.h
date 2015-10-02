@@ -2,6 +2,7 @@
 #define _Sampler_
 
 #include <vector>
+#include <list>
 #include <fstream>
 #include "RNG.h"
 
@@ -21,7 +22,7 @@ class Sampler
 		std::vector<MyModel> particles;
 
 		// Forbidden rectangles
-		std::vector< std::vector<double> > rects;
+		std::list< std::vector<double> > rects;
 
 		// Number of equilibration steps
 		int mcmc_steps;
@@ -37,6 +38,9 @@ class Sampler
 
 		// Check s against rects
 		bool is_okay(const std::vector<double>& s);
+
+		// Remove redundant rectangles (only do this just after adding one)
+		void prune_rectangles();
 
 		// Function to determine whether a point is within another point's
 		// rectangle.

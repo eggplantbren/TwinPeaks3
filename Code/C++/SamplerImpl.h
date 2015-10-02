@@ -33,6 +33,13 @@ void Sampler<MyModel>::initialise()
 }
 
 template<class MyModel>
+void Sampler<MyModel>::prune_rectangles()
+{
+	// Use std::remove_if
+
+}
+
+template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
 	// Calculate how many particles are in the rectangle of each particle
@@ -54,6 +61,7 @@ void Sampler<MyModel>::do_iteration()
 
 	// Append its scalars to the forbidden rectangles
 	rects.push_back(particles[which].get_scalars());
+	prune_rectangles();
 
 	// Assign prior weight
 	double logw = log(1./num_particles) + iteration*log(1. - 1./num_particles);
@@ -108,9 +116,10 @@ void Sampler<MyModel>::refresh_particle(int which)
 template<class MyModel>
 bool Sampler<MyModel>::is_okay(const std::vector<double>& s)
 {
-	for(size_t i=0; i<rects.size(); i++)
+	for(std::list< std::vector<double> >::iterator it=rects.begin();
+				it != rects.end(); it++)
 	{
-		if(is_in_rectangle(s, rects[i]))
+		if(is_in_rectangle(s, *it))
 			return false;
 	}
 	return true;

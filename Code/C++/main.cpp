@@ -14,7 +14,7 @@ int main()
 {
 	// Make an RNG
 	RNG rng;
-	rng.set_seed(ctime(0));
+	rng.set_seed(time(0));
 
 	// Create a sampler
 	Sampler<SimpleExample> sampler(rng, 1000, 5000);
