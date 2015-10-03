@@ -1,4 +1,4 @@
-CFLAGS = -std=c++11 -m64 -O3 -flto -march=native -Wall -Wextra -pedantic -DNDEBUG
+CFLAGS = -O3 -std=c++11 -Wall -Wextra -pedantic
 OBJECTS = RNG.o SimpleExample.o Utils.o
 
 default:
