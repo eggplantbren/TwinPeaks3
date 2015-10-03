@@ -34,8 +34,8 @@ void SimpleExample::compute_scalars()
 	scalars[1] = 0.;
 	for(const double& x: params)
 	{
-		scalars[0] += -x*x;
-		scalars[1] += pow(sin(4.*M_PI*x), 2);
+		scalars[0] += -pow(x - 0.5, 2);
+		scalars[1] += -pow(sin(4.*M_PI*x), 2);
 	}
 }
 
