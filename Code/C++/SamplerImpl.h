@@ -35,8 +35,19 @@ void Sampler<MyModel>::initialise()
 template<class MyModel>
 void Sampler<MyModel>::prune_rectangles()
 {
-	// Use std::remove_if
+	// Iterator pointing at first rectangle (most recent)
+	std::list< std::vector<double> >::iterator it0 = rects.begin();
 
+	// Iterator pointing at second rectangle
+	std::list< std::vector<double> >::iterator it=rects.begin();
+	it++;
+
+	// Remove redundant rectangles
+	for(; it != rects.end(); it++)
+	{
+		if(is_in_rectangle(*it, *it0))
+			it = rects.erase(it);
+	}
 }
 
 template<class MyModel>
@@ -110,7 +121,8 @@ void Sampler<MyModel>::refresh_particle(int which)
 	}
 
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<"Accepted "<<accepted<<"/"<<mcmc_steps<<"."<<std::endl;
+	std::cout<<"Accepted "<<accepted<<"/"<<mcmc_steps<<". ";
+	std::cout<<rects.size()<<" rectangles."<<std::endl;
 }
 
 template<class MyModel>
