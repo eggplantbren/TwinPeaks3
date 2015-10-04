@@ -232,42 +232,18 @@ $S_1$ and $S_2$, i.e. it should only depend on rankings of $S_1$ and $S_2$
 values and not the values themselves.
 \end{enumerate}
 
+\section{Draft algorithm}
+
 The algorithm works as follows.
-
-
-\section{Demonstration Example}
-The prior is a uniform distribution over the $n$-dimensional unit hypercube:
+Start with $N$ particles drawn from $\pi$.
+Define the {\it corner count} of particle $i$ by
 \begin{eqnarray}
-p(\xx) &=& 1
-\end{eqnarray}
-as long as $x_i \in [0, 1]$ for all $i$. The scalars are:
-\begin{eqnarray}
-S_1(\xx) &=& -\sum_{i=1}^n \left(x_i - 0.5\right)^2\\
-S_2(\xx) &=& -\sum_{i=1}^n \sin^2\left(4\pi x_i\right)
+C_i &=& \sum_{j=1}^N \mathds{1}\left(S_1^j < S_1^i, S_2^j < S_2^i\right)
 \end{eqnarray}
 
-For this section, we used $n=1000$ dimensions.
+Need to be able to sort particles into a total order. So add tiebreaker.
 
-\section{Example: Potts model with some embellishments}
 
-TBD
-
-\section{A Diffusive Variant}
-
-Have one walker, or a few (not a large number).
-
-Explore the prior $\pi(\xx)$, and save sampled values of the scalars
-(thinned, presumably). As a function of position $(s_1, s_2)$ there is a well
-defined value of the cumulative prior mass
-\begin{eqnarray}
-M(s_1, s_2) &=& \int \pi(\xx)\mathds{1}\left(S_1(\xx) \leq s_1,
-S_2(\xx) \leq s_2\right)\, d\xx
-\end{eqnarray}
-which can be approximated in a Monte Carlo fashion by
-\begin{eqnarray}
-\hat{M}(s_1, s_2) &=& \frac{1}{N}\sum_{i=1}^N \mathds{1}\left(S_1^i \leq s_1,
-S_2^i \leq s_2\right)
-\end{eqnarray}
 
 
 \acknowledgments{Acknowledgements}
