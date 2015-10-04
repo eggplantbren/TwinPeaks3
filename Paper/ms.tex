@@ -241,9 +241,12 @@ Define the {\it corner count} of particle $i$ by
 C_i &=& \sum_{j=1}^N \mathds{1}\left(S_1^j < S_1^i, S_2^j < S_2^i\right)
 \end{eqnarray}
 
-Need to be able to sort particles into a total order. So add tiebreaker.
+Need to be able to sort particles into a total order. Since $C_i$ is discrete,
+each particle will also need a tiebreaker variable $a_i$ to accompany it.
+For iteration 1, $\{(C_i, a_i)\}_{i=1}^N$ will provide the total ordering.
+We exclude the corner with the lowest corner count.
 
-
+For iteration 2, we need a new quantity for total order (I think?), which
 
 
 \acknowledgments{Acknowledgements}
