@@ -45,7 +45,7 @@ void Sampler<MyModel>::prune_rectangles()
 	// Remove redundant rectangles
 	for(; it != rects.end(); it++)
 	{
-		if(is_in_rectangle(*it, *it0))
+		if(is_in_lower_rectangle(*it, *it0))
 			it = rects.erase(it);
 	}
 }
@@ -53,22 +53,22 @@ void Sampler<MyModel>::prune_rectangles()
 template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
-	// Calculate how many particles are in the rectangle of each particle
-	std::vector<int> counts(num_particles, 0);
-	std::vector<int> indices; // Save counts==0 indices
+	// Calculate *upper* corner counts
+	std::vector<int> corner_counts(num_particles, 0);
 	for(int i=0; i<num_particles; i++)
 	{
 		for(int j=0; j<num_particles; j++)
 		{
-			counts[i] += is_in_rectangle(particles[j].get_scalars(),
-								particles[i].get_scalars());
+			corner_counts[i] += is_in_upper_rectangle(particles[j].get_scalars(),
+														particles[i].get_scalars());
 		}
-		if(counts[i] == 0)
-			indices.push_back(i);
 	}
 
-	// Choose an index, to become the discarded particle
-	int which = indices[rng.rand_int(indices.size())];
+	// Find the particle with the highest augmented corner count
+	int which = 0;
+	for(int i=1; i<num_particles; i++)
+		if(corner_counts[i] > corner_counts[which])
+			which = i;
 
 	// Append its scalars to the forbidden rectangles
 	rects.push_front(particles[which].get_scalars());
@@ -131,19 +131,31 @@ bool Sampler<MyModel>::is_okay(const std::vector<double>& s)
 	for(std::list< std::vector<double> >::iterator it=rects.begin();
 				it != rects.end(); it++)
 	{
-		if(is_in_rectangle(s, *it))
+		if(is_in_lower_rectangle(s, *it))
 			return false;
 	}
 	return true;
 }
 
 template<class MyModel>
-bool Sampler<MyModel>::is_in_rectangle(const std::vector<double>& s,
-										const std::vector<double>& rect)
+bool Sampler<MyModel>::is_in_lower_rectangle(const std::vector<double>& s,
+												const std::vector<double>& rect)
 {
 	for(size_t i=0; i<s.size(); i++)
 	{
 		if(s[i] >= rect[i])
+			return false;
+	}
+	return true;
+}
+
+template<class MyModel>
+bool Sampler<MyModel>::is_in_upper_rectangle(const std::vector<double>& s,
+												const std::vector<double>& rect)
+{
+	for(size_t i=0; i<s.size(); i++)
+	{
+		if(s[i] <= rect[i])
 			return false;
 	}
 	return true;

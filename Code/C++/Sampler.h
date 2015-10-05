@@ -42,10 +42,12 @@ class Sampler
 		// Remove redundant rectangles (only do this just after adding one)
 		void prune_rectangles();
 
-		// Function to determine whether a point is within another point's
+		// Functions to determine whether a point is within another point's
 		// rectangle.
-		static bool is_in_rectangle(const std::vector<double>& s1,
-									const std::vector<double>& s2);
+		static bool is_in_lower_rectangle(const std::vector<double>& s1,
+											const std::vector<double>& s2);
+		static bool is_in_upper_rectangle(const std::vector<double>& s1,
+											const std::vector<double>& s2);
 
 	public:
 		// Constructor
