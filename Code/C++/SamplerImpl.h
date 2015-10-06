@@ -10,6 +10,7 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps)
 :rng(rng)
 ,num_particles(num_particles)
 ,particles(num_particles)
+,ucc_tiebreakers(num_particles)
 ,mcmc_steps(mcmc_steps)
 ,initialised(false)
 ,iteration(0)
@@ -30,6 +31,8 @@ void Sampler<MyModel>::initialise()
 {
 	for(MyModel& p: particles)
 		p.from_prior(rng);
+	for(double& x: ucc_tiebreakers)
+		x = rng.rand();
 }
 
 template<class MyModel>
@@ -51,28 +54,46 @@ void Sampler<MyModel>::prune_rectangles()
 }
 
 template<class MyModel>
+int Sampler<MyModel>::upper_corner_count(const MyModel& particle) const
+{
+	int count = 0;
+	for(int j=0; j<num_particles; j++)
+	{
+		count += is_in_upper_rectangle(particles[j].get_scalars(),
+														particle.get_scalars());
+	}
+	return count;
+}
+
+template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
 	// Calculate *upper* corner counts
 	std::vector<int> corner_counts(num_particles, 0);
 	for(int i=0; i<num_particles; i++)
-	{
-		for(int j=0; j<num_particles; j++)
-		{
-			corner_counts[i] += is_in_upper_rectangle(particles[j].get_scalars(),
-														particles[i].get_scalars());
-		}
-	}
+		corner_counts[i] = upper_corner_count(particles[i]);
 
 	// Find the particle with the highest augmented corner count
 	int which = 0;
 	for(int i=1; i<num_particles; i++)
-		if(corner_counts[i] > corner_counts[which])
+		if((corner_counts[i] > corner_counts[which]) ||
+			((corner_counts[i] == corner_counts[which]) &&
+			(ucc_tiebreakers[i] > ucc_tiebreakers[which])))
 			which = i;
 
+	// Count number of ties
+	int ties = 0;
+	for(int i=0; i<num_particles; i++)
+		if(i != which)
+			if(corner_counts[i] == corner_counts[which])
+				ties++;
+
 	// Append its scalars to the forbidden rectangles
-	rects.push_front(particles[which].get_scalars());
-	prune_rectangles();
+	if(ties == 0)
+	{
+		rects.push_front(particles[which].get_scalars());
+		prune_rectangles();
+	}
 
 	// Assign prior weight
 	double logw = log(1./num_particles) + iteration*log(1. - 1./num_particles);
@@ -86,12 +107,17 @@ void Sampler<MyModel>::do_iteration()
 	fout.close();
 
 	// Do MCMC to generate a new particle
-	refresh_particle(which);
+	if(ties == 0)
+		refresh_particle(which, -1, 1.);
+	else
+		refresh_particle(which, corner_counts[which], ucc_tiebreakers[which]);
 	iteration++;
 }
 
+// If ucc_threshold is -1, ignore it.
 template<class MyModel>
-void Sampler<MyModel>::refresh_particle(int which)
+void Sampler<MyModel>::refresh_particle(int which, int ucc_threshold,
+														double tb_threshold)
 {
 	// Choose a particle to clone
 	int copy;

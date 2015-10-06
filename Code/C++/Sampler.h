@@ -20,6 +20,7 @@ class Sampler
 		// The particles, and information about them
 		int num_particles;
 		std::vector<MyModel> particles;
+		std::vector<double> ucc_tiebreakers;
 
 		// Forbidden rectangles
 		std::list< std::vector<double> > rects;
@@ -34,13 +35,16 @@ class Sampler
 		int iteration;
 
 		// Do MCMC to equilibrate a particle
-		void refresh_particle(int which);
+		void refresh_particle(int which, int ucc_threshold, double tb_threshold);
 
 		// Check s against rects
 		bool is_okay(const std::vector<double>& s);
 
 		// Remove redundant rectangles (only do this just after adding one)
 		void prune_rectangles();
+
+		// Calculate upper corner count
+		int upper_corner_count(const MyModel& particle) const;
 
 		// Functions to determine whether a point is within another point's
 		// rectangle.
