@@ -129,20 +129,37 @@ void Sampler<MyModel>::refresh_particle(int which, int ucc_threshold,
 
 	// Clone it
 	particles[which] = particles[copy];
+	ucc_tiebreakers[which] = ucc_tiebreakers[copy];
 
 	// Do the MCMC
 	MyModel proposal;
+	int ucc_proposal = 0;
+	double ucc_tiebreaker_proposal;
 	double logH;
 	int accepted = 0;
 	for(int i=0; i<mcmc_steps; i++)
 	{
+		// Perturb the particle		
 		proposal = particles[which];
 		logH = proposal.perturb(rng);
 
+		// Perturb the ucc_tiebreaker
+		ucc_tiebreaker_proposal = ucc_tiebreakers[which] + rng.randh();
+		wrap(ucc_tiebreaker_proposal, 0., 1.);
+
+		if(ucc_threshold != -1)
+			ucc_proposal = upper_corner_count(proposal);
+
 		if(rng.rand() <= exp(logH) && is_okay(proposal.get_scalars()))
 		{
-			particles[which] = proposal;
-			accepted++;
+			// Extra criteria apply if ucc_threshold != -1
+			if(ucc_threshold == -1 || (ucc_proposal < ucc_threshold)
+				|| ((ucc_proposal == ucc_threshold) &&
+					(ucc_tiebreaker_proposal < tb_threshold)))
+			{
+				particles[which] = proposal;
+				accepted++;
+			}
 		}
 	}
 
