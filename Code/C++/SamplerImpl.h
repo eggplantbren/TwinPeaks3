@@ -158,6 +158,7 @@ void Sampler<MyModel>::refresh_particle(int which, int ucc_threshold,
 					(ucc_tiebreaker_proposal < tb_threshold)))
 			{
 				particles[which] = proposal;
+				ucc_tiebreakers[which] = ucc_tiebreaker_proposal;
 				accepted++;
 			}
 		}
