@@ -66,8 +66,21 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 	int min_lcc = *std::min_element(lccs.begin(), lccs.end());
+	std::vector<int> usable_indices;
+	for(int i=0; i<num_particles; i++)
+		if(lccs[i] == min_lcc)
+			usable_indices.push_back(i);
 
-	exit(0);
+	// Choose one at random
+	int choice = usable_indices[rng.rand_int(usable_indices.size())];
+
+	// Find min of scalar 2 among particles in the rectangle
+	std::vector<double> s2;
+	for(int i=0; i<num_particles; i++)
+		if(is_in_lower_rectangle(particles[i].get_scalars(),
+										particles[choice].get_scalars()))
+			s2.push_back(particles[i].get_scalars()[1]);
+	double s2_min = *min_element(s2.begin(), s2.end());
 
 //	// Append its scalars to the forbidden rectangles
 //	rects.push_front(particles[which].get_scalars());
