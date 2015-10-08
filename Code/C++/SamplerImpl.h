@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <limits>
 #include <fstream>
+#include <algorithm>
 #include "Utils.h"
 
 template<class MyModel>
@@ -53,41 +54,39 @@ void Sampler<MyModel>::prune_rectangles()
 template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
-	// Calculate *upper* corner counts
-	std::vector<int> corner_counts(num_particles, 0);
+	// Calculate counts
+	std::vector<int> lccs(num_particles, 0);
 	for(int i=0; i<num_particles; i++)
 	{
 		for(int j=0; j<num_particles; j++)
 		{
-			corner_counts[i] += is_in_upper_rectangle(particles[j].get_scalars(),
-														particles[i].get_scalars());
+			if(is_in_lower_rectangle(particles[i].get_scalars(),
+											particles[j].get_scalars()))
+				lccs[i]++;
 		}
 	}
+	int min_lcc = *std::min_element(lccs.begin(), lccs.end());
 
-	// Find the particle with the highest augmented corner count
-	int which = 0;
-	for(int i=1; i<num_particles; i++)
-		if(corner_counts[i] > corner_counts[which])
-			which = i;
+	exit(0);
 
-	// Append its scalars to the forbidden rectangles
-	rects.push_front(particles[which].get_scalars());
-	prune_rectangles();
+//	// Append its scalars to the forbidden rectangles
+//	rects.push_front(particles[which].get_scalars());
+//	prune_rectangles();
 
-	// Assign prior weight
-	double logw = log(1./num_particles) + iteration*log(1. - 1./num_particles);
+//	// Assign prior weight
+//	double logw = log(1./num_particles) + iteration*log(1. - 1./num_particles);
 
-	// Write it out to an output file
-	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
-	fout<<logw<<' ';
-	for(double s: particles[which].get_scalars())
-		fout<<s<<' ';
-	fout<<std::endl;
-	fout.close();
+//	// Write it out to an output file
+//	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
+//	fout<<logw<<' ';
+//	for(double s: particles[which].get_scalars())
+//		fout<<s<<' ';
+//	fout<<std::endl;
+//	fout.close();
 
-	// Do MCMC to generate a new particle
-	refresh_particle(which);
-	iteration++;
+//	// Do MCMC to generate a new particle
+//	refresh_particle(which);
+//	iteration++;
 }
 
 template<class MyModel>
@@ -149,15 +148,4 @@ bool Sampler<MyModel>::is_in_lower_rectangle(const std::vector<double>& s,
 	return true;
 }
 
-template<class MyModel>
-bool Sampler<MyModel>::is_in_upper_rectangle(const std::vector<double>& s,
-												const std::vector<double>& rect)
-{
-	for(size_t i=0; i<s.size(); i++)
-	{
-		if(s[i] <= rect[i])
-			return false;
-	}
-	return true;
-}
 

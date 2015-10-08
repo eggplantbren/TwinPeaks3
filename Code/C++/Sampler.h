@@ -42,6 +42,9 @@ class Sampler
 		// Remove redundant rectangles (only do this just after adding one)
 		void prune_rectangles();
 
+		// Count number of particles in lower left corner of a particle
+		int lower_corner_count(const MyModel& particle, int which_scalar);
+
 		// Functions to determine whether a point is within another point's
 		// rectangle.
 		static bool is_in_lower_rectangle(const std::vector<double>& s1,
