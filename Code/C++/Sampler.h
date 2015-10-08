@@ -33,6 +33,9 @@ class Sampler
 		// Count number of iterations done
 		int iteration;
 
+		// Remaining prior mass
+		long double log_prior_mass;
+
 		// Do MCMC to equilibrate a particle
 		void refresh_particle(int which);
 

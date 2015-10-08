@@ -14,6 +14,7 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps)
 ,mcmc_steps(mcmc_steps)
 ,initialised(false)
 ,iteration(0)
+,log_prior_mass(0.)
 {
 	// Open and close output file to clear it
 	std::fstream fout("sample_info.txt", std::ios::out);
@@ -64,6 +65,8 @@ void Sampler<MyModel>::do_iteration()
 											particles[j].get_scalars()))
 				lccs[i]++;
 		}
+		if(lccs[i] == 0)
+			lccs[i] = num_particles;
 	}
 	int min_lcc = *std::min_element(lccs.begin(), lccs.end());
 	std::vector<int> usable_indices;
@@ -76,30 +79,45 @@ void Sampler<MyModel>::do_iteration()
 
 	// Find min of scalar 2 among particles in the rectangle
 	std::vector<double> s2;
+	std::vector<int> indices;
 	for(int i=0; i<num_particles; i++)
+	{
 		if(is_in_lower_rectangle(particles[i].get_scalars(),
 										particles[choice].get_scalars()))
+		{
 			s2.push_back(particles[i].get_scalars()[1]);
+			indices.push_back(i);
+		}
+	}
 	double s2_min = *min_element(s2.begin(), s2.end());
+	int which = 0;
+	for(size_t i=0; i<s2.size(); i++)
+		if(s2[i] == s2_min)
+			which = indices[i];
 
-//	// Append its scalars to the forbidden rectangles
-//	rects.push_front(particles[which].get_scalars());
-//	prune_rectangles();
+	std::vector<double> forbid(2);
+	forbid[0] = particles[choice].get_scalars()[0];
+	forbid[1] = s2_min;
 
-//	// Assign prior weight
-//	double logw = log(1./num_particles) + iteration*log(1. - 1./num_particles);
+	// Append its scalars to the forbidden rectangles
+	rects.push_front(forbid);
+	prune_rectangles();
 
-//	// Write it out to an output file
-//	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
-//	fout<<logw<<' ';
-//	for(double s: particles[which].get_scalars())
-//		fout<<s<<' ';
-//	fout<<std::endl;
-//	fout.close();
+	// Assign prior weight
+	double logw = log((double)lccs[choice]/(num_particles + 1)) + log_prior_mass;
+	log_prior_mass = logdiffexp(log_prior_mass, logw);
 
-//	// Do MCMC to generate a new particle
-//	refresh_particle(which);
-//	iteration++;
+	// Write it out to an output file
+	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
+	fout<<logw<<' ';
+	for(double s: particles[which].get_scalars())
+		fout<<s<<' ';
+	fout<<std::endl;
+	fout.close();
+
+	// Do MCMC to generate a new particle
+	refresh_particle(which);
+	iteration++;
 }
 
 template<class MyModel>
@@ -111,7 +129,7 @@ void Sampler<MyModel>::refresh_particle(int which)
 	{
 		copy = rng.rand_int(num_particles);
 	}
-	while(copy == which && num_particles > 1);
+	while(!is_okay(particles[copy].get_scalars()));
 
 	// Clone it
 	particles[which] = particles[copy];
@@ -133,8 +151,9 @@ void Sampler<MyModel>::refresh_particle(int which)
 	}
 
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<"Accepted "<<accepted<<"/"<<mcmc_steps<<". ";
-	std::cout<<rects.size()<<" rectangles."<<std::endl;
+	std::cout<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
+	std::cout<<log_prior_mass<<"."<<std::endl;
+	std::cout<<"Accepted "<<accepted<<"/"<<mcmc_steps<<". "<<std::endl<<std::endl;
 }
 
 template<class MyModel>
