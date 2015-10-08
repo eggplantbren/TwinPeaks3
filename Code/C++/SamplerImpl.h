@@ -61,14 +61,18 @@ void Sampler<MyModel>::do_iteration()
 	{
 		for(int j=0; j<num_particles; j++)
 		{
-			if(is_in_lower_rectangle(particles[i].get_scalars(),
-											particles[j].get_scalars()))
+			if(is_in_lower_rectangle(particles[j].get_scalars(),
+											particles[i].get_scalars()))
 				lccs[i]++;
 		}
 		if(lccs[i] == 0)
 			lccs[i] = num_particles;
 	}
-	int min_lcc = *std::min_element(lccs.begin(), lccs.end());
+	int min_lcc = num_particles;
+	for(int i=0; i<num_particles; i++)
+		if(lccs[i] < min_lcc)
+			min_lcc = lccs[i];
+
 	std::vector<int> usable_indices;
 	for(int i=0; i<num_particles; i++)
 		if(lccs[i] == min_lcc)
@@ -89,6 +93,7 @@ void Sampler<MyModel>::do_iteration()
 			indices.push_back(i);
 		}
 	}
+
 	double s2_min = *min_element(s2.begin(), s2.end());
 	int which = 0;
 	for(size_t i=0; i<s2.size(); i++)
