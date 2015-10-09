@@ -82,34 +82,35 @@ void Sampler<MyModel>::do_iteration()
 	int choice = usable_indices[rng.rand_int(usable_indices.size())];
 
 	// Find min of scalar 2 among particles in the rectangle
-	std::vector<double> s2;
+	int which_scalar = rng.rand_int(2);
+	std::vector<double> ss;
 	std::vector<int> indices;
 	for(int i=0; i<num_particles; i++)
 	{
 		if(is_in_lower_rectangle(particles[i].get_scalars(),
 										particles[choice].get_scalars()))
 		{
-			s2.push_back(particles[i].get_scalars()[1]);
+			ss.push_back(particles[i].get_scalars()[which_scalar]);
 			indices.push_back(i);
 		}
 	}
 
-	double s2_min = *min_element(s2.begin(), s2.end());
+	double ss_min = *min_element(ss.begin(), ss.end());
 	int which = 0;
-	for(size_t i=0; i<s2.size(); i++)
-		if(s2[i] == s2_min)
+	for(size_t i=0; i<ss.size(); i++)
+		if(ss[i] == ss_min)
 			which = indices[i];
 
 	std::vector<double> forbid(2);
-	forbid[0] = particles[choice].get_scalars()[0];
-	forbid[1] = s2_min;
+	forbid = particles[choice].get_scalars();
+	forbid[which_scalar] = particles[which].get_scalars()[which_scalar];
 
 	// Append its scalars to the forbidden rectangles
 	rects.push_front(forbid);
 	prune_rectangles();
 
 	// Assign prior weight
-	double logw = log((double)lccs[choice]/(num_particles + 1)) + log_prior_mass;
+	double logw = log((double)1./(num_particles + 1)) + log_prior_mass;
 	log_prior_mass = logdiffexp(log_prior_mass, logw);
 
 	// Write it out to an output file
