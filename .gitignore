@@ -8,4 +8,5 @@ scalars.txt
 logw_thinned.txt
 scalars_thinned.txt
 sample.txt
-
+Paper/figures/*.pdf
+*.pyc
