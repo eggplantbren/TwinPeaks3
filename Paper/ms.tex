@@ -177,8 +177,16 @@ from the original Nested Sampling run. An example application, in the case of
 a Bayesian model with a ``gaussian noise'' assumption in the likelihood,
 computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
 posterior distribution would have been if the noise variance had been greater.
-Relative to alternative approaches such as annealing, Nested Sampling continues
-to work when the problem contains a {\it phase transition}.
+This is different from including an extra parameter to allow the noise variance
+to be greater, because NS allows you to test the consequences of values of the
+variance that are very implausible given the data.
+
+Alternatives to NS include methods based on ``annealing'', where a sequence of
+distributions of the form of Equation~\ref{eqn:power_posterior} is used.
+There are many different methods based on this idea, such as the popular
+parallel tempering method \citep{pt}.
+However, unlike annealing methods, NS continues
+to work when the problem contains a phase transition.
 
 In statistical mechanics, Equation~\ref{eqn:power_posterior} defines the
 family of {\it canonical distributions}, usually written as:
@@ -282,6 +290,8 @@ The authors declare no conflict of interest.
 P{\'a}rtay, L.~v.~B., Bart{\'o}k, A.~P., Payne, M.~C., Cs{\'a}nyi, G.\ 
 2015.\ Determining pressure-temperature phase diagrams of materials.\ ArXiv 
 e-prints arXiv: 1503.03404. 
+
+\bibitem[Hansmann(1997)]{pt} Hansmann, Ulrich HE., 1997, ``Parallel tempering algorithm for conformational studies of biological molecules.'', Chemical Physics Letters 281, no. 1 (1997): 140-150.
 
 \bibitem[P{\'a}rtay et al.(2014)]{2014PhRvE..89b2302P} P{\'a}rtay, L.~B., 
 Bart{\'o}k, A.~P., Cs{\'a}nyi, G.\ 2014.\ Nested sampling for materials: 
