@@ -68,10 +68,7 @@ void Sampler<MyModel>::do_iteration()
 		if(lccs[i] == 0)
 			lccs[i] = num_particles;
 	}
-	int min_lcc = num_particles;
-	for(int i=0; i<num_particles; i++)
-		if(lccs[i] < min_lcc)
-			min_lcc = lccs[i];
+	int min_lcc = *min_element(lccs.begin(), lccs.end());
 
 	std::vector<int> usable_indices;
 	for(int i=0; i<num_particles; i++)
