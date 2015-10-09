@@ -209,19 +209,19 @@ In some inference and
 statistical mechanics problems, there are two or more scalar functions of
 $\xx$ that are relevant. Suppose our prior is $\pi(\xx)$ as before, and
 we obtain testable information that fixes the expected values of two scalar
-functions of $\xx$, $S_1(\xx)$ and $S_2(\xx)$. It is well known that the
+functions of $\xx$, $L_1(\xx)$ and $L_2(\xx)$. It is well known that the
 updated probability distribution that takes into account the constraints is
 of the ``canonical'' form:
 
 \begin{eqnarray}
-p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1S_1(\xx)+\beta_2S_2(\xx)\right]}
+p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1L_1(\xx)+\beta_2L_2(\xx)\right]}
 {Z(\beta_1, \beta_2)}
 \end{eqnarray}
 
 If we were only interested in a single canonical distribution, for example
 with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we could estimate its normalising
 constant and by running standard Nested Sampling with ``likelihood''
-$L(\xx) = \exp\left[0.3S_1(\xx) + 0.7S_2(\xx)\right]$. However, usually we
+$L(\xx) = \exp\left[0.3L_1(\xx) + 0.7L_2(\xx)\right]$. However, usually we
 are interested in a range of values for $\beta_1$ and $\beta_2$, and we
 want to know the normalisation $Z(\beta_1, \beta_2)$, called the
 partition function. This work describes
@@ -238,23 +238,32 @@ to satisfy the following requirements:
 \begin{enumerate}
 \item The algorithm should begin with $N$ points drawn from the prior $\pi(\xx)$.
 \item The algorithm should seek to explore regions where the values of
-$S_1(\xx)$ and $S_2(\xx)$ are greater than what would be expected from the
+$L_1(\xx)$ and $L_2(\xx)$ are greater than what would be expected from the
 prior.
 \item The algorithm should try to move through a sequence of probability
 distributions proportional to $\pi$, but restricted to smaller and smaller
 domains for which we can approximately measure the enclosed prior mass.
 \item The algorithm should be invariant to monotonic transformations of
-$S_1$ and $S_2$, i.e. it should only depend on rankings of $S_1$ and $S_2$
+$L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
 \end{enumerate}
 
-\section{Draft algorithm}
+\section{Proposed algorithm}
+
 
 The algorithm works as follows.
-Start with $N$ particles drawn from $\pi$.
-Define the {\it corner count} of particle $i$ by
+
+\begin{enumerate}
+\item Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.\\
+\item Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
+of each particle.\\
+\end{enumerate}
+
+The corner count of particle $i$ is defined by
 \begin{eqnarray}
-C_i &=& \sum_{j=1}^N \mathds{1}\left(S_1^j < S_1^i, S_2^j < S_2^i\right)
+C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
+L_2(\xx_j) < L_2(\xx_i)
+\right).\label{eqn:corner_count}
 \end{eqnarray}
 
 Need to be able to sort particles into a total order. Since $C_i$ is discrete,
