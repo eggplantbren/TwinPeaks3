@@ -154,10 +154,10 @@ function, and $Z$ is the normalising constant, known as the
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
-It begins by drawing particles from the
+NS begins by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
-the likelihood $L(\xx)$ that compress the prior mass by a
-factor that is approximately known.
+the likelihood $L(\xx)$ that compress the prior mass by an
+approximately-known factor.
 This enables the calculation of the marginal likelihood $Z$
 and properties of the posterior $\pi(\xx)L(\xx)/Z$.
 NS is required because Equation~\ref{eqn:evidence}
@@ -173,8 +173,10 @@ a ``power posterior'' where the likelihood is raised to a power $\beta$:
 p(\xx; \beta) &=& \frac{\pi(\xx)L(\xx)^\beta}{Z(\beta)}\label{eqn:power_posterior}
 \end{eqnarray}
 The normalisation and posterior samples from this distribution can be obtained
-from the original Nested Sampling run. An example application, in the case of
-a Bayesian model with a ``gaussian noise'' assumption in the likelihood,
+from the original NS run by re-weighting the output according to $L(\xx)^\beta$
+instead of the usual $L(\xx)$ used to obtain the posterior.
+An example application, in the case of
+a Bayesian inference problem with a ``gaussian noise'' likelihood assumption,
 computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
 posterior distribution would have been if the noise variance had been greater.
 This is different from including an extra parameter to allow the noise variance
@@ -193,9 +195,15 @@ family of {\it canonical distributions}, usually written as:
 \begin{eqnarray}
 p(\xx; \beta) &=& \frac{\pi(\xx)\exp[-\beta E(\xx)]}{Z(\beta)}
 \end{eqnarray}
-where $E(\xx)$ is the energy function. In this context we usually want to
+where $E(\xx)$ is the energy function, and $\pi(\xx)$ is often uniform over
+phase space (the set of possible positions and momenta of a collection of
+particles) or configuration space (the set of possible positions of a collection
+of particles). In this context we usually want to
 compute $Z(\beta)$ as a function of $\beta$, which is called the
-{\it partition function}.
+{\it partition function}. NS can achieve this, allowing the study of
+the properties of materials from first principles, based on hypotheses about
+the atoms or molecules that make them up \citep[e.g.][]{2009arXiv0906.3544P,
+2014PhRvE..89b2302P, 2015arXiv150303404B}.
 
 In some inference and
 statistical mechanics problems, there are two or more scalar functions of
