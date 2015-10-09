@@ -69,6 +69,11 @@ void Sampler<MyModel>::do_iteration()
 			lccs[i] = num_particles;
 	}
 	int min_lcc = *min_element(lccs.begin(), lccs.end());
+	if(min_lcc == num_particles)
+	{
+		std::cerr<<"# All particles have corner counts of zero. Aborting."<<std::endl;
+		exit(1);
+	}
 
 	std::vector<int> usable_indices;
 	for(int i=0; i<num_particles; i++)
