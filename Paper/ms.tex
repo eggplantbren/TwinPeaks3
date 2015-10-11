@@ -258,8 +258,14 @@ The algorithm works as follows.
 \item Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
 of each particle.
 \item Choose one of the particles which has corner count equal to the
-minimum nonzero value.
+minimum nonzero value. If all particles have a corner count of zero,
+the algorithm terminates. Call the selected particle particle $K$.
+\item Choose one of the objective functions, and find $K$'s rank in terms
+of that objective function.
+\item ...
 \end{enumerate}
+
+Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
 The corner count of particle $i$ is defined by
 \begin{eqnarray}
@@ -271,14 +277,20 @@ L_2(\xx_j) < L_2(\xx_i)
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{figures/joint.pdf}
-\caption{\it Awesome figure.\label{fig:joint}}
+\caption{\it The particle at the corner of the grey rectangle
+has a corner count of 1, since 1 other particle is within the
+grey rectangle.\label{fig:joint}}
 \end{figure}
 
 
 
 \section{What kind of accuracy can we expect?}
 Imagine computing $Z(\beta_1, \beta_2)$ by looping over a grid of $\beta_2$
-values and doing an NS run with respect to $L_1$ for each.
+values and doing an NS run with respect to $L_1$ for each. For each
+value of $\beta_1$ and $\beta_2$ that we're interested in, we can expect
+a (marginal) ``one-sigma'' accuracy in
+$\ln\left[Z(\beta_1, \beta_2)\right]$ of $\pm \sqrt{H(\beta_1, \beta_2)/N}$,
+for a computational cost proportional to...
 
 \acknowledgments{Acknowledgements}
 
