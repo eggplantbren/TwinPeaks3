@@ -34,13 +34,13 @@ def grid():
 
   figure(1)
   subplot(1, 2, 1)
-  imshow(logZ, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())), interpolation='nearest')
+  imshow(logZ, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())), interpolation='nearest', cmap='Purples')
   xlabel('ln($T_1$)')
   ylabel('ln($T_2$)')
   title('log(Z)')
 
   subplot(1, 2, 2)
-  imshow(H, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())), interpolation='nearest')
+  imshow(H, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())), interpolation='nearest', cmap='Purples')
   xlabel('ln($T_1$)')
   ylabel('ln($T_2$)')
   title('H, max={m}'.format(m=H.max()))
