@@ -21,9 +21,19 @@ void SimpleExample::from_prior(RNG& rng)
 
 double SimpleExample::perturb(RNG& rng)
 {
-	int which = rng.rand_int(params.size());
-	params[which] += rng.randh();
-	wrap(params[which], 0., 1.);
+	int which, count;
+	if(rng.rand() <= 0.5)
+		count = 0;
+	else
+		count = static_cast<int>(pow(10., 2.*rng.rand()));
+
+	for(int i=0; i<count; i++)
+	{
+		which = rng.rand_int(params.size());
+		params[which] += rng.randh();
+		wrap(params[which], 0., 1.);
+	}
+
 	compute_scalars();
 	return 0.;
 }
