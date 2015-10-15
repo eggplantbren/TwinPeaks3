@@ -46,19 +46,20 @@ void SpikeSlab::compute_scalars()
 
 	double u = 0.1;
 	double v = 0.01;
-	double C1 = -log(u) - log(2*M_PI);
-	double C2 = -log(v) - log(2*M_PI);
+	double C1 = -log(u) - 0.5*log(2*M_PI);
+	double C2 = -log(v) - 0.5*log(2*M_PI);
 	double C3 = log(100.);
 	double uu = u*u;
 	double vv = v*v;
 
-	double temp1, temp2;
+	double temp1 = 0.;
+	double temp2 = 0.;
 	for(const double& x: params)
 	{
-		temp1 = C1 - 0.5*pow(x - 0.5, 2)/uu;
-		temp2 = C2 - 0.5*pow(x - 0.5, 2)/vv;
-		scalars[0] += logsumexp(temp1, C3 + temp2);
+		temp1 += C1 - 0.5*pow(x - 0.5, 2)/uu;
+		temp2 += C2 - 0.5*pow(x - 0.5, 2)/vv;
 	}
+	scalars[0] = logsumexp(temp1, C3 + temp2);
 	scalars[1] = scalars[0];
 }
 
