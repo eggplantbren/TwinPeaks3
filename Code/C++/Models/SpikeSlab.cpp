@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 using namespace std;
 
@@ -60,7 +61,9 @@ void SpikeSlab::compute_scalars()
 		temp2 += C2 - 0.5*pow(x - 0.5, 2)/vv;
 	}
 	scalars[0] = logsumexp(temp1, C3 + temp2);
-	scalars[1] = scalars[0];
+	scalars[1] = 0.;
+	for(const double& x: params)
+		scalars[1] += -log(0.01*M_PI) - log(1. + pow((x - 0.5)/0.01, 2));
 }
 
 void SpikeSlab::write_text(std::ostream& out) const
