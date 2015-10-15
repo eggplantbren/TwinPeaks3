@@ -57,7 +57,7 @@ void SpikeSlab::compute_scalars()
 	{
 		temp1 = C1 - 0.5*pow(x - 0.5, 2)/uu;
 		temp2 = C2 - 0.5*pow(x - 0.5, 2)/vv;
-		scalars[0] += logsumexp(C3 + temp1, temp2);
+		scalars[0] += logsumexp(temp1, C3 + temp2);
 	}
 	scalars[1] = scalars[0];
 }
