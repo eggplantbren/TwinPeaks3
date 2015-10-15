@@ -3,7 +3,7 @@ from pylab import *
 x = linspace(0., 1., 2001)
 
 def truth(T1, T2, do_plot=False):
-  p = exp(-(x - 0.5)**2/T1 - sin(2.*pi*x/0.5)**2/T2)
+  p = exp(-(x - 0.5)**2/T1 + x/T2)
   Z = trapz(p, x=x)
   H = trapz(p/Z*log(p/Z), x=x)
 
