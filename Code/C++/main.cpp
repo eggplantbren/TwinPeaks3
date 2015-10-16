@@ -17,7 +17,7 @@ int main()
 	rng.set_seed(time(0));
 
 	// Create a sampler
-	Sampler<SimpleExample> sampler(rng, 1000, 10000);
+	Sampler<SimpleExample> sampler(rng, 1000, 10000, 1000);
 	sampler.initialise();
 
 	// Do NS indefinitely

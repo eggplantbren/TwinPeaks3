@@ -7,17 +7,22 @@
 #include "Utils.h"
 
 template<class MyModel>
-Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps)
+Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
+							int save_interval)
 :rng(rng)
 ,num_particles(num_particles)
 ,particles(num_particles)
 ,mcmc_steps(mcmc_steps)
+,save_interval(save_interval)
 ,initialised(false)
 ,iteration(0)
 ,log_prior_mass(0.)
 {
-	// Open and close output file to clear it
-	std::fstream fout("sample_info.txt", std::ios::out);
+	// Open and close outputs file to clear them
+	std::fstream fout;
+	fout.open("sample.txt", std::ios::out);
+	fout.close();
+	fout.open("sample_info.txt", std::ios::out);
 	fout.close();
 }
 
@@ -116,7 +121,15 @@ void Sampler<MyModel>::do_iteration()
 	log_prior_mass = logdiffexp(log_prior_mass, logw);
 
 	// Write it out to an output file
-	std::fstream fout("sample_info.txt", std::ios::out|std::ios::app);
+	std::fstream fout;
+	if((iteration+1)%save_interval == 0)
+	{
+		fout.open("sample.txt", std::ios::out|std::ios::app);
+		particles[which].write_text(fout);
+		fout<<std::endl;
+		fout.close();
+	}
+	fout.open("sample_info.txt", std::ios::out|std::ios::app);
 	fout<<logw<<' ';
 	for(double s: particles[which].get_scalars())
 		fout<<s<<' ';
