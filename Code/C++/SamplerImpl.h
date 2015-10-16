@@ -125,6 +125,9 @@ void Sampler<MyModel>::do_iteration()
 	if((iteration+1)%save_interval == 0)
 	{
 		fout.open("sample.txt", std::ios::out|std::ios::app);
+		fout<<logw<<' ';
+		for(double s: particles[which].get_scalars())
+			fout<<s<<' ';
 		particles[which].write_text(fout);
 		fout<<std::endl;
 		fout.close();
