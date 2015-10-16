@@ -91,21 +91,22 @@ for i in xrange(0, N):
       exp2[i, j] = NaN
   print(i+1)
 
+figure(figsize=(11, 9))
 subplot(2, 2, 1)
 imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
-title('log(Z)')
+title(r'$\log(Z)$')
 
 subplot(2, 2, 2)
 imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
-title('H')
+title(r'$H$')
 
 subplot(2, 2, 3)
 imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
-title('<S1>')
+title(r'$\left<L_1\right>$')
 
 subplot(2, 2, 4)
 imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
-title('<S2>')
+title(r'$\left<L_2\right>$')
 
 show()
 
