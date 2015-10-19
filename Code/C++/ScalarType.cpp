@@ -1,21 +1,32 @@
 #include "ScalarType.h"
+#include "Utils.h"
 
 ScalarType::ScalarType()
 {
 }
 
-ScalarType::ScalarType(double logL, double tieBreaker)
-:logL(logL)
-,tieBreaker(tieBreaker)
+ScalarType::ScalarType(double value)
+:value(value)
 {
 }
 
-bool operator < (const ScalarType& l1, const ScalarType& l2)
+void ScalarType::from_prior(RNG& rng)
+{
+	tiebreaker = rng.rand();
+}
+
+double ScalarType::perturb(RNG& rng)
+{
+	tiebreaker += rng.randh();
+	wrap(tiebreaker, 0., 1.);
+}
+
+bool operator < (const ScalarType& s1, const ScalarType& s2)
 {
 	bool result = false;
-	if(l1.logL < l2.logL)
+	if(s1.value < s2.value)
 		result = true;
-	else if(l1.logL == l2.logL && l1.tieBreaker < l2.tieBreaker)
+	else if(s1.value == s2.value && s1.tiebreaker < s2.tiebreaker)
 		result = true;
 	return result;
 }

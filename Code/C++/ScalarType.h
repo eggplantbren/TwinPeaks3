@@ -3,16 +3,21 @@
 
 #include <istream>
 #include <ostream>
+#include "RNG.h"
 
 class ScalarType
 {
 	private:
-		double logL;
-		double tieBreaker;
+		double value;
+		double tiebreaker;
 
 	public:
 		ScalarType();
-		ScalarType(double logL, double tieBreaker);
+		ScalarType(double val);
+
+		// Randomise the tiebreaker
+		void from_prior(RNG& rng);
+		double perturb(RNG& rng);
 
 	friend bool operator < (const ScalarType& l1, const ScalarType& l2);
 };
