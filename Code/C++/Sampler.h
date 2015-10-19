@@ -5,6 +5,7 @@
 #include <list>
 #include <fstream>
 #include "RNG.h"
+#include "ScalarType.h"
 
 /*
 * An object of this class is a classic Nested Sampler.
@@ -20,9 +21,10 @@ class Sampler
 		// The particles, and information about them
 		int num_particles;
 		std::vector<MyModel> particles;
+		std::vector< std::vector<ScalarType> > scalars;
 
 		// Forbidden rectangles
-		std::list< std::vector<double> > rects;
+		std::list< std::vector<ScalarType> > rects;
 
 		// Number of equilibration steps
 		int mcmc_steps;
@@ -43,7 +45,7 @@ class Sampler
 		void refresh_particle(int which);
 
 		// Check s against rects
-		bool is_okay(const std::vector<double>& s);
+		bool is_okay(const std::vector<ScalarType>& s);
 
 		// Remove redundant rectangles (only do this just after adding one)
 		void prune_rectangles();
@@ -53,10 +55,10 @@ class Sampler
 
 		// Functions to determine whether a point is within another point's
 		// rectangle.
-		static bool is_in_lower_rectangle(const std::vector<double>& s1,
-											const std::vector<double>& s2);
-		static bool is_in_upper_rectangle(const std::vector<double>& s1,
-											const std::vector<double>& s2);
+		static bool is_in_lower_rectangle(const std::vector<ScalarType>& s1,
+											const std::vector<ScalarType>& s2);
+		static bool is_in_upper_rectangle(const std::vector<ScalarType>& s1,
+											const std::vector<ScalarType>& s2);
 
 	public:
 		// Constructor

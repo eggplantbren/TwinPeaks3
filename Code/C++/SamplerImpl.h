@@ -12,6 +12,7 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
 :rng(rng)
 ,num_particles(num_particles)
 ,particles(num_particles)
+,scalars(num_particles)
 ,mcmc_steps(mcmc_steps)
 ,save_interval(save_interval)
 ,initialised(false)
@@ -35,18 +36,26 @@ void Sampler<MyModel>::set_rng_seed(unsigned int seed)
 template<class MyModel>
 void Sampler<MyModel>::initialise()
 {
-	for(MyModel& p: particles)
-		p.from_prior(rng);
+	for(int i=0; i<num_particles; i++)
+	{
+		particles[i].from_prior(rng);
+		const std::vector<double>& s = particles[i].get_scalars();
+		scalars[i].clear();
+		for(size_t j=0; j<s.size(); j++)
+			scalars[i].push_back(ScalarType(s[j]));
+		for(size_t j=0; j<scalars[i].size(); j++)
+			scalars[i][j].from_prior(rng);
+	}
 }
 
 template<class MyModel>
 void Sampler<MyModel>::prune_rectangles()
 {
 	// Iterator pointing at first rectangle (most recent)
-	std::list< std::vector<double> >::iterator it0 = rects.begin();
+	std::list< std::vector<ScalarType> >::iterator it0 = rects.begin();
 
 	// Iterator pointing at second rectangle
-	std::list< std::vector<double> >::iterator it=rects.begin();
+	std::list< std::vector<ScalarType> >::iterator it=rects.begin();
 	it++;
 
 	// Remove redundant rectangles
@@ -66,8 +75,7 @@ void Sampler<MyModel>::do_iteration()
 	{
 		for(int j=0; j<num_particles; j++)
 		{
-			if(is_in_lower_rectangle(particles[j].get_scalars(),
-											particles[i].get_scalars()))
+			if(is_in_lower_rectangle(scalars[j], scalars[i]))
 				lccs[i]++;
 		}
 		if(lccs[i] == 0)
@@ -90,27 +98,26 @@ void Sampler<MyModel>::do_iteration()
 
 	// Find min of scalar 2 among particles in the rectangle
 	int which_scalar = rng.rand_int(2);
-	std::vector<double> ss;
+	std::vector<ScalarType> ss;
 	std::vector<int> indices;
 	for(int i=0; i<num_particles; i++)
 	{
-		if(is_in_lower_rectangle(particles[i].get_scalars(),
-										particles[choice].get_scalars()))
+		if(is_in_lower_rectangle(scalars[i], scalars[choice]))
 		{
-			ss.push_back(particles[i].get_scalars()[which_scalar]);
+			ss.push_back(scalars[i][which_scalar]);
 			indices.push_back(i);
 		}
 	}
 
-	double ss_min = *min_element(ss.begin(), ss.end());
+	ScalarType ss_min = *min_element(ss.begin(), ss.end());
 	int which = 0;
 	for(size_t i=0; i<ss.size(); i++)
 		if(ss[i] == ss_min)
 			which = indices[i];
 
-	std::vector<double> forbid(2);
-	forbid = particles[choice].get_scalars();
-	forbid[which_scalar] = particles[which].get_scalars()[which_scalar];
+	std::vector<ScalarType> forbid(2);
+	forbid = scalars[choice];
+	forbid[which_scalar] = scalars[which][which_scalar];
 
 	// Append its scalars to the forbidden rectangles
 	rects.push_front(forbid);
@@ -126,16 +133,16 @@ void Sampler<MyModel>::do_iteration()
 	{
 		fout.open("sample.txt", std::ios::out|std::ios::app);
 		fout<<logw<<' ';
-		for(double s: particles[which].get_scalars())
-			fout<<s<<' ';
+		for(ScalarType s: scalars[which])
+			fout<<s.get_value()<<' ';
 		particles[which].write_text(fout);
 		fout<<std::endl;
 		fout.close();
 	}
 	fout.open("sample_info.txt", std::ios::out|std::ios::app);
 	fout<<logw<<' ';
-	for(double s: particles[which].get_scalars())
-		fout<<s<<' ';
+	for(ScalarType s: scalars[which])
+		fout<<s.get_value()<<' ';
 	fout<<std::endl;
 	fout.close();
 
@@ -153,23 +160,29 @@ void Sampler<MyModel>::refresh_particle(int which)
 	{
 		copy = rng.rand_int(num_particles);
 	}
-	while(!is_okay(particles[copy].get_scalars()));
+	while(!is_okay(scalars[copy]));
 
 	// Clone it
 	particles[which] = particles[copy];
+	scalars[which] = scalars[copy];
 
 	// Do the MCMC
 	MyModel proposal;
+	std::vector<ScalarType> s_proposal;
 	double logH;
 	int accepted = 0;
 	for(int i=0; i<mcmc_steps; i++)
 	{
 		proposal = particles[which];
-		logH = proposal.perturb(rng);
+		s_proposal = scalars[which];
 
-		if(rng.rand() <= exp(logH) && is_okay(proposal.get_scalars()))
+		logH = proposal.perturb(rng);
+		logH += s_proposal[rng.rand_int(s_proposal.size())].perturb(rng);
+
+		if(rng.rand() <= exp(logH) && is_okay(s_proposal))
 		{
 			particles[which] = proposal;
+			scalars[which] = s_proposal;
 			accepted++;
 		}
 	}
@@ -181,9 +194,9 @@ void Sampler<MyModel>::refresh_particle(int which)
 }
 
 template<class MyModel>
-bool Sampler<MyModel>::is_okay(const std::vector<double>& s)
+bool Sampler<MyModel>::is_okay(const std::vector<ScalarType>& s)
 {
-	for(std::list< std::vector<double> >::iterator it=rects.begin();
+	for(std::list< std::vector<ScalarType> >::iterator it=rects.begin();
 				it != rects.end(); it++)
 	{
 		if(is_in_lower_rectangle(s, *it))
@@ -193,15 +206,14 @@ bool Sampler<MyModel>::is_okay(const std::vector<double>& s)
 }
 
 template<class MyModel>
-bool Sampler<MyModel>::is_in_lower_rectangle(const std::vector<double>& s,
-												const std::vector<double>& rect)
+bool Sampler<MyModel>::is_in_lower_rectangle(const std::vector<ScalarType>& s,
+											const std::vector<ScalarType>& rect)
 {
 	for(size_t i=0; i<s.size(); i++)
 	{
-		if(s[i] >= rect[i])
+		if(!(s[i] < rect[i]))
 			return false;
 	}
 	return true;
 }
-
 

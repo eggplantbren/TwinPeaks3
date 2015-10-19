@@ -19,6 +19,7 @@ double ScalarType::perturb(RNG& rng)
 {
 	tiebreaker += rng.randh();
 	wrap(tiebreaker, 0., 1.);
+	return 0.;
 }
 
 bool operator < (const ScalarType& s1, const ScalarType& s2)
