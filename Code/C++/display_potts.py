@@ -7,7 +7,7 @@ ion()
 hold(False)
 for i in xrange(0, output.shape[0]):
 	x = output[i, 3:].reshape((50, 50))
-	imshow(x, interpolation='nearest', cmap='Purples')
+	imshow(x, interpolation='nearest', cmap='jet')
 	title(str(i+1) + '/' + str(output.shape[0]))
 	draw()
 ioff()
