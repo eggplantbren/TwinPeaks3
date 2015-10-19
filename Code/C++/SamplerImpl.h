@@ -177,6 +177,8 @@ void Sampler<MyModel>::refresh_particle(int which)
 		s_proposal = scalars[which];
 
 		logH = proposal.perturb(rng);
+		for(size_t j=0; j<s_proposal.size(); j++)
+			s_proposal[j].set_value(proposal.get_scalars()[j]);
 		logH += s_proposal[rng.rand_int(s_proposal.size())].perturb(rng);
 
 		if(rng.rand() <= exp(logH) && is_okay(s_proposal))
