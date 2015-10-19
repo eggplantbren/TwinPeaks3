@@ -19,6 +19,9 @@ class ScalarType
 		void from_prior(RNG& rng);
 		double perturb(RNG& rng);
 
+		bool operator == (const ScalarType& other) const
+		{ return (value == other.value && tiebreaker == other.tiebreaker); }
+
 	friend bool operator < (const ScalarType& l1, const ScalarType& l2);
 };
 
