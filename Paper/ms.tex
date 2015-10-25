@@ -134,7 +134,6 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
-
 Nested Sampling \citep[NS][]{skilling} is an effective and popular
 Monte Carlo algorithm for Bayesian computation and
 statistical mechanics
@@ -157,7 +156,14 @@ Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 NS begins by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by an
-approximately-known factor.
+approximately-known factor. Like other related algorithms such as those
+based on ``annealing'', NS
+moves through a sequence of probability distributions beginning from the
+prior. This sequence of distributions is defined by
+\begin{eqnarray}
+p(\xx; \ell) &=& \frac{1}{X(\ell)}\pi(\xx)\mathds{1}\left(L(\xx) > \ell\right).
+\end{eqnarray}
+
 This enables the calculation of the marginal likelihood $Z$
 and properties of the posterior $\pi(\xx)L(\xx)/Z$.
 NS is required because Equation~\ref{eqn:evidence}
@@ -250,7 +256,6 @@ values and not the values themselves.
 
 \section{Proposed algorithm}
 
-
 The algorithm works as follows.
 
 \begin{enumerate}
@@ -267,7 +272,11 @@ of that objective function.
 
 Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
-The corner count of particle $i$ is defined by
+The corner count of particle $i$ is defined as the number of particles with
+a lower value of {\em both} objective functions compared to particle $i$.
+Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
+particles in the rectangle whose upper right corner is at
+$\left(L_1(\xx_i), L_2(\xx_i)\right)$. The equation for the corner count is:
 \begin{eqnarray}
 C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
 L_2(\xx_j) < L_2(\xx_i)
