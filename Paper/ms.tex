@@ -46,6 +46,9 @@
 
 \usepackage{dsfont}
 \usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
 
 \newcommand{\xx}{\boldsymbol{x}}
 \newcommand{\dx}{d\boldsymbol{x}}
@@ -90,7 +93,7 @@
 %=================================================================
 
 % Full title of the paper (Capitalized)
-\Title{Nested sampling with two or more objective functions}
+\Title{Nested sampling with two objective functions}
 
 % Authors (Add full first names)
 \Author{Brendon J. Brewer$^{1,}$* and Ewan Cameron$^{2}$}
@@ -233,7 +236,9 @@ want to know the normalisation $Z(\beta_1, \beta_2)$, called the
 partition function. This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
-transitions.
+transitions. The algorithm is designed for problems with two objective
+functions, but should generalise to problems with more than two (though perhaps
+not more than a few).
 
 \section{Properties of Nested sampling}
 
@@ -246,7 +251,7 @@ to satisfy the following requirements:
 \item The algorithm should seek to explore regions where the values of
 $L_1(\xx)$ and $L_2(\xx)$ are greater than what would be expected from the
 prior.
-\item The algorithm should try to move through a sequence of probability
+\item The algorithm should consider a sequence of probability
 distributions proportional to $\pi$, but restricted to smaller and smaller
 domains for which we can approximately measure the enclosed prior mass.
 \item The algorithm should be invariant to monotonic transformations of
@@ -256,19 +261,25 @@ values and not the values themselves.
 
 \section{Proposed algorithm}
 
-The algorithm works as follows.
+Here we describe the proposed algorithm, which took three years of
+experimentation to develop. Please contact the first author for a list of
+failed ideas, some of which might lead to potential alternatives to this
+algorithm.
 
-\begin{enumerate}
-\item Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
-\item Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
+\begin{algorithm}
+\begin{algorithmic}
+\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
+\While{$abc$}
+	\State Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
 of each particle.
-\item Choose one of the particles which has corner count equal to the
+	\State Choose one of the particles which has corner count equal to the
 minimum nonzero value. If all particles have a corner count of zero,
 the algorithm terminates. Call the selected particle particle $K$.
-\item Choose one of the objective functions, and find $K$'s rank in terms
+	\State Choose one of the objective functions, and find $K$'s rank in terms
 of that objective function.
-\item ...
-\end{enumerate}
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
 
 Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
