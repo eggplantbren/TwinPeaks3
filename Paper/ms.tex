@@ -53,6 +53,7 @@
 \newcommand{\xx}{\boldsymbol{x}}
 \newcommand{\dx}{d\boldsymbol{x}}
 \newcommand{\data}{\boldsymbol{D}}
+\newcommand{\II}{\boldsymbol{I}}
 
 %------------------------------------------------------------------
 % The following line should be uncommented if the LaTeX file is uploaded to arXiv.org
@@ -138,21 +139,22 @@ broad class of problems which arise in statistical mechanics.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
+
 Nested Sampling \citep[NS][]{skilling} is an effective and popular
-Monte Carlo algorithm for Bayesian computation and
-statistical mechanics
+Monte Carlo algorithm which can solve a wide range of problems in Bayesian
+computation and statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
 In a Bayesian inference problem with unknown parameters denoted collectively
 by a vector $\xx$, the
 posterior distribution for the parameters given data $\data$ (and prior
-information $I$) is:
+information $\II$) is:
 \begin{eqnarray}
-p(\xx | \data, I) &=&
-\frac{p(\xx | I)p(\data | \xx, I)}{p(\data | I)}\\
+p(\xx | \data, \II) &=&
+\frac{p(\xx | \II)p(\data | \xx, \II)}{p(\data | \II)}\\
 &=& \frac{\pi(\xx)L(\xx)}{Z}
 \end{eqnarray}
 where $\pi(\xx)$ is the prior distribution, $L(\xx)$ is the likelihood
-function, and $Z$ is the normalising constant, known as the
+function, and $Z$ is the normalising constant, usually known as the
 ``marginal likelihood'' or the ``evidence'':
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
@@ -238,8 +240,25 @@ partition function. This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
 transitions. The algorithm is designed for problems with two objective
-functions, but should generalise to problems with more than two (though perhaps
+functions, but should generalize to problems with more than two (though perhaps
 not more than a few).
+
+The prior $\pi(\xx)$ implies a certain prior for $L_1$ and $L_2$, which we
+denote $\pi(L_1, L_2)$. An example of a prior is shown as the
+probability density in Figure~\ref{fig:joint}. The partition function
+$Z(\beta_1, \beta_2)$ is a set of expected values with respect to this density.
+Simple Monte Carlo sampling from $\pi$ will not work except for values of
+$(\beta_1, \beta_2)$ where the canonical distribution remains similar to $\pi$.
+We need a sampler that explores regions where $L_1$ and $L_2$ are high in order
+to accurately estimate $Z(\beta_1, \beta_2)$.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{figures/joint.pdf}
+\caption{\it The particle at the corner of the grey rectangle
+has a corner count of 1, since 1 other particle is within the
+grey rectangle.\label{fig:joint}}
+\end{figure}
 
 \section{Properties of Nested sampling}
 
@@ -265,12 +284,12 @@ values and not the values themselves.
 Here we describe the proposed algorithm, which took three years of
 experimentation to develop. Please contact the first author for a list of
 failed ideas, some of which might lead to potential alternatives to this
-algorithm.
+algorithm. 
 
 \begin{algorithm}
 \begin{algorithmic}
 \State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
-\While{$abc$}
+\While{More iterations needed}
 	\State Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
 of each particle.
 	\State Choose one of the particles which has corner count equal to the
@@ -296,13 +315,7 @@ L_2(\xx_j) < L_2(\xx_i)
 \right).\label{eqn:corner_count}
 \end{eqnarray}
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.5]{figures/joint.pdf}
-\caption{\it The particle at the corner of the grey rectangle
-has a corner count of 1, since 1 other particle is within the
-grey rectangle.\label{fig:joint}}
-\end{figure}
+
 
 
 
