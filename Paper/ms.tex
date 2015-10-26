@@ -245,7 +245,7 @@ not more than a few).
 
 The prior $\pi(\xx)$ implies a certain prior for $L_1$ and $L_2$, which we
 denote $\pi(L_1, L_2)$. An example of a prior is shown as the
-probability density in Figure~\ref{fig:joint}. The partition function
+probability density in Figure~\ref{fig:joint1}. The partition function
 $Z(\beta_1, \beta_2)$ is a set of expected values with respect to this density.
 Simple Monte Carlo sampling from $\pi$ will not work except for values of
 $(\beta_1, \beta_2)$ where the canonical distribution remains similar to $\pi$.
@@ -254,11 +254,35 @@ to accurately estimate $Z(\beta_1, \beta_2)$.
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.5]{figures/joint.pdf}
-\caption{\it The particle at the corner of the grey rectangle
-has a corner count of 1, since 1 other particle is within the
-grey rectangle.\label{fig:joint}}
+\includegraphics[scale=0.5]{figures/joint1.pdf}
+\caption{\it An example of a prior for $L_1$ and $L_2$, which is implied by
+the prior $\pi(\xx)$. We have overplotted some points drawn from this prior.
+\label{fig:joint1}}
 \end{figure}
+
+Our proposed algorithm (introduced in Section~\ref{sec:algorithm}) makes use
+of a quantity we call the corner count. For any values $(\ell_1, \ell_2)$,
+the prior mass for which both objective functions are lower is
+\begin{eqnarray}
+X(\ell_1, \ell_2) &=& \int \pi(L_1, L_2) \mathds{1}\left(L_1 < \ell_1, L_2 < \ell_2 \right)
+ \, dL_1 \, dL_2
+\end{eqnarray}
+This is the two dimensional cumulative distribution function (CDF) of
+$L_1$ and $L_2$.
+
+
+The corner count of particle $i$ is defined as the number of particles with
+a lower value of {\em both} objective functions compared to particle $i$.
+Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
+particles in the rectangle whose upper right corner is at
+$\left(L_1(\xx_i), L_2(\xx_i)\right)$ (see Figure~\ref{fig:joint2} for an
+example). The equation for the corner count is:
+\begin{eqnarray}
+C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
+L_2(\xx_j) < L_2(\xx_i)
+\right).\label{eqn:corner_count}
+\end{eqnarray}
+
 
 \section{Properties of Nested sampling}
 
@@ -279,7 +303,17 @@ $L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
 \end{enumerate}
 
-\section{Proposed algorithm}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{figures/joint2.pdf}
+\caption{\it The same as Figure~\ref{fig:joint1}.
+\label{fig:joint2}}
+\end{figure}
+
+
+
+\section{Proposed algorithm}\label{sec:algorithm}
 
 Here we describe the proposed algorithm, which took three years of
 experimentation to develop. Please contact the first author for a list of
@@ -303,29 +337,25 @@ of that objective function.
 
 Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
-The corner count of particle $i$ is defined as the number of particles with
-a lower value of {\em both} objective functions compared to particle $i$.
-Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
-particles in the rectangle whose upper right corner is at
-$\left(L_1(\xx_i), L_2(\xx_i)\right)$ (see Figure~\ref{fig:joint} for an
-example). The equation for the corner count is:
-\begin{eqnarray}
-C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
-L_2(\xx_j) < L_2(\xx_i)
-\right).\label{eqn:corner_count}
-\end{eqnarray}
-
 
 
 
 
 \section{What kind of accuracy can we expect?}
+
 Imagine computing $Z(\beta_1, \beta_2)$ by looping over a grid of $\beta_2$
 values and doing an NS run with respect to $L_1$ for each. For each
 value of $\beta_1$ and $\beta_2$ that we're interested in, we can expect
 a (marginal) ``one-sigma'' accuracy in
 $\ln\left[Z(\beta_1, \beta_2)\right]$ of $\pm \sqrt{H(\beta_1, \beta_2)/N}$,
 for a computational cost proportional to...
+
+\section{What kind of accuracy do we need?}
+
+Use Skilling's argument about the prior distribution of a log Bayes factor.
+Even though the performance of this algorithm won't be great for high $H$, it
+will be good enough. I think the probability it won't give enough accuracy will
+be ``exponentially small''.
 
 \acknowledgments{Acknowledgements}
 
