@@ -46,10 +46,14 @@
 
 \usepackage{dsfont}
 \usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
 
 \newcommand{\xx}{\boldsymbol{x}}
 \newcommand{\dx}{d\boldsymbol{x}}
 \newcommand{\data}{\boldsymbol{D}}
+\newcommand{\II}{\boldsymbol{I}}
 
 %------------------------------------------------------------------
 % The following line should be uncommented if the LaTeX file is uploaded to arXiv.org
@@ -90,7 +94,7 @@
 %=================================================================
 
 % Full title of the paper (Capitalized)
-\Title{Nested sampling with two or more objective functions}
+\Title{Nested sampling with two objective functions}
 
 % Authors (Add full first names)
 \Author{Brendon J. Brewer$^{1,}$* and Ewan Cameron$^{2}$}
@@ -108,7 +112,8 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 \corres{{\tt bj.brewer@auckland.ac.nz}}
 
 % Abstract (Do not use inserted blank lines, i.e. \\)
-\abstract{The abstract goes here.}
+\abstract{We present a generalization of the Nested Sampling algorithm to a
+broad class of problems which arise in statistical mechanics.}
 
 % Keywords: add 3 to 10 keywords
 \keyword{nested sampling; bayesian computation; statistical mechanics}
@@ -136,20 +141,20 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 \section{Introduction}
 
 Nested Sampling \citep[NS][]{skilling} is an effective and popular
-Monte Carlo algorithm for Bayesian computation and
-statistical mechanics
+Monte Carlo algorithm which can solve a wide range of problems in Bayesian
+computation and statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
 In a Bayesian inference problem with unknown parameters denoted collectively
 by a vector $\xx$, the
 posterior distribution for the parameters given data $\data$ (and prior
-information $I$) is:
+information $\II$) is:
 \begin{eqnarray}
-p(\xx | \data, I) &=&
-\frac{p(\xx | I)p(\data | \xx, I)}{p(\data | I)}\\
+p(\xx | \data, \II) &=&
+\frac{p(\xx | \II)p(\data | \xx, \II)}{p(\data | \II)}\\
 &=& \frac{\pi(\xx)L(\xx)}{Z}
 \end{eqnarray}
 where $\pi(\xx)$ is the prior distribution, $L(\xx)$ is the likelihood
-function, and $Z$ is the normalising constant, known as the
+function, and $Z$ is the normalising constant, usually known as the
 ``marginal likelihood'' or the ``evidence'':
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
@@ -157,7 +162,14 @@ Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 NS begins by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by an
-approximately-known factor.
+approximately-known factor. Like other related algorithms such as those
+based on ``annealing'', NS
+moves through a sequence of probability distributions beginning from the
+prior. This sequence of distributions is defined by
+\begin{eqnarray}
+p(\xx; \ell) &=& \frac{1}{X(\ell)}\pi(\xx)\mathds{1}\left(L(\xx) > \ell\right).
+\end{eqnarray}
+
 This enables the calculation of the marginal likelihood $Z$
 and properties of the posterior $\pi(\xx)L(\xx)/Z$.
 NS is required because Equation~\ref{eqn:evidence}
@@ -227,7 +239,50 @@ want to know the normalisation $Z(\beta_1, \beta_2)$, called the
 partition function. This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
-transitions.
+transitions. The algorithm is designed for problems with two objective
+functions, but should generalize to problems with more than two (though perhaps
+not more than a few).
+
+The prior $\pi(\xx)$ implies a certain prior for $L_1$ and $L_2$, which we
+denote $\pi(L_1, L_2)$. An example of a prior is shown as the
+probability density in Figure~\ref{fig:joint1}. The partition function
+$Z(\beta_1, \beta_2)$ is a set of expected values with respect to this density.
+Simple Monte Carlo sampling from $\pi$ will not work except for values of
+$(\beta_1, \beta_2)$ where the canonical distribution remains similar to $\pi$.
+We need a sampler that explores regions where $L_1$ and $L_2$ are high in order
+to accurately estimate $Z(\beta_1, \beta_2)$.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{figures/joint1.pdf}
+\caption{\it An example of a prior for $L_1$ and $L_2$, which is implied by
+the prior $\pi(\xx)$. We have overplotted some points drawn from this prior.
+\label{fig:joint1}}
+\end{figure}
+
+Our proposed algorithm (introduced in Section~\ref{sec:algorithm}) makes use
+of a quantity we call the corner count. For any values $(\ell_1, \ell_2)$,
+the prior mass for which both objective functions are lower is
+\begin{eqnarray}
+X(\ell_1, \ell_2) &=& \int \pi(L_1, L_2) \mathds{1}\left(L_1 < \ell_1, L_2 < \ell_2 \right)
+ \, dL_1 \, dL_2
+\end{eqnarray}
+This is the two dimensional cumulative distribution function (CDF) of
+$L_1$ and $L_2$.
+
+
+The corner count of particle $i$ is defined as the number of particles with
+a lower value of {\em both} objective functions compared to particle $i$.
+Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
+particles in the rectangle whose upper right corner is at
+$\left(L_1(\xx_i), L_2(\xx_i)\right)$ (see Figure~\ref{fig:joint2} for an
+example). The equation for the corner count is:
+\begin{eqnarray}
+C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
+L_2(\xx_j) < L_2(\xx_i)
+\right).\label{eqn:corner_count}
+\end{eqnarray}
+
 
 \section{Properties of Nested sampling}
 
@@ -240,7 +295,7 @@ to satisfy the following requirements:
 \item The algorithm should seek to explore regions where the values of
 $L_1(\xx)$ and $L_2(\xx)$ are greater than what would be expected from the
 prior.
-\item The algorithm should try to move through a sequence of probability
+\item The algorithm should consider a sequence of probability
 distributions proportional to $\pi$, but restricted to smaller and smaller
 domains for which we can approximately measure the enclosed prior mass.
 \item The algorithm should be invariant to monotonic transformations of
@@ -248,49 +303,59 @@ $L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
 \end{enumerate}
 
-\section{Proposed algorithm}
-
-
-The algorithm works as follows.
-
-\begin{enumerate}
-\item Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
-\item Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
-of each particle.
-\item Choose one of the particles which has corner count equal to the
-minimum nonzero value. If all particles have a corner count of zero,
-the algorithm terminates. Call the selected particle particle $K$.
-\item Choose one of the objective functions, and find $K$'s rank in terms
-of that objective function.
-\item ...
-\end{enumerate}
-
-Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
-
-The corner count of particle $i$ is defined by
-\begin{eqnarray}
-C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
-L_2(\xx_j) < L_2(\xx_i)
-\right).\label{eqn:corner_count}
-\end{eqnarray}
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.5]{figures/joint.pdf}
-\caption{\it The particle at the corner of the grey rectangle
-has a corner count of 1, since 1 other particle is within the
-grey rectangle.\label{fig:joint}}
+\includegraphics[scale=0.5]{figures/joint2.pdf}
+\caption{\it The same as Figure~\ref{fig:joint1}.
+\label{fig:joint2}}
 \end{figure}
 
 
 
+\section{Proposed algorithm}\label{sec:algorithm}
+
+Here we describe the proposed algorithm, which took three years of
+experimentation to develop. Please contact the first author for a list of
+failed ideas, some of which might lead to potential alternatives to this
+algorithm. 
+
+\begin{algorithm}
+\begin{algorithmic}
+\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
+\While{More iterations needed}
+	\State Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
+of each particle.
+	\State Choose one of the particles which has corner count equal to the
+minimum nonzero value. If all particles have a corner count of zero,
+the algorithm terminates. Call the selected particle particle $K$.
+	\State Choose one of the objective functions, and find $K$'s rank in terms
+of that objective function.
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
+
+
+
+
+
 \section{What kind of accuracy can we expect?}
+
 Imagine computing $Z(\beta_1, \beta_2)$ by looping over a grid of $\beta_2$
 values and doing an NS run with respect to $L_1$ for each. For each
 value of $\beta_1$ and $\beta_2$ that we're interested in, we can expect
 a (marginal) ``one-sigma'' accuracy in
 $\ln\left[Z(\beta_1, \beta_2)\right]$ of $\pm \sqrt{H(\beta_1, \beta_2)/N}$,
 for a computational cost proportional to...
+
+\section{What kind of accuracy do we need?}
+
+Use Skilling's argument about the prior distribution of a log Bayes factor.
+Even though the performance of this algorithm won't be great for high $H$, it
+will be good enough. I think the probability it won't give enough accuracy will
+be ``exponentially small''.
 
 \acknowledgments{Acknowledgements}
 
