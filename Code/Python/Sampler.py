@@ -45,14 +45,27 @@ class Sampler:
 		Do an NS iteration
 		"""
 		counts = self.corner_counts
+		ii = 
+		counts = counts[counts != 0]
+		if len(counts) == 0:
+			exit()
 
-		# Choose one with minimum count to discard
+		# Choose one with minimum nonzero count
 		temp = np.nonzero(counts == counts.min())[0]
-		which = temp[rng.randint(len(temp))]
+		choice = temp[rng.randint(len(temp))]
 
-		# Need to figure out what happens in this case
-		if counts.min() != 0:
-			print("counts.min() != 0")
+		# Choose one of the two scalars and find its minimum within
+		# particle[choice]'s rectangle
+		which_scalar = rng.randint(2)
+		inside = [Sampler.is_in_rectangle(self.all_scalars, self.all_scalars[choice, :]) \
+						for i in range(self.num_particles)]
+		inside = np.nonzero(inside)[0]
+		print(inside)
+		ss = self.all_scalars[inside, which_scalar]
+		which = np.nonzero(ss==ss.min())[0]
+
+		forbid = self.all_scalars[choice, :].copy()
+		forbid[which_scalar] = self.all_scalars[which, which_scalar]
 
 		# Estimate the fraction of *remaining* prior mass being eliminated
 		frac = float(1 + counts[which])/self.num_particles
@@ -75,7 +88,7 @@ class Sampler:
 
 		# Forbid another rectangle
 		self.forbidden_rectangles = np.vstack([self.forbidden_rectangles, \
-										self.all_scalars[which, :]])
+										forbid])
 		self.refresh_particle(which)
 
 		return keep
