@@ -44,7 +44,7 @@ class Sampler:
 		"""
 		Do an NS iteration
 		"""
-		counts = self.rectangle_counts
+		counts = self.corner_counts
 
 		# Choose one with minimum count to discard
 		temp = np.nonzero(counts == counts.min())[0]
@@ -110,7 +110,7 @@ class Sampler:
 		self.iteration += 1
 
 	@property
-	def rectangle_counts(self):
+	def corner_counts(self):
 		"""
 		Count how many other particles are within the rectangle
 		of each particle.
