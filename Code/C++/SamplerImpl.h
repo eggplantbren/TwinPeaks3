@@ -52,10 +52,10 @@ template<class MyModel>
 void Sampler<MyModel>::prune_rectangles()
 {
 	// Iterator pointing at first rectangle (most recent)
-	std::list< std::vector<ScalarType> >::iterator it0 = rects.begin();
+	auto it0 = rects.begin();
 
 	// Iterator pointing at second rectangle
-	std::list< std::vector<ScalarType> >::iterator it=rects.begin();
+	auto it=rects.begin();
 	it++;
 
 	// Remove redundant rectangles
@@ -198,7 +198,7 @@ void Sampler<MyModel>::refresh_particle(int which)
 template<class MyModel>
 bool Sampler<MyModel>::is_okay(const std::vector<ScalarType>& s)
 {
-	for(std::list< std::vector<ScalarType> >::iterator it=rects.begin();
+	for(auto it=rects.begin();
 				it != rects.end(); it++)
 	{
 		if(is_in_lower_rectangle(s, *it))
