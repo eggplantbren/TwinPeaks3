@@ -45,7 +45,7 @@ void SimpleExample::compute_scalars()
 	for(const double& x: params)
 	{
 		scalars[0] += -pow(x - 0.5, 2);
-		scalars[1] += x;
+		scalars[1] += -log(1. + pow(x - 0.5, 2)/1E-4);
 	}
 }
 

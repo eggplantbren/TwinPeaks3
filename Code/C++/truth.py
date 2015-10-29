@@ -1,11 +1,11 @@
 from pylab import *
 
-x = linspace(0., 1., 2001)
+x = linspace(0., 1., 10001)
 
 def truth(T1, T2, do_plot=False):
-  p = exp(-(x - 0.5)**2/T1 + x/T2)
+  p = exp(-(x - 0.5)**2/T1 - log(1. + (x - 0.5)**2/0.01**2)/T2)
   Z = trapz(p, x=x)
-  H = trapz(p/Z*log(p/Z), x=x)
+  H = trapz(p/Z*log(p/Z + 1E-300), x=x)
 
   logZ = 100*log(Z)
   H *= 100
