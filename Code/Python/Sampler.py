@@ -3,7 +3,7 @@ import numpy.random as rng
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-from Walker import Walker
+from Particle import Particle
 
 class Sampler:
 	"""
@@ -15,7 +15,7 @@ class Sampler:
 		Constructor: pass in the number of particles
 		"""
 		self.num_particles = num_particles
-		self.walkers = [Walker() for i in range(0, num_particles)]
+		self.particles = [Particle() for i in range(0, num_particles)]
 
 		# Open and close output file to clear it
 		f = open('output.txt', 'w')
@@ -29,12 +29,12 @@ class Sampler:
 
 	def initialise(self):
 		"""
-		Generate all the walkers from the prior
+		Generate all the particles from the prior
 		"""
-		self.all_scalars = []	# Values of scalars for all walkers
-		for walker in self.walkers:
-			walker.from_prior()
-			self.all_scalars.append(walker.scalars)
+		self.all_scalars = []	# Values of scalars for all particles
+		for particle in self.particles:
+			particle.from_prior()
+			self.all_scalars.append(particle.scalars)
 		self.all_scalars = np.array(self.all_scalars)
 		self.forbidden_rectangles = np.empty((0, self.all_scalars.shape[1]))
 		self.iteration = 0
@@ -44,15 +44,28 @@ class Sampler:
 		"""
 		Do an NS iteration
 		"""
-		counts = self.rectangle_counts
+		counts = self.corner_counts
+		ii = 
+		counts = counts[counts != 0]
+		if len(counts) == 0:
+			exit()
 
-		# Choose one with minimum count to discard
+		# Choose one with minimum nonzero count
 		temp = np.nonzero(counts == counts.min())[0]
-		which = temp[rng.randint(len(temp))]
+		choice = temp[rng.randint(len(temp))]
 
-		# Need to figure out what happens in this case
-		if counts.min() != 0:
-			print("counts.min() != 0")
+		# Choose one of the two scalars and find its minimum within
+		# particle[choice]'s rectangle
+		which_scalar = rng.randint(2)
+		inside = [Sampler.is_in_rectangle(self.all_scalars, self.all_scalars[choice, :]) \
+						for i in range(self.num_particles)]
+		inside = np.nonzero(inside)[0]
+		print(inside)
+		ss = self.all_scalars[inside, which_scalar]
+		which = np.nonzero(ss==ss.min())[0]
+
+		forbid = self.all_scalars[choice, :].copy()
+		forbid[which_scalar] = self.all_scalars[which, which_scalar]
 
 		# Estimate the fraction of *remaining* prior mass being eliminated
 		frac = float(1 + counts[which])/self.num_particles
@@ -75,7 +88,7 @@ class Sampler:
 
 		# Forbid another rectangle
 		self.forbidden_rectangles = np.vstack([self.forbidden_rectangles, \
-										self.all_scalars[which, :]])
+										forbid])
 		self.refresh_particle(which)
 
 		return keep
@@ -90,19 +103,19 @@ class Sampler:
 			copy = rng.randint(self.num_particles)
 
 		# Clone it
-		self.walkers[which] = deepcopy(self.walkers[copy])
+		self.particles[which] = deepcopy(self.particles[copy])
 
 		# Do MCMC
 		num_accepted = 0
 		for i in range(0, mcmc_steps):
-			proposal = deepcopy(self.walkers[which])
+			proposal = deepcopy(self.particles[which])
 			logH = proposal.proposal()
 			proposal_scalars = proposal.scalars
 
 			if rng.rand() <= np.exp(logH) and not np.any\
 				(Sampler.is_in_rectangle\
 					(proposal_scalars, self.forbidden_rectangles)):
-				self.walkers[which] = proposal
+				self.particles[which] = proposal
 				self.all_scalars[which, :] = proposal_scalars
 				num_accepted += 1
 
@@ -110,10 +123,10 @@ class Sampler:
 		self.iteration += 1
 
 	@property
-	def rectangle_counts(self):
+	def corner_counts(self):
 		"""
-		Count how many other walkers are within the rectangle
-		of each walker.
+		Count how many other particles are within the rectangle
+		of each particle.
 		"""
 		counts = np.empty(self.num_particles, dtype='int64')
 		for i in range(0, self.num_particles):
