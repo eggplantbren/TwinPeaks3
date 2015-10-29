@@ -1,9 +1,9 @@
 import numpy as np
 import numpy.random as rng
 
-class Walker:
+class Particle:
 	"""
-	Class defining a walker, and the scalar functions
+	Class defining a particle, and the scalar functions
 	(log-likelihood or -energy) that you want to increase
 	"""
 	def __init__(self):

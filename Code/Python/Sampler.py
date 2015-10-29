@@ -3,7 +3,7 @@ import numpy.random as rng
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-from Walker import Walker
+from Particle import Particle
 
 class Sampler:
 	"""
@@ -15,7 +15,7 @@ class Sampler:
 		Constructor: pass in the number of particles
 		"""
 		self.num_particles = num_particles
-		self.walkers = [Walker() for i in range(0, num_particles)]
+		self.particles = [Particle() for i in range(0, num_particles)]
 
 		# Open and close output file to clear it
 		f = open('output.txt', 'w')
@@ -29,12 +29,12 @@ class Sampler:
 
 	def initialise(self):
 		"""
-		Generate all the walkers from the prior
+		Generate all the particles from the prior
 		"""
-		self.all_scalars = []	# Values of scalars for all walkers
-		for walker in self.walkers:
-			walker.from_prior()
-			self.all_scalars.append(walker.scalars)
+		self.all_scalars = []	# Values of scalars for all particles
+		for particle in self.particles:
+			particle.from_prior()
+			self.all_scalars.append(particle.scalars)
 		self.all_scalars = np.array(self.all_scalars)
 		self.forbidden_rectangles = np.empty((0, self.all_scalars.shape[1]))
 		self.iteration = 0
@@ -90,19 +90,19 @@ class Sampler:
 			copy = rng.randint(self.num_particles)
 
 		# Clone it
-		self.walkers[which] = deepcopy(self.walkers[copy])
+		self.particles[which] = deepcopy(self.particles[copy])
 
 		# Do MCMC
 		num_accepted = 0
 		for i in range(0, mcmc_steps):
-			proposal = deepcopy(self.walkers[which])
+			proposal = deepcopy(self.particles[which])
 			logH = proposal.proposal()
 			proposal_scalars = proposal.scalars
 
 			if rng.rand() <= np.exp(logH) and not np.any\
 				(Sampler.is_in_rectangle\
 					(proposal_scalars, self.forbidden_rectangles)):
-				self.walkers[which] = proposal
+				self.particles[which] = proposal
 				self.all_scalars[which, :] = proposal_scalars
 				num_accepted += 1
 
@@ -112,8 +112,8 @@ class Sampler:
 	@property
 	def rectangle_counts(self):
 		"""
-		Count how many other walkers are within the rectangle
-		of each walker.
+		Count how many other particles are within the rectangle
+		of each particle.
 		"""
 		counts = np.empty(self.num_particles, dtype='int64')
 		for i in range(0, self.num_particles):
