@@ -16,12 +16,18 @@ int main()
 	RNG rng;
 	rng.set_seed(time(0));
 
+	constexpr int num_particles = 1000;
+	constexpr int num_mcmc_steps = 10000;
+	constexpr double depth = 1000.;
+	constexpr int steps = depth/num_particles;
+
 	// Create a sampler
-	Sampler<SimpleExample> sampler(rng, 1000, 10000, 1000);
+	Sampler<SimpleExample> sampler(rng, num_particles, num_mcmc_steps,
+											num_particles);
 	sampler.initialise();
 
 	// Do NS indefinitely
-	while(true)
+	for(int i=0; i<steps; ++i)
 		sampler.do_iteration();
 
 	return 0;
