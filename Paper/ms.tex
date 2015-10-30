@@ -355,24 +355,30 @@ for a computational cost proportional to...
 The following argument is due to John Skilling. Consider Bayesian model selection
 between two models $M_1$ and $M_2$. The Bayes Factor is the ratio of the
 two marginal likelihoods:
-
 \begin{eqnarray}
 B = \frac{P(D | M_1)}{P(D | M_2)} = \frac{Z_1}{Z_2}
 \end{eqnarray}
 In large problems, the log of the Bayes Factor is usually more convenient:
-
 \begin{eqnarray}
 \ln B = \ln Z_1 - \ln Z_2.
 \end{eqnarray}
-
 Naively, we want $\ln B$ to an accuracy of about 0.1, so that we can reliably
 quantify the strength of the evidence when the two models are similarly
-supported by the data.
+supported by the data. But is this a realistic situation?
+Prior to the data, we don't know the
+value of $\ln B$. Rather, $\ln B$ has a prior distribution:
+\begin{eqnarray}
+P(\ln B \in R) &=& \int P(D)P(\ln B \in R | D) \, dD\\
+&=& \int P(D) \mathds{1}\left(\ln B(D) \in R\right) \, dD\\
+&=& \int \sum_{i\in\{1,2\}}\left[P(M_i)P(D|M_i)\right] \mathds{1}\left(\ln B(D) \in R\right) \, dD
+\end{eqnarray}
 
-Use Skilling's argument about the prior distribution of a log Bayes factor.
-Even though the performance of this algorithm won't be great for high $H$, it
-will be good enough. I think the probability it won't give enough accuracy will
-be ``exponentially small''.
+
+
+%Use Skilling's argument about the prior distribution of a log Bayes factor.
+%Even though the performance of this algorithm won't be great for high $H$, it
+%will be good enough. I think the probability it won't give enough accuracy will
+%be ``exponentially small''.
 
 \acknowledgments{Acknowledgements}
 
