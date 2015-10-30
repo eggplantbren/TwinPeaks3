@@ -366,11 +366,12 @@ Naively, we want $\ln B$ to an accuracy of about 0.1, so that we can reliably
 quantify the strength of the evidence when the two models are similarly
 supported by the data. But is this a realistic situation?
 Prior to the data, we don't know the
-value of $\ln B$. Rather, $\ln B$ has a prior distribution:
+value of $\ln B$. Rather, $\ln B$ has a prior distribution. We can find this
+prior in terms of its CDF:
 \begin{eqnarray}
-P(\ln B \in R) &=& \int P(D)P(\ln B \in R | D) \, dD\\
-&=& \int P(D) \mathds{1}\left(\ln B(D) \in R\right) \, dD\\
-&=& \int \sum_{i\in\{1,2\}}\left[P(M_i)P(D|M_i)\right] \mathds{1}\left(\ln B(D) \in R\right) \, dD
+P(\ln B \leq R) &=& \int P(D)P(\ln B \leq R | D) \, dD\\
+&=& \int P(D) \mathds{1}\left(\ln B(D) \leq R\right) \, dD\\
+&=& \int \sum_{i\in\{1,2\}}\left[P(M_i)P(D|M_i)\right] \mathds{1}\left(\ln B(D) \leq R\right) \, dD
 \end{eqnarray}
 
 
