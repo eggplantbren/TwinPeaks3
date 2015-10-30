@@ -288,8 +288,8 @@ L_2(\xx_j) < L_2(\xx_i)
 
 We seek an algorithm for computing the partition function
 $Z(\beta_1, \beta_2)$ for a range of values of the $\beta$s, from a single
-run. To be considered a variant of Nested Sampling, we require the method
-to satisfy the following requirements:
+run. To be considered a variant of Nested Sampling, the method should satisfy
+the following properties:
 \begin{enumerate}
 \item The algorithm should begin with $N$ points drawn from the prior $\pi(\xx)$.
 \item The algorithm should seek to explore regions where the values of
@@ -323,7 +323,7 @@ algorithm.
 \begin{algorithm}
 \begin{algorithmic}
 \State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
-\While{More iterations needed}
+\While{more iterations desired}
 	\State Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
 of each particle.
 	\State Choose one of the particles which has corner count equal to the
@@ -351,6 +351,23 @@ $\ln\left[Z(\beta_1, \beta_2)\right]$ of $\pm \sqrt{H(\beta_1, \beta_2)/N}$,
 for a computational cost proportional to...
 
 \section{What kind of accuracy do we need?}
+
+The following argument is due to John Skilling. Consider Bayesian model selection
+between two models $M_1$ and $M_2$. The Bayes Factor is the ratio of the
+two marginal likelihoods:
+
+\begin{eqnarray}
+B = \frac{P(D | M_1)}{P(D | M_2)} = \frac{Z_1}{Z_2}
+\end{eqnarray}
+In large problems, the log of the Bayes Factor is usually more convenient:
+
+\begin{eqnarray}
+\ln B = \ln Z_1 - \ln Z_2.
+\end{eqnarray}
+
+Naively, we want $\ln B$ to an accuracy of about 0.1, so that we can reliably
+quantify the strength of the evidence when the two models are similarly
+supported by the data.
 
 Use Skilling's argument about the prior distribution of a log Bayes factor.
 Even though the performance of this algorithm won't be great for high $H$, it
