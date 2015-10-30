@@ -1,5 +1,8 @@
 from pylab import *
 
+rc("font", size=18, family="serif", serif="Computer Sans")
+rc("text", usetex=True)
+
 x = linspace(0., 1., 10001)
 
 def truth(T1, T2, do_plot=False):
@@ -34,17 +37,18 @@ def grid():
 
   figure(1)
   subplot(1, 2, 1)
-  imshow(logZ, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())), interpolation='nearest', cmap='Purples')
-  xlabel('ln($T_1$)')
-  ylabel('ln($T_2$)')
-  title('log(Z)')
+  imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
+  xlabel(r'$\log_{10}(T_1)$')
+  ylabel(r'$\log_{10}(T_2)$')
+  title(r'$\ln(Z)$')
 
   subplot(1, 2, 2)
-  imshow(H, extent=(log(T1.min()), log(T1.max()), log(T2.min()), log(T2.max())), interpolation='nearest', cmap='Purples')
-  xlabel('ln($T_1$)')
-  ylabel('ln($T_2$)')
-  title('H, max={m}'.format(m=H.max()))
-
+  imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
+  xlabel(r'$\log_{10}(T_1)$')
+#  ylabel(r'$\log_{10}(T_2)$')
+  title(r'$H$')
+  print('H_max = ', H.max())
+  savefig('truth.pdf', bbox_inches='tight')
   show()
   return [logZ, H]
 
