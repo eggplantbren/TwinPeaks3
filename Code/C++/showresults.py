@@ -71,7 +71,7 @@ xlabel("$L_1$")
 ylabel("$L_2$")
 axis([-10, 0, -650, 0])
 #legend(loc='upper left')
-savefig('output.pdf', bbox_inches='tight')
+savefig('output.png', bbox_inches='tight', dpi=300)
 savetxt("posterior_sample.txt", posterior_sample)
 show()
 
