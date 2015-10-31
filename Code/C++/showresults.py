@@ -62,11 +62,16 @@ for i in xrange(0, N):
       break
   posterior_sample[i,:] = scalars[which,:]
 
-plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=5, alpha=0.5)
+plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=5,\
+					alpha=0.5, label='Discarded points')
 hold(True)
-plot(scalars[:,0], scalars[:,1], 'r.', markersize=1, alpha=0.2)
-xlabel("Scalar 1")
-ylabel("Scalar 2")
+plot(scalars[:,0], scalars[:,1], 'r.', markersize=1, alpha=0.2,\
+					label='Canonical distribution')
+xlabel("$L_1$")
+ylabel("$L_2$")
+axis([-10, 0, -650, 0])
+#legend(loc='upper left')
+savefig('output.pdf', bbox_inches='tight')
 savetxt("posterior_sample.txt", posterior_sample)
 show()
 
