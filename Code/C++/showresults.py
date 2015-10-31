@@ -2,6 +2,9 @@ from pylab import *
 import scipy
 from postprocess import logsumexp
 
+rc("font", size=18, family="serif", serif="Computer Sans")
+rc("text", usetex=True)
+
 # Temperatures
 T1, T2 = 0.1, 1.
 
@@ -91,10 +94,11 @@ for i in xrange(0, N):
       exp2[i, j] = NaN
   print(i+1)
 
-figure(figsize=(11, 9))
+figure(figsize=(11, 11))
 subplot(2, 2, 1)
 imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
 title(r'$\log(Z)$')
+ylabel(r'$\log_{10}(T_2)$')
 
 subplot(2, 2, 2)
 imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
@@ -103,11 +107,14 @@ title(r'$H$')
 subplot(2, 2, 3)
 imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
 title(r'$\left<L_1\right>$')
+xlabel(r'$\log_{10}(T_1)$')
+ylabel(r'$\log_{10}(T_2)$')
 
 subplot(2, 2, 4)
 imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
 title(r'$\left<L_2\right>$')
-
+xlabel(r'$\log_{10}(T_1)$')
+savefig('results.pdf', bbox_inches='tight')
 show()
 
 true_logZ = loadtxt('true_logZ.txt')
