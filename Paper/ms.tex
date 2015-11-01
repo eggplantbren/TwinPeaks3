@@ -329,13 +329,15 @@ of each particle.
 	\State Choose one of the particles which has corner count equal to the
 minimum nonzero value. If all particles have a corner count of zero,
 the algorithm terminates. Call the selected particle particle $K$.
-	\State Choose one of the objective functions, and find $K$'s rank in terms
-of that objective function.
+	\State Choose one of the objective functions 
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
 
 Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
+In Steps 2 and 3, we search for a particle with a low corner count, such as
+one or two (so the fraction of the remaining prior mass to the lower left of
+the chosen particle is approximately $1/N$ or $2/N$ respectively).
 
 
 
