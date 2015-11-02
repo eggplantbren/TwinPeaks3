@@ -43,13 +43,13 @@ def canonical_properties(temperature1, temperature2):
 
 [logZ, H, logWW, ess, exp1, exp2] = canonical_properties(T1, T2)
 
-print('log(Z) = {logZ}'.format(logZ=logZ))
-print('H = {H} nats'.format(H=H))
+#print('log(Z) = {logZ}'.format(logZ=logZ))
+#print('H = {H} nats'.format(H=H))
 
-plot(exp(logWW))
-ylabel('Weight wrt canonical distribution')
-title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
-show()
+#plot(exp(logWW))
+#ylabel('Weight wrt canonical distribution')
+#title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
+#show()
 
 # Resample to uniform weight
 N = int(ess)
