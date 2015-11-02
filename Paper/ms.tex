@@ -329,10 +329,8 @@ Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 In step 2, we try to find a particle with the lowest possible nonzero
 corner count. Often this will be 1. In Figure~\ref{fig:joint2}, particle $K$
 is located at $(2.65, 1.31)$ and has a corner count of 1.
+If all particles have a corner count of 0, the algorithm terminates.
 
-
-
-At step 2, if all particles have a corner count of 0, the algorithm terminates.
 
 
 \begin{figure}
@@ -340,7 +338,7 @@ At step 2, if all particles have a corner count of 0, the algorithm terminates.
 \includegraphics[scale=0.5]{figures/joint2.pdf}
 \caption{\it The same as Figure~\ref{fig:joint1}. The selected particle
 at $(2.65, 1.31)$ has a corner count of 1. The particle at
-$(2.50, 0.84)$ can be thought of as a single-particle standard Nested Sampling
+$(2.53, 0.84)$ can be thought of as a single-particle standard Nested Sampling
 run restricted to $L_1 < 2.65$ which is attempting to increase $L_1$.
 \label{fig:joint2}}
 \end{figure}

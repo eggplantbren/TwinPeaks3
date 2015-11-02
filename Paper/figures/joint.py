@@ -39,6 +39,8 @@ plt.axhline(1.3095, linestyle='--', color='k')
 plt.axvline(2.6455, linestyle='--', color='k')
 plt.axhline(0.841, xmin=0., xmax=2.6455/5., linestyle='-.', color='k')
 plt.fill_between(x[0, :][x[0, :] < 2.6455], 0., 1.3095, color=[0.6, 0.6, 0.6], alpha=0.2)
+plt.plot(2.645, 1.31, 'r*', markersize=15)
+plt.plot(2.525, 0.84, 'gH', markersize=10)
 plt.savefig('joint2.pdf', bbox_inches='tight')
 plt.show()
 
