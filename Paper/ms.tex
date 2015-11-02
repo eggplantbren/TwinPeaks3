@@ -114,8 +114,9 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 \corres{{\tt bj.brewer@auckland.ac.nz}}
 
 % Abstract (Do not use inserted blank lines, i.e. \\)
-\abstract{We present a generalization of the Nested Sampling algorithm to a
-broad class of problems which arise in statistical mechanics.}
+\abstract{We present a generalization of the Nested Sampling algorithm for
+estimating the partition function of a two-dimensional family of
+probability distributions.}
 
 % Keywords: add 3 to 10 keywords
 \keyword{nested sampling; bayesian computation; statistical mechanics}
@@ -161,7 +162,8 @@ function, and $Z$ is the normalising constant, usually known as the
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
-NS begins by drawing particles from the
+The main goal of NS is to approximate $Z$.
+This is done by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by an
 approximately-known factor. Like other related algorithms such as those
@@ -172,13 +174,12 @@ prior. This sequence of distributions is defined by
 p(\xx; \ell) &=& \frac{1}{X(\ell)}\pi(\xx)\mathds{1}\left(L(\xx) > \ell\right).
 \end{eqnarray}
 
-This enables the calculation of the marginal likelihood $Z$
-and properties of the posterior $\pi(\xx)L(\xx)/Z$.
+In addition to the marginal likelihood $Z$, NS also allows us
+to approximate properties of the posterior $\pi(\xx)L(\xx)/Z$.
 NS is required because Equation~\ref{eqn:evidence}
 is the expected value of $L$ with respect to a very heavy-tailed distribution
 (the prior for the $L$ value implied by $\pi(\xx)$). Hence, there is a strong
 connection between NS and ideas from rare event simulation \citep{walter}.
-
 NS also allows us to calculate the properties of any other distribution that
 is in some sense intermediate
 between the prior and the posterior. For example, we might be interested in
@@ -226,12 +227,10 @@ we obtain testable information that fixes the expected values of two scalar
 functions of $\xx$, $L_1(\xx)$ and $L_2(\xx)$. It is well known that the
 updated probability distribution that takes into account the constraints is
 of the ``canonical'' form:
-
 \begin{eqnarray}
 p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1L_1(\xx)+\beta_2L_2(\xx)\right]}
 {Z(\beta_1, \beta_2)}
 \end{eqnarray}
-
 If we were only interested in a single canonical distribution, for example
 with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we could estimate its normalising
 constant and by running standard Nested Sampling with ``likelihood''
@@ -253,7 +252,6 @@ Simple Monte Carlo sampling from $\pi$ will not work except for values of
 $(\beta_1, \beta_2)$ where the canonical distribution remains similar to $\pi$.
 We need a sampler that explores regions where $L_1$ and $L_2$ are high in order
 to accurately estimate $Z(\beta_1, \beta_2)$.
-
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{figures/joint1.pdf}
@@ -270,21 +268,19 @@ X(\ell_1, \ell_2) &=& \int \pi(L_1, L_2) \mathds{1}\left(L_1 < \ell_1, L_2 < \el
  \, dL_1 \, dL_2
 \end{eqnarray}
 This is the two dimensional cumulative distribution function (CDF) of
-$L_1$ and $L_2$.
-
-
+$L_1$ and $L_2$. The corner count is a related quantity when we have
+a collection of $N$ particles in the $L_1$-$L_2$ plane.
 The corner count of particle $i$ is defined as the number of particles with
-a lower value of {\em both} objective functions compared to particle $i$.
-Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
-particles in the rectangle whose upper right corner is at
-$\left(L_1(\xx_i), L_2(\xx_i)\right)$ (see Figure~\ref{fig:joint2} for an
-example). The equation for the corner count of particle $i$ is:
+a lower value of {\em both} objective functions compared to particle $i$:
 \begin{eqnarray}
 C_i &=& \sum_{\substack{j=1\\{j \neq i}}}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
 L_2(\xx_j) < L_2(\xx_i)
 \right).\label{eqn:corner_count}
 \end{eqnarray}
-
+Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
+particles in the rectangle whose upper right corner is at
+$\left(L_1(\xx_i), L_2(\xx_i)\right)$ (see Figure~\ref{fig:joint2} for an
+example).
 
 \section{Properties of Nested sampling}
 
