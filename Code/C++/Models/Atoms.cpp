@@ -54,13 +54,14 @@ void Atoms::calculate_PE()
 
 void Atoms::calculate_PE(int i, int j)
 {
-	double Rmsq = pow(0.05, 2);
-	double rsq = pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2) + pow(z[i] - z[j], 2);
+	constexpr double Rmsq = pow(0.02, 2);
+	double rsq = pow(x[i] - x[j], 2) + pow(z[i] - z[j], 2);
 	terms[i][j] = pow(Rmsq/rsq, 6) - 2.*pow(Rmsq/rsq, 3);
 }
 
 double Atoms::perturb(RNG& rng)
 {
+	top:
 	int which = rng.rand_int(x.size());
 	int what = rng.rand_int(3);
 
@@ -71,6 +72,7 @@ double Atoms::perturb(RNG& rng)
 	}
 	if(what == 1)
 	{
+		goto top;
 		y[which] += rng.randh();
 		wrap(y[which], 0., 1.);
 	}
