@@ -47,9 +47,11 @@
 \usepackage{dsfont}
 \usepackage[utf8]{inputenc}
 \usepackage{algorithm}
+\usepackage{amsmath}
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
 
+\DeclareUnicodeCharacter{00A0}{ }
 \newcommand{\xx}{\boldsymbol{x}}
 \newcommand{\dx}{d\boldsymbol{x}}
 \newcommand{\data}{\boldsymbol{D}}
@@ -276,9 +278,9 @@ a lower value of {\em both} objective functions compared to particle $i$.
 Graphically, on a plot of $L_2$ vs. $L_1$ the corner count is the number of
 particles in the rectangle whose upper right corner is at
 $\left(L_1(\xx_i), L_2(\xx_i)\right)$ (see Figure~\ref{fig:joint2} for an
-example). The equation for the corner count is:
+example). The equation for the corner count of particle $i$ is:
 \begin{eqnarray}
-C_i &=& \sum_{j=1}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
+C_i &=& \sum_{\substack{j=1\\{j \neq i}}}^N \mathds{1}\left(L_1(\xx_j) < L_1(\xx_i),
 L_2(\xx_j) < L_2(\xx_i)
 \right).\label{eqn:corner_count}
 \end{eqnarray}
@@ -293,8 +295,7 @@ the following properties:
 \begin{enumerate}
 \item The algorithm should begin with $N$ points drawn from the prior $\pi(\xx)$.
 \item The algorithm should seek to explore regions where the values of
-$L_1(\xx)$ and $L_2(\xx)$ are greater than what would be expected from the
-prior.
+$L_1(\xx)$ and $L_2(\xx)$ are higher than the prior would typically predict.
 \item The algorithm should consider a sequence of probability
 distributions proportional to $\pi$, but restricted to smaller and smaller
 domains for which we can approximately measure the enclosed prior mass.
@@ -302,16 +303,8 @@ domains for which we can approximately measure the enclosed prior mass.
 $L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
 \end{enumerate}
-
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.5]{figures/joint2.pdf}
-\caption{\it The same as Figure~\ref{fig:joint1}.
-\label{fig:joint2}}
-\end{figure}
-
-
+The standard Nested Sampling algorithm, (as well as alternatives such as
+Diffusive Nested Sampling \citep{dnest}) has these properties.
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
@@ -322,20 +315,39 @@ algorithm.
 
 \begin{algorithm}
 \begin{algorithmic}
-\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
+\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$, and
+initialise the {\em remaining prior mass} at $M=1$.
 \While{more iterations desired}
 	\State Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
 of each particle.
 	\State Choose one of the particles which has corner count equal to the
-minimum nonzero value. If all particles have a corner count of zero,
-the algorithm terminates. Call the selected particle particle $K$.
-	\State Choose one of the objective functions, and find $K$'s rank in terms
-of that objective function.
+minimum nonzero value. Label this particle number $K$.
+	\State Choose one of the objective functions at random. Label this
+objective function $J$. Let $L_{J}(\xx_K)$ be the value of this objective
+function for particle $K$.
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
 
 Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
+In step 2, we try to find a particle with the lowest possible nonzero
+corner count. Often this will be 1. In Figure~\ref{fig:joint2}, particle $K$
+is located at $(2.65, 1.31)$ and has a corner count of 1.
+
+
+
+At step 2, if all particles have a corner count of 0, the algorithm terminates.
+
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{figures/joint2.pdf}
+\caption{\it The same as Figure~\ref{fig:joint1}. The selected particle
+at $(2.65, 1.31)$ has a corner count of 1. The particle at
+$(2.50, 0.84)$ can be thought of as a single-particle standard Nested Sampling
+run restricted to $L_1 < 2.65$ which is attempting to increase $L_1$.
+\label{fig:joint2}}
+\end{figure}
 
 
 
@@ -368,7 +380,9 @@ $0.01\sqrt{T_2}$.
 \begin{figure}
 \centering
 \includegraphics[scale=0.75]{figures/truth.pdf}
-\caption{\label{fig:truth}}
+\caption{The true partition function and KL divergence (from the prior to
+the canonical distribution) as a function of two temperatures for the
+test problem.\label{fig:truth}}
 \end{figure}
 
 
