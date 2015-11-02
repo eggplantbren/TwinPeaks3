@@ -1,6 +1,7 @@
 from pylab import *
 import scipy
 from postprocess import logsumexp
+import colormaps as cmaps
 
 rc("font", size=18, family="serif", serif="Computer Sans")
 rc("text", usetex=True)
@@ -100,22 +101,22 @@ for i in xrange(0, N):
 
 figure(figsize=(11, 11))
 subplot(2, 2, 1)
-imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
+imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
 title(r'$\log(Z)$')
 ylabel(r'$\log_{10}(T_2)$')
 
 subplot(2, 2, 2)
-imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
+imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
 title(r'$H$')
 
 subplot(2, 2, 3)
-imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
+imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
 title(r'$\left<L_1\right>$')
 xlabel(r'$\log_{10}(T_1)$')
 ylabel(r'$\log_{10}(T_2)$')
 
 subplot(2, 2, 4)
-imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='Purples')
+imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
 title(r'$\left<L_2\right>$')
 xlabel(r'$\log_{10}(T_1)$')
 savefig('results.pdf', bbox_inches='tight')
@@ -126,7 +127,7 @@ true_H = loadtxt('true_H.txt')
 subplot(1,2,1)
 err1 = logZ - true_logZ
 good = logical_not(isnan(err1))
-imshow(err1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='coolwarm')
+imshow(err1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', vmin=-(abs(err1[good])).max(), vmax=(abs(err1[good])).max(), cmap='coolwarm')
 print("H_max = " + str(H[good].max()))
 print(err1[good].min(), err1[good].max())
 print(4.*H[good].max()/(abs(err1[good]).max())**2)
@@ -134,7 +135,7 @@ print(4.*H[good].max()/(abs(err1[good]).max())**2)
 subplot(1,2,2)
 err2 = (H - true_H)#/true_H
 good = logical_not(isnan(err1))
-imshow(err2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap='coolwarm')
+imshow(err2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', vmin=-(abs(err2[good])).max(), vmax=(abs(err2[good])).max(), cmap='coolwarm')
 print(err2[good].min(), err2[good].max())
 show()
 
