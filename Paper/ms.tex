@@ -361,14 +361,14 @@ prior is a uniform distribution between 0 and 1 for each coordinate:
 \end{eqnarray}
 The two objective functions are:
 \begin{eqnarray}
-L_1(\xx) &=& -\sum_{i=1}^{100} \left(x_i - 0.5\right)^2\\
+L_1(\xx) &=& -\frac{1}{2}\sum_{i=1}^{100} \left(\frac{x_i - 0.5}{0.01}\right)^2\\
 L_2(\xx) &=& -\sum_{i=1}^{100} \log\left[1 +
 \left(\frac{x_i - 0.5}{0.01}\right)^2
 \right].
 \end{eqnarray}
 The canonical distribution at low temperature for $L_1$ and high temperature
 for $L_2$ is a gaussian centered at 0.5 with standard deviation
-$\sqrt{T_1/2}$. At high temperatures for $L_2$ and low temperatures for $L_1$ the
+$0.01\sqrt{T_1}$. At high temperatures for $L_2$ and low temperatures for $L_1$ the
 canonical distributions are Cauchy centered at 0.5 with width
 $0.01\sqrt{T_2}$.
 
