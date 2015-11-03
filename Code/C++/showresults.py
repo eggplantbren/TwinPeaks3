@@ -7,7 +7,7 @@ rc("font", size=18, family="serif", serif="Computer Sans")
 rc("text", usetex=True)
 
 # Temperatures
-T1, T2 = 0.1, 1.
+T1, T2 = 1., 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
 output = loadtxt('sample_info.txt')
@@ -47,10 +47,10 @@ def canonical_properties(temperature1, temperature2):
 #print('log(Z) = {logZ}'.format(logZ=logZ))
 #print('H = {H} nats'.format(H=H))
 
-#plot(exp(logWW))
-#ylabel('Weight wrt canonical distribution')
-#title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
-#show()
+plot(exp(logWW))
+ylabel('Weight wrt canonical distribution')
+title('ESS (for purposes of normalising constant calc) = {ess}'.format(ess=ess))
+show()
 
 # Resample to uniform weight
 N = int(ess)
@@ -63,14 +63,14 @@ for i in xrange(0, N):
       break
   posterior_sample[i,:] = scalars[which,:]
 
-plot(posterior_sample[:,0], posterior_sample[:,1], 'b.', markersize=5,\
-					alpha=0.5, label='Discarded points')
+plot(scalars[0::10,0], scalars[0::10,1], 'y.', markersize=1, label='Discarded points', alpha=1.)
 hold(True)
-plot(scalars[:,0], scalars[:,1], 'r.', markersize=1, alpha=0.2,\
-					label='Canonical distribution')
+plot(posterior_sample[:,0], posterior_sample[:,1], 'k.', markersize=1,\
+					alpha=1, label='Canonical distribution')
 xlabel("$L_1$")
 ylabel("$L_2$")
-#legend(loc='upper left')
+#xlim([-10, 0])
+legend(loc='upper left', markerscale=10, numpoints=1)
 savefig('output.png', bbox_inches='tight', dpi=300)
 savetxt("posterior_sample.txt", posterior_sample)
 show()
