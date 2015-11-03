@@ -7,7 +7,7 @@ rc("text", usetex=True)
 x = linspace(0., 1., 10001)
 
 def truth(T1, T2, do_plot=False):
-  p = exp(-(x - 0.5)**2/T1 - log(1. + (x - 0.5)**2/0.01**2)/T2)
+  p = exp(-0.5*(x - 0.5)**2/0.01**2/T1 - log(1. + (x - 0.5)**2/0.01**2)/T2)
   Z = trapz(p, x=x)
   H = trapz(p/Z*log(p/Z + 1E-300), x=x)
 
