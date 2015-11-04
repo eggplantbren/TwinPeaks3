@@ -158,7 +158,7 @@ p(\xx | \data, \II) &=&
 \end{eqnarray}
 where $\pi(\xx)$ is the prior distribution, $L(\xx)$ is the likelihood
 function, and $Z$ is the normalising constant, usually known as the
-``marginal likelihood'' or the ``evidence'':
+`marginal likelihood' or the `evidence':
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
@@ -167,7 +167,7 @@ This is done by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by an
 approximately-known factor. Like other related algorithms such as those
-based on ``annealing'', NS
+based on `annealing', NS
 moves through a sequence of probability distributions beginning from the
 prior. This sequence of distributions is defined by
 \begin{eqnarray}
@@ -183,7 +183,7 @@ connection between NS and ideas from rare event simulation \citep{walter}.
 NS also allows us to calculate the properties of any other distribution that
 is in some sense intermediate
 between the prior and the posterior. For example, we might be interested in
-a ``power posterior'' where the likelihood is raised to a power $\beta$:
+a `power posterior' where the likelihood is raised to a power $\beta$:
 \begin{eqnarray}
 p(\xx; \beta) &=& \frac{\pi(\xx)L(\xx)^\beta}{Z(\beta)}\label{eqn:power_posterior}
 \end{eqnarray}
@@ -191,14 +191,14 @@ The normalisation and posterior samples from this distribution can be obtained
 from the original NS run by re-weighting the output according to $L(\xx)^\beta$
 instead of the usual $L(\xx)$ used to obtain the posterior.
 An example application, in the case of
-a Bayesian inference problem with a ``gaussian noise'' likelihood assumption,
+a Bayesian inference problem with a `gaussian noise' likelihood assumption,
 computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
 posterior distribution would have been if the noise variance had been greater.
 This is different from including an extra parameter to allow the noise variance
 to be greater, because NS allows you to test the consequences of values of the
 variance that are very implausible given the data.
 
-Alternatives to NS include methods based on ``annealing'', where a sequence of
+Alternatives to NS include methods based on `annealing', where a sequence of
 distributions of the form of Equation~\ref{eqn:power_posterior} is used.
 There are many different methods based on this idea, such as the popular
 parallel tempering method \citep{pt}.
@@ -226,14 +226,15 @@ $\xx$ that are relevant. Suppose our prior is $\pi(\xx)$ as before, and
 we obtain testable information that fixes the expected values of two scalar
 functions of $\xx$, $L_1(\xx)$ and $L_2(\xx)$. It is well known that the
 updated probability distribution that takes into account the constraints is
-of the ``canonical'' form:
+of the `canonical' form:
 \begin{eqnarray}
 p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1L_1(\xx)+\beta_2L_2(\xx)\right]}
 {Z(\beta_1, \beta_2)}
 \end{eqnarray}
+where $\beta_1$ and $\beta_2$ are two `inverse temperatures'.
 If we were only interested in a single canonical distribution, for example
 with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we could estimate its normalising
-constant and by running standard Nested Sampling with ``likelihood''
+constant and by running standard Nested Sampling with `likelihood'
 $L(\xx) = \exp\left[0.3L_1(\xx) + 0.7L_2(\xx)\right]$. However, usually we
 are interested in a range of values for $\beta_1$ and $\beta_2$, and we
 want to know the normalisation $Z(\beta_1, \beta_2)$, called the
@@ -372,6 +373,10 @@ $0.01\sqrt{T_1}$. At high temperatures for $L_2$ and low temperatures for $L_1$ 
 canonical distributions are Cauchy centered at 0.5 with width
 $0.01\sqrt{T_2}$.
 
+The true partition function (computed numerically) and the Kullback-Leibler
+divergence from the prior to the canonical distribution are shown in
+Figure~\ref{fig:truth} as a function of two temperatures.
+
 \begin{figure}
 \centering
 \includegraphics[scale=0.75]{figures/truth.pdf}
@@ -405,7 +410,7 @@ true partition function and KL divergence given in Figure~\ref{fig:truth}.
 Imagine computing $Z(\beta_1, \beta_2)$ by looping over a grid of $\beta_2$
 values and doing an NS run with respect to $L_1$ for each. For each
 value of $\beta_1$ and $\beta_2$ that we're interested in, we can expect
-a (marginal) ``one-sigma'' accuracy in
+a (marginal) `one-sigma' accuracy in
 $\ln\left[Z(\beta_1, \beta_2)\right]$ of $\pm \sqrt{H(\beta_1, \beta_2)/N}$,
 for a computational cost proportional to...
 
@@ -417,6 +422,8 @@ two marginal likelihoods:
 \begin{eqnarray}
 B = \frac{P(D | M_1)}{P(D | M_2)} = \frac{Z_1}{Z_2}
 \end{eqnarray}
+where $Z_1 = \int \pi(\xx_1)L(\xx_1) \, d\xx_1$ and
+$Z_2 = \int \pi(\xx_2)L(\xx_2) \, d\xx_2$.
 In large problems, the log of the Bayes Factor is usually more convenient:
 \begin{eqnarray}
 \ln B = \ln Z_1 - \ln Z_2.
@@ -426,13 +433,10 @@ quantify the strength of the evidence when the two models are similarly
 supported by the data. But is this a realistic situation?
 Prior to the data, we don't know the
 value of $\ln B$. Rather, $\ln B$ has a prior distribution. We can find this
-prior in terms of its CDF:
-\begin{eqnarray}
-P(\ln B \leq R) &=& \int P(D)P(\ln B \leq R | D) \, dD\\
-&=& \int P(D) \mathds{1}\left(\ln B(D) \leq R\right) \, dD\\
-&=& \int \sum_{i\in\{1,2\}}\left[P(M_i)P(D|M_i)\right] \mathds{1}\left(\ln B(D) \leq R\right) \, dD
-\end{eqnarray}
+prior via its CDF:
 
+{\bf Need thought here}
+{\bf Thermodynamic integral might be helpful?}
 
 
 %Use Skilling's argument about the prior distribution of a log Bayes factor.
