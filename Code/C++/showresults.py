@@ -56,7 +56,7 @@ show()
 N = int(ess)
 posterior_sample = zeros((N, scalars.shape[1]))
 w = exp(logWW)/max(exp(logWW))
-for i in xrange(0, N):
+for i in range(0, N):
   while True:
     which = randint(scalars.shape[0])
     if rand() <= w[which]:
@@ -88,8 +88,8 @@ exp1 = zeros((N, N))
 exp2 = zeros((N, N))
 depth = output[:,0].max() - output[:,0].min()
 
-for i in xrange(0, N):
-  for j in xrange(0, N):
+for i in range(0, N):
+  for j in range(0, N):
     [logZ[i,j], H[i,j], temp1, temp2, exp1[i, j], exp2[i, j]] = canonical_properties(T1[i, j], T2[i, j])
     # Blank out 'unreliable' results
     if H[i, j] > 0.7*depth:
