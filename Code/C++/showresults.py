@@ -67,9 +67,13 @@ plot(scalars[0::10,0], scalars[0::10,1], 'y.', markersize=1, label='Discarded po
 hold(True)
 plot(posterior_sample[:,0], posterior_sample[:,1], 'k.', markersize=1,\
 					alpha=1, label='Canonical distribution')
+# Adaptive axes
+ss1 = sort(scalars[:,0])
+ss2 = sort(scalars[:,1])
+xlim([ss1[int(0.05*len(ss1))], ss1.max()])
+ylim([ss2[int(0.05*len(ss2))], ss2.max()])
 xlabel("$L_1$")
 ylabel("$L_2$")
-#xlim([-10, 0])
 legend(loc='upper left', markerscale=10, numpoints=1)
 savefig('output.png', bbox_inches='tight', dpi=300)
 savetxt("posterior_sample.txt", posterior_sample)
