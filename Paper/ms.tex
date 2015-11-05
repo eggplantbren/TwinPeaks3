@@ -115,8 +115,8 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 
 % Abstract (Do not use inserted blank lines, i.e. \\)
 \abstract{We present a generalization of the Nested Sampling algorithm for
-estimating the partition function of a two-dimensional family of
-probability distributions.}
+estimating the partition function of a family of
+probability distributions indexed by two hyperparameters.}
 
 % Keywords: add 3 to 10 keywords
 \keyword{nested sampling; bayesian computation; statistical mechanics}
@@ -147,7 +147,7 @@ Nested Sampling \citep[NS][]{skilling} is an effective and popular
 Monte Carlo algorithm which can solve a wide range of problems in Bayesian
 computation and statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
-In a Bayesian inference problem with unknown parameters denoted collectively
+In a Bayesian inference framework with unknown parameters denoted collectively
 by a vector $\xx$, the
 posterior distribution for the parameters given data $\data$ (and prior
 information $\II$) is:
@@ -173,14 +173,18 @@ prior. This sequence of distributions is defined by
 \begin{eqnarray}
 p(\xx; \ell) &=& \frac{1}{X(\ell)}\pi(\xx)\mathds{1}\left(L(\xx) > \ell\right).
 \end{eqnarray}
-
+and the marginal likelihood can be computed by numerically integrating the
+function $L(X)$:
+\begin{eqnarray}
+Z &=& \int_0^1 L(X)\, dX.
+\end{eqnarray}
 In addition to the marginal likelihood $Z$, NS also allows us
 to approximate properties of the posterior $\pi(\xx)L(\xx)/Z$.
 NS is required because Equation~\ref{eqn:evidence}
 is the expected value of $L$ with respect to a very heavy-tailed distribution
 (the prior for the $L$ value implied by $\pi(\xx)$). Hence, there is a strong
 connection between NS and ideas from rare event simulation \citep{walter}.
-NS also allows us to calculate the properties of any other distribution that
+Using a single NS run, we can also calculate the properties of any other distribution that
 is in some sense intermediate
 between the prior and the posterior. For example, we might be interested in
 a `power posterior' where the likelihood is raised to a power $\beta$:
@@ -210,7 +214,8 @@ family of {\it canonical distributions}, usually written as:
 \begin{eqnarray}
 p(\xx; \beta) &=& \frac{\pi(\xx)\exp[-\beta E(\xx)]}{Z(\beta)}
 \end{eqnarray}
-where $E(\xx)$ is the energy function, and $\pi(\xx)$ is often uniform over
+where $E(\xx)$ is the energy function (analogous to minus the log likelihood
+in the Bayesian case), and $\pi(\xx)$ is often uniform over
 phase space (the set of possible positions and momenta of a collection of
 particles) or configuration space (the set of possible positions of a collection
 of particles). In this context we usually want to
@@ -218,20 +223,30 @@ compute $Z(\beta)$ as a function of $\beta$, which is called the
 {\it partition function}. NS can achieve this, allowing the study of
 the properties of materials from first principles, based on hypotheses about
 the atoms or molecules that make them up \citep[e.g.][]{2009arXiv0906.3544P,
-2014PhRvE..89b2302P, 2015arXiv150303404B}.
+2014PhRvE..89b2302P, 2015arXiv150303404B}. The NS algorithm is invariant under
+monotonic transformations of $L$ or $E$ and therefore there we can discuss the
+algorithm in Bayesian or statistical mechanical terms without loss of
+generality.
 
 In some inference and
 statistical mechanics problems, there are two or more scalar functions of
 $\xx$ that are relevant. Suppose our prior is $\pi(\xx)$ as before, and
 we obtain testable information that fixes the expected values of two scalar
-functions of $\xx$, $L_1(\xx)$ and $L_2(\xx)$. It is well known that the
+functions of $\xx$, $L_1(\xx)$ and $L_2(\xx)$.
+It is well known that the
 updated probability distribution that takes into account the constraints is
 of the `canonical' form:
 \begin{eqnarray}
 p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1L_1(\xx)+\beta_2L_2(\xx)\right]}
 {Z(\beta_1, \beta_2)}
 \end{eqnarray}
-where $\beta_1$ and $\beta_2$ are two `inverse temperatures'.
+where $\beta_1$ and $\beta_2$ are two `inverse temperatures'. In a Bayesian
+context, this distribution (when $\beta_1 = \beta_2 = 1$) could be the
+posterior distribution for parameters $\xx$
+given two datasets, where $L_1$ and $L_2$ are the
+likelihood functions for each dataset. In statistical mechanics, $L_1$ might
+be $\exp\left(-\textnormal{energy}\right)$ and $L_2$ might be the total
+angular momentum.
 If we were only interested in a single canonical distribution, for example
 with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we could estimate its normalising
 constant and by running standard Nested Sampling with `likelihood'
@@ -432,8 +447,12 @@ Naively, we want $\ln B$ to an accuracy of about 0.1, so that we can reliably
 quantify the strength of the evidence when the two models are similarly
 supported by the data. But is this a realistic situation?
 Prior to the data, we don't know the
-value of $\ln B$. Rather, $\ln B$ has a prior distribution. We can find this
-prior via its CDF:
+value of $B$. Rather, $B$ has a prior distribution:
+\begin{eqnarray}
+p(B) &=& P(M_1)p(B|M_1) + P(M_2)p(B|M_2)\\
+&=& P(M_1)\int p(\xx_1, D, B | M_1)\,d\xx_1\,dD
+    + P(M_2)\int p(\xx_2, D, B | M_2)\,d\xx_2\,dD
+\end{eqnarray}
 
 {\bf Need thought here}
 {\bf Thermodynamic integral might be helpful?}
