@@ -258,7 +258,12 @@ progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
 transitions. The algorithm is designed for problems with two objective
 functions, but should generalize to problems with more than two (though perhaps
-not more than a few).
+not more than a few). Throughout this paper we will refer $L_i(\xx)$ or
+$\exp\left[-E_i(\xx)\right]$ as `objective functions',
+by analogy with the terminology used when
+discussing optimizations methods. Although we are interested in sampling rather
+than optimization, we still want to increase the values of $L_i$ or decrease
+the values of $E_i$ relative to what is typical of the prior.
 
 The prior $\pi(\xx)$ implies a certain prior for $L_1$ and $L_2$, which we
 denote $\pi(L_1, L_2)$. An example of a prior is shown as the
