@@ -2,12 +2,13 @@
 from pylab import *
 
 output = atleast_2d(loadtxt('sample.txt'))
+num_atoms = (output.shape[1] - 3)//3
 
 ion()
 hold(False)
-for i in xrange(0, output.shape[0]):
+for i in range(0, output.shape[0]):
 	model = output[i, 3:]
-	x, y = model[0:50], model[100:150]
+	x, y = model[0:num_atoms], model[2*num_atoms:3*num_atoms]
 	plot(x, y, 'k.')
 	axis('scaled')
 	axis([0, 1, 0, 1])
