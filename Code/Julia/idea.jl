@@ -9,7 +9,12 @@ using PyCall
 (dx, dy) = (1.0/nj, 1.0/ni)
 
 # Prior distribution
-prior = ones(ni, nj)
+prior = Array(Float64, (ni, nj))
+for(j in 1:nj)
+	for(i in 1:ni)
+		prior[i, j] = exp(-0.5*(i - 0.5*ni)^2/2^2 - 0.5*(j - (ni - i))^2/2^2)
+	end
+end
 prior = prior/sum(prior)
 
 # Upper corner mass
@@ -25,6 +30,6 @@ for(j in 1:nj)
 	end
 end
 
-plt.imshow(log(prior./G), cmap=colormaps.viridis, interpolation="nearest")
+plt.imshow((prior./G), cmap=colormaps.viridis, interpolation="nearest")
 plt.show()
 
