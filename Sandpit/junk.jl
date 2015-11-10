@@ -6,9 +6,9 @@ Initial conditions
 """ ->
 function from_prior(num::Int64)
 	@assert num > 1
-	X = rand(num)
-	Y = rand(num)
-	return (X, Y)
+	x = rand(num)
+	y = x.^2 + 0.1*randn(num)
+	return hcat(x, y)
 end
 
 @doc """
@@ -38,10 +38,18 @@ function uccs(X::Vector{Float64}, Y::Vector{Float64})
 end
 
 # Generate some points
-(X, Y) = from_prior(1000)
+params = from_prior(1000)
+
+# Assign x and y
+xy = -log(rand(size(params)))
 
 # Plot
-plt.scatter(X, Y, marker="o", s=uccs(X, Y), alpha=0.2)
-plt.axis("scaled")
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.plot(params[:,1], params[:,2], "b.")
+
+plt.subplot(1, 2, 2)
+plt.plot(xy[:,1], xy[:,2], "b.")
 plt.show()
+
 
