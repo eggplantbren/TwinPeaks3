@@ -39,20 +39,18 @@ end
 plt.figure(figsize=(14, 6))
 plt.subplot(1, 2, 1)
 plt.imshow(prior, cmap=colormaps.viridis, interpolation="nearest")
-plt.title("\$\\pi(L_1, L_2)\$")
-plt.xlabel("\$L_1\$")
-plt.ylabel("\$L_2\$")
+plt.title("\$\\pi(L_1, L_2)\$", fontsize=16)
+plt.xlabel("\$L_1\$", fontsize=16)
+plt.ylabel("\$L_2\$", fontsize=16)
 plt.gca()[:set_xticklabels]([])
 plt.gca()[:set_yticklabels]([])
 
 plt.subplot(1, 2, 2)
 plt.imshow(prior./G, cmap=colormaps.viridis, interpolation="nearest")
-plt.title("\$\\pi(L_1, L_2)/G(L_1, L_2)\$")
-plt.xlabel("\$L_1\$")
-plt.ylabel("\$L_2\$")
+plt.title("\$\\pi(L_1, L_2)/G(L_1, L_2)\$", fontsize=16)
+plt.xlabel("\$L_1\$", fontsize=16)
+plt.ylabel("\$L_2\$", fontsize=16)
 plt.gca()[:set_xticklabels]([])
 plt.gca()[:set_yticklabels]([])
-
-
 plt.show()
 
