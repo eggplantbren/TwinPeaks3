@@ -12,7 +12,7 @@ for(j in 1:nj)
 	x = (j - 0.5)/nj
 	for(i in 1:ni)
 		y = 1.0 - (i - 0.5)/ni
-		log_prior[i, j] = -0.5*(x - 0.1)^2/0.1^2 - 0.5*(y - x^2)^2/0.1^2
+		log_prior[i, j] = -0.5*(x - 0.1)^2/0.03^2 - 0.5*(y - x^2)^2/0.03^2
 	end
 end
 log_prior -= logsumexp(vec(log_prior))
@@ -49,7 +49,7 @@ plt.gca()[:set_yticklabels]([])
 
 plt.subplot(1, 2, 2)
 p = exp(log_prior - logG)
-upper = maximum(sort(vec(p))[1:Int64(floor(0.9*ni*nj))])
+upper = maximum(sort(vec(p))[1:Int64(floor(0.95*ni*nj))])
 plt.imshow(p, vmax=upper, cmap=colormaps.viridis, interpolation="nearest")
 plt.title("\$\\pi(L_1, L_2)/G(L_1, L_2)\$", fontsize=16)
 plt.xlabel("\$L_1\$", fontsize=16)
