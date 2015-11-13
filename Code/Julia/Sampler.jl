@@ -15,3 +15,15 @@ function Sampler(num_particles::Int64)
 									Array(Float64, (num_particles, 2)))
 end
 
+@doc """
+Generate all the particles from the prior.
+""" ->
+function initialise!(sampler::Sampler)
+	for(i in 1:sampler.num_particles)
+		sampler.particles[i] = Particle()
+		from_prior!(sampler.particles[i])
+		sampler.all_scalars[i, :] = calculate_scalars(sampler.particles[i])
+	end
+end
+
+

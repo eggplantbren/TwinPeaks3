@@ -37,7 +37,7 @@ end
 @doc """
 Evaluate the two objective functions
 """ ->
-function objective_functions(particle::Particle)
+function calculate_scalars(particle::Particle)
 	s = Array(Float64, (2, ))
 	s[1] = particle.params[1]
 	s[2] = particle.params[2]
