@@ -46,3 +46,34 @@ function calculate_uccs!(sampler::Sampler)
 	end
 end
 
+@doc """
+Find the particle with the highest (ucc, tiebreaker) combo.
+""" ->
+function find_worst(sampler::Sampler)
+	which = 1
+	for(i in 2:sampler.num_particles)
+		worse = false
+		if(sampler.uccs[i] > sampler.uccs[which])
+			worse = true
+		end
+		if(sampler.uccs[i] == sampler.uccs[which])
+			if(sampler.tiebreakers[i] > sampler.tiebreakers[which])
+				worse = true
+			end
+		end
+
+		if(worse)
+			which = i
+		end
+	end
+	return which
+end
+
+@doc """
+Do one iteration of Nested Sampling.
+""" ->
+function do_iteration!(sampler::Sampler)
+	worst = find_worst(sampler)
+	println(sampler.uccs[worst], " ", sampler.tiebreakers[worst])
+end
+
