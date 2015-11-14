@@ -6,6 +6,7 @@ type Sampler
 	particles::Vector{Particle}
 	all_scalars::Matrix{Float64}
 	uccs::Vector{Int64}
+	tiebreakers::Vector{Float64}
 end
 
 @doc """
@@ -14,7 +15,8 @@ A constructor. Input the number of particles.
 function Sampler(num_particles::Int64)
 	return Sampler(num_particles, Array(Particle, (num_particles, )),
 									Array(Float64, (num_particles, 2)),
-									Array(Int64, (num_particles, )))
+									Array(Int64, (num_particles, )),
+									Array(Float64, (num_particles, )))
 end
 
 @doc """
@@ -25,6 +27,7 @@ function initialise!(sampler::Sampler)
 		sampler.particles[i] = Particle()
 		from_prior!(sampler.particles[i])
 		sampler.all_scalars[i, :] = calculate_scalars(sampler.particles[i])
+		sampler.tiebreakers[i] = rand()
 	end
 	calculate_uccs!(sampler::Sampler)
 end
