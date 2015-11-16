@@ -4,6 +4,7 @@
 #include <limits>
 #include <fstream>
 #include <algorithm>
+#include <cassert>
 #include "Utils.h"
 
 template<class MyModel>
@@ -19,6 +20,8 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
 ,iteration(0)
 ,log_prior_mass(0.)
 {
+	assert(num_particles%2 == 0);
+
 	// Open and close outputs file to clear them
 	std::fstream fout;
 	fout.open("sample.txt", std::ios::out);
@@ -77,10 +80,24 @@ void Sampler<MyModel>::do_iteration()
 			uccs[i] += is_in_lower_rectangle(scalars[i], scalars[j]);
 	}
 
+	// Argsort the corner counts
 	std::vector<size_t> indices = argsort(uccs);
 	std::reverse(indices.begin(), indices.end());
 
+	// Mark first half the particles as dying
+	std::vector<size_t> dying;	// indices of dying particles
+	for(int i=0; i<num_particles/2; i++)
+		dying.push_back(indices[i]);
+	// Continue until ucc changes
+	for(int i=num_particles/2; i<num_particles; i++)
+	{
+		if(uccs[indices[i]] != uccs[indices[num_particles/2-1]])
+			break;
+		dying.push_back(indices[i]);
+	}
 
+	std::cout<<dying.size()<<std::endl;
+	exit(0);
 
 }
 
