@@ -69,86 +69,13 @@ void Sampler<MyModel>::prune_rectangles()
 template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
-	// Calculate counts
-	std::vector<int> lccs(num_particles, 0);
+	// Calculate all upper corner counts
+	std::vector<int> uccs(num_particles, 0);
 	for(int i=0; i<num_particles; i++)
 	{
 		for(int j=0; j<num_particles; j++)
-		{
-			if(is_in_lower_rectangle(scalars[j], scalars[i]))
-				lccs[i]++;
-		}
-		if(lccs[i] == 0)
-			lccs[i] = num_particles;
+			uccs[i] += is_in_lower_rectangle(scalars[i], scalars[j]);
 	}
-	int min_lcc = *min_element(lccs.begin(), lccs.end());
-	if(min_lcc == num_particles)
-	{
-		std::cerr<<"# All particles have corner counts of zero. Aborting."<<std::endl;
-		exit(1);
-	}
-
-	std::vector<int> usable_indices;
-	for(int i=0; i<num_particles; i++)
-		if(lccs[i] == min_lcc)
-			usable_indices.push_back(i);
-
-	// Choose one at random
-	int choice = usable_indices[rng.rand_int(usable_indices.size())];
-
-	// Find min of scalar 2 among particles in the rectangle
-	int which_scalar = rng.rand_int(2);
-	std::vector<ScalarType> ss;
-	std::vector<int> indices;
-	for(int i=0; i<num_particles; i++)
-	{
-		if(is_in_lower_rectangle(scalars[i], scalars[choice]))
-		{
-			ss.push_back(scalars[i][which_scalar]);
-			indices.push_back(i);
-		}
-	}
-
-	ScalarType ss_min = *min_element(ss.begin(), ss.end());
-	int which = 0;
-	for(size_t i=0; i<ss.size(); i++)
-		if(ss[i] == ss_min)
-			which = indices[i];
-
-	std::vector<ScalarType> forbid(2);
-	forbid = scalars[choice];
-	forbid[which_scalar] = scalars[which][which_scalar];
-
-	// Append its scalars to the forbidden rectangles
-	rects.push_front(forbid);
-	prune_rectangles();
-
-	// Assign prior weight
-	double logw = log((double)1./(num_particles + 1)) + log_prior_mass;
-	log_prior_mass = logdiffexp(log_prior_mass, logw);
-
-	// Write it out to an output file
-	std::fstream fout;
-	if((iteration+1)%save_interval == 0)
-	{
-		fout.open("sample.txt", std::ios::out|std::ios::app);
-		fout<<logw<<' ';
-		for(ScalarType s: scalars[which])
-			fout<<s.get_value()<<' ';
-		particles[which].write_text(fout);
-		fout<<std::endl;
-		fout.close();
-	}
-	fout.open("sample_info.txt", std::ios::out|std::ios::app);
-	fout<<logw<<' ';
-	for(ScalarType s: scalars[which])
-		fout<<s.get_value()<<' ';
-	fout<<std::endl;
-	fout.close();
-
-	// Do MCMC to generate a new particle
-	refresh_particle(which);
-	iteration++;
 }
 
 template<class MyModel>
