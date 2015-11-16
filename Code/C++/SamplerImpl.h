@@ -96,9 +96,47 @@ void Sampler<MyModel>::do_iteration()
 		dying.push_back(indices[i]);
 	}
 
-	std::cout<<dying.size()<<std::endl;
-	exit(0);
+	// For each dying particle
+	for(size_t which: dying)
+	{
+		// Append its scalars to the forbidden rectangles
+		rects.push_front(scalars[which]);
+		prune_rectangles();
 
+		// Assign prior weight
+		double logw = log_prior_mass - log(num_particles);
+
+		// Write it out to an output file
+		std::fstream fout;
+		if((iteration+1)%save_interval == 0)
+		{
+			fout.open("sample.txt", std::ios::out|std::ios::app);
+			fout<<logw<<' ';
+			for(ScalarType s: scalars[which])
+				fout<<s.get_value()<<' ';
+			particles[which].write_text(fout);
+			fout<<std::endl;
+			fout.close();
+		}
+		fout.open("sample_info.txt", std::ios::out|std::ios::app);
+		fout<<logw<<' ';
+		for(ScalarType s: scalars[which])
+			fout<<s.get_value()<<' ';
+		fout<<std::endl;
+		fout.close();
+	}
+
+	// Reduce remaining prior mass
+	log_prior_mass = logdiffexp(log_prior_mass,
+						log_prior_mass + log((double)dying.size()/num_particles));
+
+	// For each dying particle
+	for(size_t which: dying)
+	{
+		// Do MCMC to generate a new particle
+		refresh_particle(which);
+	}
+	iteration++;
 }
 
 template<class MyModel>
