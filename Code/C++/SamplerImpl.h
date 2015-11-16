@@ -76,6 +76,12 @@ void Sampler<MyModel>::do_iteration()
 		for(int j=0; j<num_particles; j++)
 			uccs[i] += is_in_lower_rectangle(scalars[i], scalars[j]);
 	}
+
+	std::vector<size_t> indices = argsort(uccs);
+	std::reverse(indices.begin(), indices.end());
+
+
+
 }
 
 template<class MyModel>
