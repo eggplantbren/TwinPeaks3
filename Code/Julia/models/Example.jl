@@ -20,7 +20,8 @@ end
 Generate params from the prior
 """ ->
 function from_prior!(particle::Particle)
-	particle.params = rand(length(particle.params))
+	particle.params[1] = rand()#rand(length(particle.params))
+	particle.params[2] = rand()*particle.params[1]
 	return nothing
 end
 
@@ -28,9 +29,13 @@ end
 Do a metropolis proposal. Return log(hastings factor for prior sampling)
 """ ->
 function perturb!(particle::Particle)
+	particle.params[2] /= particle.params[1]
+
 	i = rand(1:length(particle.params))
 	particle.params[i] += randh()
 	particle.params[i] = mod(particle.params[i], 1.0)
+
+	particle.params[2] *= particle.params[1]
 	return 0.0
 end
 
