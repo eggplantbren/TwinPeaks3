@@ -19,7 +19,7 @@ int main()
 	constexpr int num_particles = 1000;
 	constexpr int num_mcmc_steps = 10000;
 	constexpr double depth = 1000.;
-	constexpr int steps = depth*num_particles;
+	constexpr int steps = depth/log(2.);
 
 	// Create a sampler
 	Sampler<SimpleExample> sampler(rng, num_particles, num_mcmc_steps,
