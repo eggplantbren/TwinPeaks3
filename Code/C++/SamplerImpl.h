@@ -130,17 +130,26 @@ void Sampler<MyModel>::do_iteration()
 	log_prior_mass = logdiffexp(log_prior_mass,
 						log_prior_mass + log((double)dying.size()/num_particles));
 
+	std::cout<<"# Iteration "<<(iteration+1)<<". ";
+	std::cout<<"Killing "<<dying.size()<<" particles."<<std::endl;
+	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
+	std::cout<<log_prior_mass<<"."<<std::endl;
+
+	int accepted = 0;
+
 	// For each dying particle
 	for(size_t which: dying)
 	{
 		// Do MCMC to generate a new particle
-		refresh_particle(which);
+		accepted += refresh_particle(which);
 	}
+
+	std::cout<<"# Accepted "<<accepted<<"/"<<dying.size()*mcmc_steps<<". "<<std::endl<<std::endl;
 	iteration++;
 }
 
 template<class MyModel>
-void Sampler<MyModel>::refresh_particle(int which)
+int Sampler<MyModel>::refresh_particle(int which)
 {
 	// Choose a particle to clone
 	int copy;
@@ -176,11 +185,7 @@ void Sampler<MyModel>::refresh_particle(int which)
 			accepted++;
 		}
 	}
-
-	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
-	std::cout<<log_prior_mass<<"."<<std::endl;
-	std::cout<<"Accepted "<<accepted<<"/"<<mcmc_steps<<". "<<std::endl<<std::endl;
+	return accepted;
 }
 
 template<class MyModel>

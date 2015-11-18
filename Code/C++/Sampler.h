@@ -42,9 +42,10 @@ class Sampler
 		long double log_prior_mass;
 
 		// Do MCMC to equilibrate a particle
-		void refresh_particle(int which);
+		int refresh_particle(int which);
 
 		// Check s against rects
+	public:
 		bool is_okay(const std::vector<ScalarType>& s);
 
 		// Remove redundant rectangles (only do this just after adding one)
