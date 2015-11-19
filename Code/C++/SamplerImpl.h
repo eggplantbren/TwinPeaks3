@@ -87,13 +87,13 @@ void Sampler<MyModel>::do_iteration()
 	// Mark first half the particles as dying
 	std::vector<bool> dying(num_particles, false);
 	for(int i=0; i<num_particles/2; i++)
-		dying[i] = true;
+		dying[indices[i]] = true;
 	// Continue until ucc changes
 	for(int i=num_particles/2; i<num_particles; i++)
 	{
 		if(uccs[indices[i]] != uccs[indices[num_particles/2-1]])
 			break;
-		dying[i] = true;
+		dying[indices[i]] = true;
 	}
 
 	// Count number of dying particles
