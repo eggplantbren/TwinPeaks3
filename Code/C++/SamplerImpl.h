@@ -85,26 +85,60 @@ void Sampler<MyModel>::do_iteration()
 	std::reverse(indices.begin(), indices.end());
 
 	// Mark first half the particles as dying
-	std::vector<size_t> dying;	// indices of dying particles
+	std::vector<bool> dying(num_particles, false);
 	for(int i=0; i<num_particles/2; i++)
-		dying.push_back(indices[i]);
+		dying[i] = true;
 	// Continue until ucc changes
 	for(int i=num_particles/2; i<num_particles; i++)
 	{
 		if(uccs[indices[i]] != uccs[indices[num_particles/2-1]])
 			break;
-		dying.push_back(indices[i]);
+		dying[i] = true;
 	}
 
-	// For each dying particle
-	for(size_t which: dying)
-	{
-		// Append its scalars to the forbidden rectangles
-		rects.push_front(scalars[which]);
-		prune_rectangles();
+	// Count number of dying particles
+	int num_dying = 0;
+	for(const bool d: dying)
+		num_dying += static_cast<int>(d);
 
+	// For each dying particle
+	for(int i=0; i<num_particles; i++)
+	{
+		if(dying[i])
+		{
+			// Append its scalars to the forbidden rectangles
+			rects.push_front(scalars[i]);
+			prune_rectangles();
+		}
+	}
+
+	// Find 'interior' dying particles
+	std::vector<size_t> interior;
+	for(int i=0; i<num_particles; i++)
+	{
+		if(dying[i])
+		{
+			for(int j=0; j<num_particles; j++)
+			{
+				if((i != j) && (dying[j]) &&
+					is_in_lower_rectangle(scalars[i], scalars[j]))
+				{
+					interior.push_back(i);
+					break;
+				}
+			}
+		}
+	}
+	// Count 'interior' dying particles
+	int num_interior = 0;
+	for(const bool i: interior)
+		num_interior += static_cast<int>(i);
+
+	// Save interior dying particles
+	for(const size_t i: interior)
+	{
 		// Assign prior weight
-		double logw = log_prior_mass - log(num_particles);
+		double logw = log_prior_mass - log(num_interior);
 
 		// Write it out to an output file
 		std::fstream fout;
@@ -112,15 +146,15 @@ void Sampler<MyModel>::do_iteration()
 		{
 			fout.open("sample.txt", std::ios::out|std::ios::app);
 			fout<<logw<<' ';
-			for(ScalarType s: scalars[which])
+			for(ScalarType s: scalars[i])
 				fout<<s.get_value()<<' ';
-			particles[which].write_text(fout);
+			particles[i].write_text(fout);
 			fout<<std::endl;
 			fout.close();
 		}
 		fout.open("sample_info.txt", std::ios::out|std::ios::app);
 		fout<<logw<<' ';
-		for(ScalarType s: scalars[which])
+		for(ScalarType s: scalars[i])
 			fout<<s.get_value()<<' ';
 		fout<<std::endl;
 		fout.close();
@@ -128,23 +162,27 @@ void Sampler<MyModel>::do_iteration()
 
 	// Reduce remaining prior mass
 	log_prior_mass = logdiffexp(log_prior_mass,
-						log_prior_mass + log((double)dying.size()/num_particles));
+						log_prior_mass + log((double)num_interior/num_particles));
 
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<"Killing "<<dying.size()<<" particles."<<std::endl;
+	std::cout<<"Killing "<<num_dying<<" particles. ";
+	std::cout<<num_interior<<" are interior."<<std::endl;
 	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
 	std::cout<<log_prior_mass<<"."<<std::endl;
 
 	int accepted = 0;
 
 	// For each dying particle
-	for(size_t which: dying)
+	for(int i=0; i<num_particles; ++i)
 	{
-		// Do MCMC to generate a new particle
-		accepted += refresh_particle(which);
+		if(dying[i])
+		{
+			// Do MCMC to generate a new particle
+			accepted += refresh_particle(i);
+		}
 	}
 
-	std::cout<<"# Accepted "<<accepted<<"/"<<dying.size()*mcmc_steps<<". "<<std::endl<<std::endl;
+	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
 	iteration++;
 }
 
