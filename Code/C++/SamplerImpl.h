@@ -130,15 +130,17 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 	// Count 'interior' dying particles
-	int num_interior = 0;
-	for(const bool i: interior)
-		num_interior += static_cast<int>(i);
+	int num_interior = interior.size();
+
+	// Mass saved
+	double logw_tot = -1E300;
 
 	// Save interior dying particles
 	for(const size_t i: interior)
 	{
 		// Assign prior weight
-		double logw = log_prior_mass - log(num_interior);
+		double logw = log_prior_mass - log(num_particles - (num_dying - num_interior));
+		logw_tot = logsumexp(logw_tot, logw);
 
 		// Write it out to an output file
 		std::fstream fout;
@@ -160,9 +162,17 @@ void Sampler<MyModel>::do_iteration()
 		fout.close();
 	}
 
+//	for(int i=0; i<num_particles; i++)
+//	{
+//		std::cout<<dying[i]<<' '<<interior[i]<<' '<<uccs[i]<<' ';
+//		for(size_t j=0; j<scalars[i].size(); j++)
+//			std::cout<<scalars[i][j].get_value()<<' ';
+//		std::cout<<std::endl;
+//	}
+//	exit(0);
+
 	// Reduce remaining prior mass
-	log_prior_mass = logdiffexp(log_prior_mass,
-						log_prior_mass + log((double)num_interior/num_particles));
+	log_prior_mass = logdiffexp(log_prior_mass, logw_tot);
 
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
 	std::cout<<"Killing "<<num_dying<<" particles. ";
