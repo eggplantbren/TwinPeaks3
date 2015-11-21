@@ -172,13 +172,13 @@ void Sampler<MyModel>::do_iteration()
 	// Place forbidding rectangles anywhere ucc >= threshold
 	for(int i=0; i<num_particles; i++)
 	{
-		int j;
-		for(j=(num_particles-1); j>=0; j--)
-			if(ucc[i][j] >= threshold)
-				break;
+		int j = num_particles-1;
+		while(j > 0 && ucc[i][j] < threshold)
+			j--;
+
 		if(ucc[i][j] >= threshold)
 		{
-			rects.push_front({s1[i], s2[j]});
+			rects.push_front({s1[num_particles-i-1], s2[j]});
 			prune_rectangles();
 		}
 	}
