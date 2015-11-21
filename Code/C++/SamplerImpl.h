@@ -20,7 +20,7 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
 ,iteration(0)
 ,log_prior_mass(0.)
 {
-	assert(num_particles%2 == 0);
+	assert(num_particles%2 != 0);
 
 	// Open and close outputs file to clear them
 	std::fstream fout;
@@ -72,107 +72,142 @@ void Sampler<MyModel>::prune_rectangles()
 template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
-	// Calculate all upper corner counts
-	std::vector<double> uccs(num_particles, 0.5);
+	// Extract and sort the two scalars
+	std::vector<ScalarType> s1(num_particles);
+	std::vector<ScalarType> s2(num_particles);
 	for(int i=0; i<num_particles; i++)
 	{
-		for(int j=0; j<num_particles; j++)
-			uccs[i] += is_in_lower_rectangle(scalars[i], scalars[j]);
+		s1[i] = scalars[i][0];
+		s2[i] = scalars[i][1];
+	}
+	// Calculate ranks
+	std::vector<size_t> r1 = ranks(s1);
+	std::vector<size_t> r2 = ranks(s2);
+
+	// Calculate empirical measure of ranks
+	std::vector< std::vector<int> > empirical_measure(num_particles,
+										std::vector<int>(num_particles, 0));
+	for(int i=0; i<num_particles; i++)
+		empirical_measure[num_particles - r2[i] - 1][r1[i]] += 1;
+
+	// Integrate empirical measure to get (inclusive) upper corner count
+	std::vector< std::vector<int> > ucc(num_particles,
+										std::vector<int>(num_particles, 0));
+	int up, right, up_and_right;
+	for(int i=0; i<num_particles; i++)
+	{
+		for(int j=(num_particles-1); j>=0; j--)
+		{
+			up = 0;
+			right = 0;
+			up_and_right = 0;
+			if(i != 0)
+				up = ucc[i-1][j];
+			if(j != (num_particles-1))
+				right = ucc[i][j+1];
+			if((i != 0) && (j != (num_particles-1)))
+				up_and_right = ucc[i-1][j+1];
+			ucc[i][j] = empirical_measure[i][j] + up + right - up_and_right;
+		}
 	}
 
-	// Argsort the corner counts
-	std::vector<size_t> indices = argsort(uccs);
-	std::reverse(indices.begin(), indices.end());
+	// The uccs of the particles themselves
+	std::vector<int> particle_uccs(num_particles);
+	for(int i=0; i<num_particles; i++)
+		particle_uccs[i] = ucc[num_particles - r2[i] - 1][r1[i]];
 
-	// Mark first half the particles as dying
+	// Sort the particle uccs from highest to lowest
+	std::vector<int> particle_uccs_sorted = particle_uccs;
+	std::sort(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
+	std::reverse(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
+
+	// Make a ucc threshold (particles on the threshold die too)
+	int threshold = particle_uccs_sorted[num_particles/2];
+
+	// Assign particles to die
 	std::vector<bool> dying(num_particles, false);
-	for(int i=0; i<num_particles/2; i++)
-		dying[indices[i]] = true;
-	// Continue until ucc changes
-	for(int i=num_particles/2; i<num_particles; i++)
-	{
-		if(uccs[indices[i]] != uccs[indices[num_particles/2-1]])
-			break;
-		dying[indices[i]] = true;
-	}
-
-	// Count number of dying particles
 	int num_dying = 0;
-	for(const bool d: dying)
-		num_dying += static_cast<int>(d);
-
-	// For each dying particle
 	for(int i=0; i<num_particles; i++)
 	{
-		if(dying[i])
+		if(particle_uccs[i] >= threshold)
 		{
-			// Append its scalars to the forbidden rectangles
-			rects.push_front(scalars[i]);
-			prune_rectangles();
+			dying[i] = true;
+			num_dying++;
 		}
 	}
 
-	// Mass saved
-	double logw_tot = -1E300;
+//	// For each dying particle
+//	for(int i=0; i<num_particles; i++)
+//	{
+//		if(dying[i])
+//		{
+//			// Append its scalars to the forbidden rectangles
+//			rects.push_front(scalars[i]);
+//			prune_rectangles();
+//		}
+//	}
 
-	// Save dying particles
-	for(int i=0; i<num_particles; i++)
-	{
-		// Assign prior weight
-		double logw = log_prior_mass - log(num_particles - num_dying);
-		logw_tot = logsumexp(logw_tot, logw);
+//	// Mass saved
+//	double logw_tot = -1E300;
 
-		// Write it out to an output file
-		std::fstream fout;
-		if((iteration+1)%save_interval == 0)
-		{
-			fout.open("sample.txt", std::ios::out|std::ios::app);
-			fout<<logw<<' ';
-			for(ScalarType s: scalars[i])
-				fout<<s.get_value()<<' ';
-			particles[i].write_text(fout);
-			fout<<std::endl;
-			fout.close();
-		}
-		fout.open("sample_info.txt", std::ios::out|std::ios::app);
-		fout<<logw<<' ';
-		for(ScalarType s: scalars[i])
-			fout<<s.get_value()<<' ';
-		fout<<std::endl;
-		fout.close();
-	}
+//	// Save dying particles
+//	for(int i=0; i<num_particles; i++)
+//	{
+//		// Assign prior weight
+//		double logw = log_prior_mass - log(num_particles - num_dying);
+//		logw_tot = logsumexp(logw_tot, logw);
+
+//		// Write it out to an output file
+//		std::fstream fout;
+//		if((iteration+1)%save_interval == 0)
+//		{
+//			fout.open("sample.txt", std::ios::out|std::ios::app);
+//			fout<<logw<<' ';
+//			for(ScalarType s: scalars[i])
+//				fout<<s.get_value()<<' ';
+//			particles[i].write_text(fout);
+//			fout<<std::endl;
+//			fout.close();
+//		}
+//		fout.open("sample_info.txt", std::ios::out|std::ios::app);
+//		fout<<logw<<' ';
+//		for(ScalarType s: scalars[i])
+//			fout<<s.get_value()<<' ';
+//		fout<<std::endl;
+//		fout.close();
+//	}
 
 //	for(int i=0; i<num_particles; i++)
 //	{
-//		std::cout<<dying[i]<<' '<<interior[i]<<' '<<uccs[i]<<' ';
+//		std::cout<<dying[i]<<' '<<uccs[i]<<' ';
 //		for(size_t j=0; j<scalars[i].size(); j++)
 //			std::cout<<scalars[i][j].get_value()<<' ';
 //		std::cout<<std::endl;
 //	}
 //	exit(0);
 
-	// Reduce remaining prior mass
-	log_prior_mass = logdiffexp(log_prior_mass, logw_tot);
+//	// Reduce remaining prior mass
+//	log_prior_mass = logdiffexp(log_prior_mass, logw_tot);
 
-	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<"Killing "<<num_dying<<" particles. ";
-	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
-	std::cout<<log_prior_mass<<"."<<std::endl;
+//	std::cout<<"# Iteration "<<(iteration+1)<<". ";
+//	std::cout<<"Killing "<<num_dying<<" particles. ";
+//	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
+//	std::cout<<log_prior_mass<<"."<<std::endl;
 
-	int accepted = 0;
+//	int accepted = 0;
 
-	// For each dying particle
-	for(int i=0; i<num_particles; ++i)
-	{
-		if(dying[i])
-		{
-			// Do MCMC to generate a new particle
-			accepted += refresh_particle(i);
-		}
-	}
+//	// For each dying particle
+//	for(int i=0; i<num_particles; ++i)
+//	{
+//		if(dying[i])
+//		{
+//			// Do MCMC to generate a new particle
+//			accepted += refresh_particle(i);
+//		}
+//	}
 
-	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
-	iteration++;
+//	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
+//	iteration++;
 }
 
 template<class MyModel>
