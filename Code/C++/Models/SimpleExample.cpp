@@ -42,10 +42,10 @@ void SimpleExample::compute_scalars()
 {
 	scalars[0] = 0.;
 	scalars[1] = 0.;
-	for(const double& x: params)
+	for(size_t i=0; i<params.size(); i++)
 	{
-		scalars[0] += -0.5*pow(x - 0.5, 2)/1E-4;
-		scalars[1] += -log(1. + pow(x - 0.5, 2)/1E-4);
+		scalars[0] += -pow(params[i] - 0.5, 2);
+		scalars[1] += -pow(sin(4.*M_PI*params[i]), 2);
 	}
 }
 

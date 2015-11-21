@@ -7,7 +7,7 @@ rc("font", size=18, family="serif", serif="Computer Sans")
 rc("text", usetex=True)
 
 # Temperatures
-T1, T2 = 200., 100.
+T1, T2 = 0.1, 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
 output = loadtxt('sample_info.txt')
