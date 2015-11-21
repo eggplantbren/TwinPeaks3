@@ -18,7 +18,8 @@ reverse!(indices)
 
 # Find the ucc threshold
 threshold_index = 1 + div(num_particles, 2)
-while(sampler.uccs[threshold_index+1] == sampler.uccs[threshold_index])
+while((threshold_index != num_particles)
+		&& (sampler.uccs[threshold_index+1] == sampler.uccs[threshold_index]))
 	threshold_index += 1
 end
 
