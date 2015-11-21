@@ -1,6 +1,7 @@
 # Setup plotting and include other files
 using PyCall
 @pyimport matplotlib.pyplot as plt
+@pyimport colormaps
 include("models/Example.jl")
 include("Sampler.jl")
 
@@ -24,14 +25,13 @@ while((threshold_index != num_particles)
 end
 threshold = sampler.uccs[indices[threshold_index]]
 
-plt.plot(1:num_particles, sampler.uccs[indices])
-plt.plot(threshold_index, threshold, "ro")
-plt.xlim([0, num_particles+1])
-plt.show()
+# Which particles will die?
+dying = sampler.uccs .>= threshold
 
-plt.scatter(sampler.all_scalars[:,1], sampler.all_scalars[:,2], marker="o",
-						s=0.5*sampler.uccs, alpha=0.5)
+# Plot scalars
+plt.scatter(sampler.all_scalars[dying,1], sampler.all_scalars[dying,2],
+					marker="o", alpha=0.5)
 plt.axis("scaled")
-plt.axis([0, 1, 0, 1])
+plt.axis([-0.01, 1.01, -0.01, 1.01])
 plt.show()
 
