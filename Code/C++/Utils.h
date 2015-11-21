@@ -31,5 +31,18 @@ std::vector<size_t> argsort(const std::vector<T>& v)
 	return idx;
 }
 
+// Calculate ranks
+template <typename T>
+std::vector<size_t> ranks(const std::vector<T>& v)
+{
+	// initialize original index locations
+	std::vector<size_t> ii = argsort(v);
+	std::vector<size_t> r(ii.size());
+
+	for(size_t i=0; i<ii.size(); i++)
+		r[ii[i]] = i;
+	return r;
+}
+
 #endif
 
