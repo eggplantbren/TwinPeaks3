@@ -83,6 +83,9 @@ void Sampler<MyModel>::do_iteration()
 	// Calculate ranks
 	std::vector<size_t> r1 = ranks(s1);
 	std::vector<size_t> r2 = ranks(s2);
+	// Sort
+	std::sort(s1.begin(), s1.end());
+	std::sort(s2.begin(), s2.end());
 
 	// Calculate empirical measure of ranks
 	std::vector< std::vector<int> > empirical_measure(num_particles,
@@ -136,78 +139,73 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 
-//	// For each dying particle
-//	for(int i=0; i<num_particles; i++)
-//	{
-//		if(dying[i])
-//		{
-//			// Append its scalars to the forbidden rectangles
-//			rects.push_front(scalars[i]);
-//			prune_rectangles();
-//		}
-//	}
+	// Save dying particles
+	// Mass saved
+	double logw_tot = -1E300;
+	for(int i=0; i<num_particles; i++)
+	{
+		if(dying[i])
+		{
+			// Assign prior weight
+			double logw = log_prior_mass - log(num_particles - num_dying);
+			logw_tot = logsumexp(logw_tot, logw);
 
-//	// Mass saved
-//	double logw_tot = -1E300;
+			// Write it out to an output file
+			std::fstream fout;
+			if((iteration+1)%save_interval == 0)
+			{
+				fout.open("sample.txt", std::ios::out|std::ios::app);
+				fout<<logw<<' ';
+				for(ScalarType s: scalars[i])
+					fout<<s.get_value()<<' ';
+				particles[i].write_text(fout);
+				fout<<std::endl;
+				fout.close();
+			}
+			fout.open("sample_info.txt", std::ios::out|std::ios::app);
+			fout<<logw<<' ';
+			for(ScalarType s: scalars[i])
+				fout<<s.get_value()<<' ';
+			fout<<std::endl;
+			fout.close();
+		}
+	}
 
-//	// Save dying particles
-//	for(int i=0; i<num_particles; i++)
-//	{
-//		// Assign prior weight
-//		double logw = log_prior_mass - log(num_particles - num_dying);
-//		logw_tot = logsumexp(logw_tot, logw);
+	// Place forbidding rectangles anywhere ucc >= threshold
+	for(int i=0; i<num_particles; i++)
+	{
+		int j;
+		for(j=(num_particles-1); j>=0; j--)
+			if(ucc[i][j] >= threshold)
+				break;
+		if(ucc[i][j] >= threshold)
+		{
+			rects.push_front({s1[i], s2[j]});
+			prune_rectangles();
+		}
+	}
 
-//		// Write it out to an output file
-//		std::fstream fout;
-//		if((iteration+1)%save_interval == 0)
-//		{
-//			fout.open("sample.txt", std::ios::out|std::ios::app);
-//			fout<<logw<<' ';
-//			for(ScalarType s: scalars[i])
-//				fout<<s.get_value()<<' ';
-//			particles[i].write_text(fout);
-//			fout<<std::endl;
-//			fout.close();
-//		}
-//		fout.open("sample_info.txt", std::ios::out|std::ios::app);
-//		fout<<logw<<' ';
-//		for(ScalarType s: scalars[i])
-//			fout<<s.get_value()<<' ';
-//		fout<<std::endl;
-//		fout.close();
-//	}
+	// Reduce remaining prior mass
+	log_prior_mass = logdiffexp(log_prior_mass, logw_tot);
 
-//	for(int i=0; i<num_particles; i++)
-//	{
-//		std::cout<<dying[i]<<' '<<uccs[i]<<' ';
-//		for(size_t j=0; j<scalars[i].size(); j++)
-//			std::cout<<scalars[i][j].get_value()<<' ';
-//		std::cout<<std::endl;
-//	}
-//	exit(0);
+	// Print messages
+	std::cout<<"# Iteration "<<(iteration+1)<<". ";
+	std::cout<<"Killing "<<num_dying<<" particles. ";
+	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
+	std::cout<<log_prior_mass<<"."<<std::endl;
 
-//	// Reduce remaining prior mass
-//	log_prior_mass = logdiffexp(log_prior_mass, logw_tot);
-
-//	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-//	std::cout<<"Killing "<<num_dying<<" particles. ";
-//	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
-//	std::cout<<log_prior_mass<<"."<<std::endl;
-
-//	int accepted = 0;
-
-//	// For each dying particle
-//	for(int i=0; i<num_particles; ++i)
-//	{
-//		if(dying[i])
-//		{
-//			// Do MCMC to generate a new particle
-//			accepted += refresh_particle(i);
-//		}
-//	}
-
-//	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
-//	iteration++;
+	// Replace dead particles
+	int accepted = 0;
+	for(int i=0; i<num_particles; ++i)
+	{
+		if(dying[i])
+		{
+			// Do MCMC to generate a new particle
+			accepted += refresh_particle(i);
+		}
+	}
+	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
+	iteration++;
 }
 
 template<class MyModel>
