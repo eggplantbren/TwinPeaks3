@@ -73,7 +73,7 @@ template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
 	// Calculate all upper corner counts
-	std::vector<int> uccs(num_particles, 0);
+	std::vector<double> uccs(num_particles, 0.5);
 	for(int i=0; i<num_particles; i++)
 	{
 		for(int j=0; j<num_particles; j++)
@@ -112,34 +112,14 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 
-	// Find 'interior' dying particles
-	std::vector<size_t> interior;
-	for(int i=0; i<num_particles; i++)
-	{
-		if(dying[i])
-		{
-			for(int j=0; j<num_particles; j++)
-			{
-				if((i != j) && (dying[j]) &&
-					is_in_lower_rectangle(scalars[i], scalars[j]))
-				{
-					interior.push_back(i);
-					break;
-				}
-			}
-		}
-	}
-	// Count 'interior' dying particles
-	int num_interior = interior.size();
-
 	// Mass saved
 	double logw_tot = -1E300;
 
-	// Save interior dying particles
-	for(const size_t i: interior)
+	// Save dying particles
+	for(int i=0; i<num_particles; i++)
 	{
 		// Assign prior weight
-		double logw = log_prior_mass - log(num_particles - (num_dying - num_interior));
+		double logw = log_prior_mass - log(num_particles - num_dying);
 		logw_tot = logsumexp(logw_tot, logw);
 
 		// Write it out to an output file
@@ -176,7 +156,6 @@ void Sampler<MyModel>::do_iteration()
 
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
 	std::cout<<"Killing "<<num_dying<<" particles. ";
-	std::cout<<num_interior<<" are interior."<<std::endl;
 	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
 	std::cout<<log_prior_mass<<"."<<std::endl;
 
