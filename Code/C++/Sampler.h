@@ -29,8 +29,8 @@ class Sampler
 		// Number of equilibration steps
 		int mcmc_steps;
 
-		// Save interval
-		int save_interval;
+		// How many samples (to save to sample.txt) per iteration
+		int saves_per_iteration;
 
 		// Whether from_prior has been called on all the particles
 		bool initialised;
@@ -61,7 +61,7 @@ class Sampler
 	public:
 		// Constructor
 		Sampler(const RNG& rng, int num_particles, int mcmc_steps,
-														int save_interval);
+														int saves_per_iteration);
 
 		// Set RNG seed
 		void set_rng_seed(unsigned int seed);

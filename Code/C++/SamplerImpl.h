@@ -9,13 +9,13 @@
 
 template<class MyModel>
 Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
-							int save_interval)
+							int saves_per_iteration)
 :rng(rng)
 ,num_particles(num_particles)
 ,particles(num_particles)
 ,scalars(num_particles)
 ,mcmc_steps(mcmc_steps)
-,save_interval(save_interval)
+,saves_per_iteration(saves_per_iteration)
 ,initialised(false)
 ,iteration(0)
 ,log_prior_mass(0.)
@@ -139,8 +139,22 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 
+	// Select some particles to save in their entirety
+	std::vector<bool> save(num_particles, false);
+	if(num_dying != 0)
+	{
+		for(int i=0; i<saves_per_iteration; i++)
+		{
+			int ii;
+			do
+			{
+				ii = rng.rand_int(num_particles);
+			}while(!dying[ii]);
+			save[ii] = true;
+		}
+	}
+
 	// Save dying particles
-	// Mass saved
 	for(int i=0; i<num_particles; i++)
 	{
 		if(dying[i])
@@ -150,7 +164,7 @@ void Sampler<MyModel>::do_iteration()
 
 			// Write it out to an output file
 			std::fstream fout;
-			if((iteration+1)%save_interval == 0)
+			if(save[i])
 			{
 				fout.open("sample.txt", std::ios::out|std::ios::app);
 				fout<<logw<<' ';

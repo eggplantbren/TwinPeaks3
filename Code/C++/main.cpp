@@ -22,8 +22,7 @@ int main()
 	constexpr int steps = depth/log(2.);
 
 	// Create a sampler
-	Sampler<SimpleExample> sampler(rng, num_particles, num_mcmc_steps,
-											num_particles);
+	Sampler<SimpleExample> sampler(rng, num_particles, num_mcmc_steps, 1);
 	sampler.initialise();
 
 	// Do NS indefinitely
