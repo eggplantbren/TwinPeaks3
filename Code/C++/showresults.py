@@ -63,7 +63,7 @@ for i in range(0, N):
       break
   posterior_sample[i,:] = scalars[which,:]
 
-plot(scalars[0::10,0], scalars[0::10,1], 'y.', markersize=1, label='Discarded points', alpha=1.)
+plot(scalars[:,0], scalars[:,1], 'y.', markersize=1, label='Discarded points', alpha=1.)
 hold(True)
 plot(posterior_sample[:,0], posterior_sample[:,1], 'k.', markersize=1,\
 					alpha=1, label='Canonical distribution')
@@ -74,7 +74,7 @@ xlim([ss1[int(0.05*len(ss1))], ss1.max()])
 ylim([ss2[int(0.05*len(ss2))], ss2.max()])
 xlabel("$L_1$")
 ylabel("$L_2$")
-legend(loc='upper left', markerscale=10, numpoints=1)
+legend(loc='lower left', markerscale=10, numpoints=1)
 savefig('output.png', bbox_inches='tight', dpi=300)
 savetxt("posterior_sample.txt", posterior_sample)
 show()
