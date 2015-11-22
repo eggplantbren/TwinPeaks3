@@ -16,8 +16,8 @@ int main()
 	RNG rng;
 	rng.set_seed(time(0));
 
-	constexpr int num_particles = 1001;
-	constexpr int num_mcmc_steps = 10000;
+	constexpr int num_particles = 3001;
+	constexpr int num_mcmc_steps = 1000;
 	constexpr double depth = 1000.;
 	constexpr int steps = depth/log(2.);
 
