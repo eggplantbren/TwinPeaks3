@@ -41,7 +41,7 @@ void Atoms::compute_scalars()
 	scalars[0] = -PE;
 	scalars[1] = 0.;
 	for(size_t i=0; i<x.size(); i++)
-		scalars[1] -= z[i];
+		scalars[1] += -pow(x[i] - 0.5, 2) - pow(z[i] - 0.5, 2);
 }
 
 void Atoms::calculate_PE()
