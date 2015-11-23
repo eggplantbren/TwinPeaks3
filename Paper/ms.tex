@@ -352,7 +352,7 @@ $N$ should be odd and quite large (1001 or greater).
 	\State Create a region in the $L_1$-$L_2$ plane defined by
 				$\hat{X} \geq \hat{X}_{(k)}$, to be excluded at all subsequent
 				steps.
-	\State Update the remaining prior mass to $M \leftarrow (M - M/N)$.
+	\State Update the remaining prior mass to $M \leftarrow M(1 - k/N)$.
 	\State Replace all particles with $\hat{X} \geq \hat{X}_{(k)}$ by new
 			particles generated from $\pi(\xx)$, subject to the constraint
 			of not being in the excluded region.
