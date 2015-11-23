@@ -48,6 +48,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{algorithm}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
 
@@ -337,9 +338,11 @@ algorithm.
 
 \begin{algorithm}
 \begin{algorithmic}
-\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$, and
-initialise the {\em remaining prior mass} at $M=1$. The number of particles
+\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
 $N$ should be odd and quite large (1001 or greater).
+\State Initialise the {\em remaining prior mass} to be $M=1$.
+\State Initialise the {\em excluded region} $\mathcal{R}$ to be the empty set
+$\emptyset$.
 \While{more iterations desired}
 	\State Calculate $\hat{X}(\ell_1, \ell_2)$ at the position of each particle
 			and sort the $\hat{X}$ values observed.
@@ -349,9 +352,9 @@ $N$ should be odd and quite large (1001 or greater).
 	\EndWhile
 	\State Save all particles with $\hat{X} \geq \hat{X}_{(k)}$ to disk,
 			assigning each a prior weight of $M/N$.
-	\State Create a region in the $L_1$-$L_2$ plane defined by
-				$\hat{X} \geq \hat{X}_{(k)}$, to be excluded at all subsequent
-				steps.
+	\State Exclude the region in the $L_1$-$L_2$ plane where
+$\hat{X} \geq \hat{X}_{(k)}$. That is, set
+	\State \hspace{20pt} $\mathcal{R} \leftarrow \mathcal{R} \cup \{(\ell_1, \ell_2) \in \mathbb{R}^2: \hat{X}(\ell_1, \ell_2) \geq \hat{X}_{(k)}\}$.
 	\State Update the remaining prior mass to $M \leftarrow M(1 - k/N)$.
 	\State Replace all particles with $\hat{X} \geq \hat{X}_{(k)}$ by new
 			particles generated from $\pi(\xx)$, subject to the constraint
