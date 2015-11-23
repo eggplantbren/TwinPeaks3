@@ -5,6 +5,7 @@
 #include <fstream>
 #include <algorithm>
 #include <cassert>
+#include <thread>
 #include "Utils.h"
 
 template<class MyModel>
@@ -201,8 +202,7 @@ void Sampler<MyModel>::do_iteration()
 	std::cout<<log_prior_mass<<"."<<std::endl;
 
 	// Replace dead particles
-	int accepted = 0;
-	int num_threads = rngs.size() - 1;
+	int num_threads = rngs.size();
 
 	// Assign particles to threads
 	std::vector< std::vector<int> > which_particles(num_threads);
@@ -210,11 +210,23 @@ void Sampler<MyModel>::do_iteration()
 	for(int i=0; i<num_particles; ++i)
 	{
 		if(dying[i])
-			which_particles[k++].push_back(i);
+			which_particles[(k++)%num_threads].push_back(i);
 	}
+	// Store acceptance counts
+	std::vector<int> accepts(num_threads);
 
-	// Do MCMC to generate a new particle
-	// accepted += refresh_particle(i);
+	// Do MCMC to generate new particles
+	std::vector<std::thread> threads;
+	for(int i=0; i<num_threads; i++)
+	{
+		threads.push_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]))));
+	}
+	for(int i=0; i<num_threads; i++)
+		threads[i].join();
+	// Sum acceptance counts
+	int accepted = 0;
+	for(const int& c: accepts)
+		accepted += c;
 
 	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
 	iteration++;
@@ -223,22 +235,23 @@ void Sampler<MyModel>::do_iteration()
 
 // Refresh all the particles in indices
 template<class MyModel>
-int Sampler<MyModel>::refresh_particles(const std::vector<int>& indices)
+void Sampler<MyModel>::refresh_particles(const std::vector<int>& indices,
+														int which_rng,
+														int& accepts)
 {
-	int accepts = 0;
+	accepts = 0;
 	for(int i: indices)
-		accepts += refresh_particle(i);
-	return accepts;
+		accepts += refresh_particle(i, which_rng);
 }
 
 template<class MyModel>
-int Sampler<MyModel>::refresh_particle(int which)
+int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 {
 	// Choose a particle to clone
 	int copy;
 	do
 	{
-		copy = rngs[0].rand_int(num_particles);
+		copy = rngs[which_rng].rand_int(num_particles);
 	}
 	while(!is_okay(scalars[copy]));
 
@@ -256,12 +269,12 @@ int Sampler<MyModel>::refresh_particle(int which)
 		proposal = particles[which];
 		s_proposal = scalars[which];
 
-		logH = proposal.perturb(rngs[0]);
+		logH = proposal.perturb(rngs[which_rng]);
 		for(size_t j=0; j<s_proposal.size(); j++)
 			s_proposal[j].set_value(proposal.get_scalars()[j]);
-		logH += s_proposal[rngs[0].rand_int(s_proposal.size())].perturb(rngs[0]);
+		logH += s_proposal[rngs[which_rng].rand_int(s_proposal.size())].perturb(rngs[which_rng]);
 
-		if(rngs[0].rand() <= exp(logH) && is_okay(s_proposal))
+		if(rngs[which_rng].rand() <= exp(logH) && is_okay(s_proposal))
 		{
 			particles[which] = proposal;
 			scalars[which] = s_proposal;

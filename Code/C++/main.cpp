@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 
 	// Make (num_threads) RNGs: one for the main process
 	// and num_threads for use whenever we send out threads
-	vector<RNG> rngs(num_threads+1);
+	vector<RNG> rngs(num_threads, RNG());
 	auto seed = time(0);
 	for(RNG& r: rngs)
 		r.set_seed(++seed);

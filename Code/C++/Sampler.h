@@ -42,10 +42,11 @@ class Sampler
 		long double log_prior_mass;
 
 		// Do MCMC to equilibrate a particle
-		int refresh_particle(int which);
+		int refresh_particle(int which, int which_rng);
 
 		// Do MCMC to equilibrate a set of particles
-		int refresh_particles(const std::vector<int>& indices);
+		void refresh_particles(const std::vector<int>& indices, int which_rng,
+										int& accepts);
 
 	public:
 		bool is_okay(const std::vector<ScalarType>& s);
