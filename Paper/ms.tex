@@ -277,9 +277,9 @@ to accurately estimate $Z(\beta_1, \beta_2)$.
 \centering
 \includegraphics[scale=0.5]{figures/joint1.pdf}
 \caption{\it An example of a prior for $L_1$ and $L_2$, which is implied by
-the prior $\pi(\xx)$. We have overplotted 15 points drawn from this prior.
+the prior $\pi(\xx)$. We have overplotted 25 points drawn from this prior.
 The estimated prior mass in the shaded rectangle is
-$\hat{X}(3, 1.5) = 13/15 \approx 0.867$.
+$\hat{X}(2, 1.5) = 5/25 = 0.2$.
 \label{fig:joint1}}
 \end{figure}
 
@@ -361,10 +361,10 @@ If all particles have a corner count of 0, the algorithm terminates.
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{figures/joint2.pdf}
-\caption{\it The same as Figure~\ref{fig:joint1}. The selected particle
-at $(2.65, 1.31)$ has a corner count of 1. The particle at
-$(2.53, 0.84)$ can be thought of as a single-particle standard Nested Sampling
-run restricted to $L_1 < 2.65$ which is attempting to increase $L_2$.
+\caption{\it The joint prior for the objective functions, and Monte Carlo
+samples, as in Figure~\ref{fig:joint1}. The shaded region imposes a
+constraint on the value of $\hat{X}$. Its boundary approximates a contour
+of $X(L_1, L_2)$.
 \label{fig:joint2}}
 \end{figure}
 
