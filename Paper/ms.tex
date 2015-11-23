@@ -291,8 +291,14 @@ the prior mass for which both $L_1 > \ell_1$ {\em and} $L_2 > \ell_2$ is:
 \begin{eqnarray}
 X(\ell_1, \ell_2) &=& \int \pi(L_1, L_2)
 \mathds{1}\left[L_1 > \ell_1, L_2 > \ell_2 \right]
- \, dL_1 \, dL_2
+ \, dL_1 \, dL_2.
 \end{eqnarray}
+Since $X$ is a probability, it must satisfy a product rule:
+\begin{eqnarray}
+X(\ell_1, \ell_2) = X(\ell_1)X(\ell_2 | \ell_1) = X(\ell_2)X(\ell_1 | \ell_2).
+\end{eqnarray}
+
+
 When the prior $\pi$ is approximated with a set of $N$
 particles $\{\xx_i\}_{i=1}^N$
 (Monte Carlo samples ``drawn from'' $\pi$),
@@ -305,8 +311,8 @@ L_2(\xx_i) > \ell_2\right].\label{eqn:corner_count}
 \end{eqnarray}
 Graphically, on a plot of $L_2$ vs. $L_1$, $\hat{X}(\ell_1, \ell_2)$
 is the fraction of particles in the rectangle whose upper right corner is at
-$\left(\ell_1, \ell_2\right)$ (see Figure~\ref{fig:joint1} for an
-example).
+$\left(\ell_1, \ell_2\right)$. See Figure~\ref{fig:joint1} for an
+example.
 
 \section{Properties of Nested sampling}
 
@@ -328,6 +334,9 @@ values and not the values themselves.
 \end{enumerate}
 The standard Nested Sampling algorithm, (as well as alternatives such as
 Diffusive Nested Sampling \citep{dnest}) has these properties.
+
+Consider running standard NS using the objective function $L_1(\xx)$. After some
+time, we'd know the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
