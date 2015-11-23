@@ -44,7 +44,9 @@ class Sampler
 		// Do MCMC to equilibrate a particle
 		int refresh_particle(int which);
 
-		// Check s against rects
+		// Do MCMC to equilibrate a set of particles
+		int refresh_particles(const std::vector<int>& indices);
+
 	public:
 		bool is_okay(const std::vector<ScalarType>& s);
 

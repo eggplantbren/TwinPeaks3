@@ -202,16 +202,33 @@ void Sampler<MyModel>::do_iteration()
 
 	// Replace dead particles
 	int accepted = 0;
+	int num_threads = rngs.size() - 1;
+
+	// Assign particles to threads
+	std::vector< std::vector<int> > which_particles(num_threads);
+	int k=0;
 	for(int i=0; i<num_particles; ++i)
 	{
 		if(dying[i])
-		{
-			// Do MCMC to generate a new particle
-			accepted += refresh_particle(i);
-		}
+			which_particles[k++].push_back(i);
 	}
+
+	// Do MCMC to generate a new particle
+	// accepted += refresh_particle(i);
+
 	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
 	iteration++;
+}
+
+
+// Refresh all the particles in indices
+template<class MyModel>
+int Sampler<MyModel>::refresh_particles(const std::vector<int>& indices)
+{
+	int accepts = 0;
+	for(int i: indices)
+		accepts += refresh_particle(i);
+	return accepts;
 }
 
 template<class MyModel>
