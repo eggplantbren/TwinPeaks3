@@ -51,7 +51,6 @@ plt.plot(xx, yy, 'ko')
 plt.xlabel(r'$L_1$')
 plt.ylabel(r'$L_2$')
 plt.title(r'Prior $\pi(L_1, L_2)$')
-#plt.fill_between(x[0, :][x[0, :] > 3.], 1.5, 5., color=[0, 0, 0], alpha=0.1)
-plt.savefig('joint1.pdf', bbox_inches='tight')
+plt.savefig('joint2.pdf', bbox_inches='tight')
 plt.show()
 
