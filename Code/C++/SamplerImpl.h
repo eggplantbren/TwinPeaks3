@@ -178,6 +178,12 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 
+	if(num_dying == num_particles)
+	{
+		std::cout<<"# Cannot continue."<<std::endl;
+		exit(0);
+	}
+
 	// Place forbidding rectangles anywhere ucc >= threshold
 	for(int i=0; i<num_particles; i++)
 	{
