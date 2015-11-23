@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 		r.set_seed(++seed);
 
 	constexpr int num_particles = 3001;
-	constexpr int num_mcmc_steps = 1000;
+	constexpr int num_mcmc_steps = 5000;
 	constexpr double depth = 1000.;
 	constexpr int steps = depth/log(2.);
 
