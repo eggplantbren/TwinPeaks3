@@ -319,7 +319,8 @@ the following properties:
 $L_1(\xx)$ and $L_2(\xx)$ are higher than the prior would typically predict.
 \item The algorithm should consider a sequence of probability
 distributions proportional to $\pi$, but restricted to smaller and smaller
-domains for which we can approximately measure the enclosed prior mass.
+domains for which the enclosed prior mass shrinks by a (roughly) constant and
+known factor each iteration.
 \item The algorithm should be invariant to monotonic transformations of
 $L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
@@ -337,25 +338,29 @@ algorithm.
 \begin{algorithm}
 \begin{algorithmic}
 \State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$, and
-initialise the {\em remaining prior mass} at $M=1$.
+initialise the {\em remaining prior mass} at $M=1$. The number of particles
+$N$ should be odd and quite large (1001 or greater).
 \While{more iterations desired}
-	\State Calculate the {\it corner count} (Equation~\ref{eqn:corner_count})
-of each particle.
-	\State Choose one of the particles which has corner count equal to the
-minimum nonzero value. Label this particle number $K$.
-	\State Choose one of the objective functions at random. Label this
-objective function $J$. Let $L_{J}(\xx_K)$ be the value of this objective
-function for particle $K$.
+	\State Calculate $\hat{X}(\ell_1, \ell_2)$ at the position of each particle
+			and sort the $\hat{X}$ values observed.
+	\State Find the median $\hat{X}$ value, $\hat{X}_{(k)}$, where $k = (N-1)/2$.
+	\While{$k > 1$ and $\hat{X}_{(k-1)} = \hat{X}_{(k)}$}
+		\State Set $k \leftarrow (k-1)$.
+	\EndWhile
+	\State Save all particles with $\hat{X} \geq \hat{X}_{(k)}$ to disk,
+			assigning each a prior weight of $M/N$.
+	\State Create a region in the $L_1$-$L_2$ plane defined by
+				$\hat{X} \geq \hat{X}_{(k)}$, to be excluded at all subsequent
+				steps.
+	\State Update the remaining prior mass to $M \leftarrow (M - M/N)$.
+	\State Replace all particles with $\hat{X} \geq \hat{X}_{(k)}$ by new
+			particles generated from $\pi(\xx)$, subject to the constraint
+			of not being in the excluded region.
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
 
 Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
-In step 2, we try to find a particle with the lowest possible nonzero
-corner count. Often this will be 1. In Figure~\ref{fig:joint2}, particle $K$
-is located at $(2.65, 1.31)$ and has a corner count of 1.
-If all particles have a corner count of 0, the algorithm terminates.
-
 
 
 \begin{figure}
