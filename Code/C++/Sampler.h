@@ -16,7 +16,7 @@ class Sampler
 {
 	private:
 		// The random number generator to use
-		RNG rng;
+		std::vector<RNG> rngs;
 
 		// The particles, and information about them
 		int num_particles;
@@ -60,11 +60,8 @@ class Sampler
 
 	public:
 		// Constructor
-		Sampler(const RNG& rng, int num_particles, int mcmc_steps,
+		Sampler(const std::vector<RNG>& rngs, int num_particles, int mcmc_steps,
 														int saves_per_iteration);
-
-		// Set RNG seed
-		void set_rng_seed(unsigned int seed);
 
 		// Call from_prior on all the particles
 		void initialise();
@@ -82,12 +79,6 @@ class Sampler
 		// the output files. If not called, it will append
 		// to whatever's already in them
 		void clear_output_files();
-
-		// Setter and getter for the RNG
-		void set_rng(const RNG& rng)
-		{ this->rng = rng; }
-		RNG get_rng() const
-		{ return rng; }
 };
 
 #include "SamplerImpl.h"

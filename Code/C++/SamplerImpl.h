@@ -8,9 +8,9 @@
 #include "Utils.h"
 
 template<class MyModel>
-Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
-							int saves_per_iteration)
-:rng(rng)
+Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
+							int mcmc_steps,	int saves_per_iteration)
+:rngs(rngs)
 ,num_particles(num_particles)
 ,particles(num_particles)
 ,scalars(num_particles)
@@ -31,23 +31,17 @@ Sampler<MyModel>::Sampler(const RNG& rng, int num_particles, int mcmc_steps,
 }
 
 template<class MyModel>
-void Sampler<MyModel>::set_rng_seed(unsigned int seed)
-{
-	rng.set_seed(seed);
-}
-
-template<class MyModel>
 void Sampler<MyModel>::initialise()
 {
 	for(int i=0; i<num_particles; i++)
 	{
-		particles[i].from_prior(rng);
+		particles[i].from_prior(rngs[0]);
 		const std::vector<double>& s = particles[i].get_scalars();
 		scalars[i].clear();
 		for(size_t j=0; j<s.size(); j++)
 			scalars[i].push_back(ScalarType(s[j]));
 		for(size_t j=0; j<scalars[i].size(); j++)
-			scalars[i][j].from_prior(rng);
+			scalars[i][j].from_prior(rngs[0]);
 	}
 }
 
@@ -148,7 +142,7 @@ void Sampler<MyModel>::do_iteration()
 			int ii;
 			do
 			{
-				ii = rng.rand_int(num_particles);
+				ii = rngs[0].rand_int(num_particles);
 			}while(!dying[ii]);
 			save[ii] = true;
 		}
@@ -227,7 +221,7 @@ int Sampler<MyModel>::refresh_particle(int which)
 	int copy;
 	do
 	{
-		copy = rng.rand_int(num_particles);
+		copy = rngs[0].rand_int(num_particles);
 	}
 	while(!is_okay(scalars[copy]));
 
@@ -245,12 +239,12 @@ int Sampler<MyModel>::refresh_particle(int which)
 		proposal = particles[which];
 		s_proposal = scalars[which];
 
-		logH = proposal.perturb(rng);
+		logH = proposal.perturb(rngs[0]);
 		for(size_t j=0; j<s_proposal.size(); j++)
 			s_proposal[j].set_value(proposal.get_scalars()[j]);
-		logH += s_proposal[rng.rand_int(s_proposal.size())].perturb(rng);
+		logH += s_proposal[rngs[0].rand_int(s_proposal.size())].perturb(rngs[0]);
 
-		if(rng.rand() <= exp(logH) && is_okay(s_proposal))
+		if(rngs[0].rand() <= exp(logH) && is_okay(s_proposal))
 		{
 			particles[which] = proposal;
 			scalars[which] = s_proposal;
