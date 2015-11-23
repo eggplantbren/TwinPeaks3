@@ -10,24 +10,30 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-	// Make an RNG
-	RNG rng;
-	rng.set_seed(time(0));
+	// Number of threads is 1 or a number given on the command line
+	int num_threads = (argc==1)?(1):(atoi(argv[1]));
 
-	constexpr int num_particles = 3001;
-	constexpr int num_mcmc_steps = 1000;
-	constexpr double depth = 1000.;
-	constexpr int steps = depth/log(2.);
+	// Make (num_threads) RNGs: one for the main process
+	// and num_threads for use whenever we send out threads
+	vector<RNG> rngs(num_threads+1);
+	auto seed = time(0);
+	for(RNG& r: rngs)
+		r.set_seed(++seed);
 
-	// Create a sampler
-	Sampler<SimpleExample> sampler(rng, num_particles, num_mcmc_steps, 1);
-	sampler.initialise();
+//	constexpr int num_particles = 3001;
+//	constexpr int num_mcmc_steps = 1000;
+//	constexpr double depth = 1000.;
+//	constexpr int steps = depth/log(2.);
 
-	// Do NS indefinitely
-	for(int i=0; i<steps; ++i)
-		sampler.do_iteration();
+//	// Create a sampler
+//	Sampler<SimpleExample> sampler(rng, num_particles, num_mcmc_steps, 1);
+//	sampler.initialise();
+
+//	// Do NS indefinitely
+//	for(int i=0; i<steps; ++i)
+//		sampler.do_iteration();
 
 	return 0;
 }
