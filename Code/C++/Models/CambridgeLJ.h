@@ -8,6 +8,8 @@
 class CambridgeLJ
 {
 	private:
+		double* s;
+
 		std::vector<double> scalars;
 
 		void compute_scalars();

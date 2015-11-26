@@ -308,6 +308,12 @@ contains
 
   end subroutine roam_volume
 
+! Deallocate s
+subroutine destroy(s)
+  real(dp), dimension(:,:), allocatable, intent(inout) :: s ! uniformly random fractional coordinates
+  if (allocated(s)) deallocate(s)
+end
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! ROUTINE FOR CREATING AN INITIAL CONFIGURATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

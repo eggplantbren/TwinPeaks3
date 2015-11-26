@@ -14,6 +14,8 @@ extern "C"
 					double* Vmax, int* N, double* cutoff,
 					double* univar_3Nplus10001, double* univar_60k,
 					double* univar_30k, double* nvar_60k, bool* flat_v_prior);
+
+	void __twin_peaks_routines_MOD_destroy(double* s);
 }
 
 CambridgeLJ::CambridgeLJ()
@@ -24,7 +26,7 @@ CambridgeLJ::CambridgeLJ()
 
 CambridgeLJ::~CambridgeLJ()
 {
-
+	__twin_peaks_routines_MOD_destroy(s);
 }
 
 void CambridgeLJ::from_prior(RNG& rng)
