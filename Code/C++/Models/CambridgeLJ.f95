@@ -9,7 +9,7 @@ contains
 ! 1. MC MOVES
 ! 2. ROUTINE FOR CREATING AN INITIAL CONFIGURATION
 ! It should not be neccessary to read the last two sections
-! 3. ROUTINES FOR CALCULATING THE ENTHALPY OF A LENNARD JONES SYSTEM
+! 3. ROUTINES FOR CALCULATING THE ENERGY OF A LENNARD JONES SYSTEM
 ! 4. VARIOUS NUMERICAL FUNCTIONS AND ROUTINES REQUIRED BY THE ABOVE
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -19,48 +19,49 @@ contains
   !   ************************************************************
   !   * Single atom MC move                                      *
   !   ************************************************************
-  subroutine roam_oneatom_onestep(s_in, s_out, h0, V, delta_enth, step_1a1s, iat, cutoff, press, n_call_enth, skip_enth_calc)
+  subroutine roam_oneatom_onestep(s_in, s_out, h0, V, delta_ener, step_1a1s, iat, cutoff, &
+                                & univar_rnd4, n_call_ener, skip_ener_calc)
 
     real(dp), dimension(:,:), intent(in)   :: s_in  ! fractional coords in
     real(dp), dimension(:,:), intent(out)  :: s_out ! fractional coords out
     real(dp), dimension(3,3), intent(in)   :: h0    ! normalised cell matrix
     real(dp), intent(in)                   :: V     ! volume
-    real(dp), intent(out)                  :: delta_enth ! enthalpy change due to single atom step
+    real(dp), intent(out)                  :: delta_ener ! energy change due to single atom step
     real(dp), intent(in)      :: step_1a1s          ! step length
                                                     ! defined as a fraction of unit_cell_volume**(1/3)
     integer, intent(out)      :: iat                ! index of random atom that was chosen moved 
                                                     ! element of (1,2,...,N)
     real(dp), intent(in)      :: cutoff             ! radial cutoff of potential, defined in units of sigma
-    real(dp), intent(in)      :: press              ! pressure defined in units of eps/(sigma**3)
-    real(dp), intent(inout)   :: n_call_enth        ! number of entahlpy calls (tally) - updated by +1 
-    logical, optional, intent(in) :: skip_enth_calc ! OPTIONAL. if .true. do not calculate delta_enthalpy 
+    real(dp), dimension(4), intent(in) :: univar_rnd4      ! an array of 4 iid univariate random numbers 
+                                                    ! on (0,1)
+    real(dp), intent(inout)   :: n_call_ener        ! number of entahlpy calls (tally) - updated by +1 
+    logical, optional, intent(in) :: skip_ener_calc ! OPTIONAL. if .true. do not calculate delta_energy 
     ! internal arguments
-    real(dp), dimension(4) :: rnd4
     real(dp), dimension(3) :: translation_roos
+    real(dp), dimension(4) :: univar_rnd4mod
     integer :: i, N
 
     N = size(s_in)/3
 
-    call random_number(rnd4)
-    iat = int(rnd4(1)*real(N)) + 1
+    iat = int(univar_rnd4(1)*real(N)) + 1
     ! choose random particle between 1 and N for taking the step
 
-    rnd4 = rnd4 * 2.0_dp * step_1a1s - step_1a1s  
+    univar_rnd4mod = univar_rnd4 * 2.0_dp * step_1a1s - step_1a1s  
 
     s_out = s_in
     do i = 2,4
        ! do move in fractional coordinates
-       s_out(i-1,iat) = s_out(i-1,iat) + rnd4(i)
+       s_out(i-1,iat) = s_out(i-1,iat) + univar_rnd4mod(i)
     end do
 
     ! map back into cell if atom has stepped out of periodic boundaries
     translation_roos = nint(s_out(:,iat) - 0.5_dp, dp)
     s_out(:,iat) = s_out(:,iat) - translation_roos
 
-    if (.not. (present(skip_enth_calc).and.skip_enth_calc)) then 
-      delta_enth = enthalpy( s_out, h0, V, press, cutoff, atom=iat, n_call_enthalpy=n_call_enth )
-      delta_enth = delta_enth - enthalpy( s_in, h0, V, press, cutoff, atom=iat ) 
-      ! only count one enthalpy call for this move
+    if (.not. (present(skip_ener_calc).and.skip_ener_calc)) then 
+      delta_ener = energy( s_out, h0, V, cutoff, atom=iat, n_call_energy=n_call_ener )
+      delta_ener = delta_ener - energy( s_in, h0, V, cutoff, atom=iat ) 
+      ! only count one energy call for this move
     end if
 
   end subroutine roam_oneatom_onestep
@@ -71,7 +72,8 @@ contains
   !   * manifold det(h0) = 1 and cell_depth > min_height         *
   !   ************************************************************
   subroutine roam_latticeshape_shear(h0_in, h0_out, s, V, latt_step, min_height, &
-                             & pressure, cutoff, change_flag, enth_out, n_call_enth, skip_enth_calc )
+                             & cutoff, univar_rnd3, norm_rnd6, change_flag, ener_out, &
+                             & n_call_ener, skip_ener_calc )
 
     real(dp), dimension(3,3), intent(in) :: h0_in   ! normalised cell matrix in
     real(dp), dimension(3,3), intent(out) :: h0_out ! normalised cell matrix out
@@ -79,26 +81,26 @@ contains
     real(dp), intent(in) :: V                       ! volume
     real(dp), intent(in)       :: latt_step         ! step length - element of (0.0,1.0)
     real(dp), intent(in) :: min_height              ! minimum cell height (see paper)
-    real(dp), intent(in) :: pressure                ! pressure defined in units of eps/(sigma**3)
     real(dp), intent(in) :: cutoff                  ! radial cutoff of potential, defined in units of sigma
+    real(dp), dimension(3), intent(in) :: univar_rnd3 ! an array of 3 iid univariate random numbers 
+                                                    ! on (0,1)
+    real(dp), dimension(6), intent(in) :: norm_rnd6 ! an array of 6 iid normally distributed random numbers 
+                                                    ! each with mean 0 and standard deviation 1.0
     integer , intent(inout) :: change_flag          ! flags whether the minimum cell height condition was met.
                                                     ! 0 : YES 
                                                     ! 1 : NO 
-                                                    ! enth_out has ONLY been calculated if change_flag=0
+                                                    ! ener_out has ONLY been calculated if change_flag=0
 
-    real(dp), intent(out)   :: enth_out             ! enthalpy of trial h0
-    real(dp), intent(inout) :: n_call_enth          ! tally of enthalpy calls.
-    logical, optional, intent(in) :: skip_enth_calc ! if .true. do not perform enthalpy calculation
+    real(dp), intent(out)   :: ener_out             ! energy of trial h0
+    real(dp), intent(inout) :: n_call_ener          ! tally of energy calls.
+    logical, optional, intent(in) :: skip_ener_calc ! if .true. do not perform energy calculation
 
     real(dp) :: volume_curt, rand_nm, rnd2(2), vol_save
-    real(dp), dimension(9) :: rnd_matrix
     real(dp), dimension(3) :: delta_vec, orth1, orth2
     real(dp), dimension(3,3) :: latt_save
-    integer  :: i,i3, chosen_lv, roam_count, vs(2)
+    integer  :: i, chosen_lv, roam_count, vs(2)
 
     h0_out = h0_in
-
-    call random_number(rnd_matrix)
 
     change_flag = 1 ! default value indicating that the move was not successful
     vol_save = lattice_Cell_Volume(h0_out)
@@ -108,8 +110,7 @@ contains
     latt_save = h0_out
     do roam_count = 1,3
       ! choose random lattice vector to roam
-      i3=(roam_count-1)*3
-      rand_nm = rnd_matrix(i3 + 1)
+      rand_nm = univar_rnd3(roam_count)
       chosen_lv = (rand_nm*3) + 1 ! from 1 to 3
       if (chosen_lv==1) then
         vs = (/ 2, 3 /)
@@ -123,20 +124,10 @@ contains
       call orthonormal_basis(h0_out(:,vs(1)), &
                            & h0_out(:,vs(2)), orth1, orth2)
 
-      rnd2(1) = rnd_matrix(i3 + 2)
-      rnd2(2) = rnd_matrix(i3 + 3)
-      ! Insist that these are from inside a unit circle, 
-      ! because the direction of orth1, orth2 depend on the lattice vectors.
-      ! Makes detailed balance good.
-      if (sum(rnd2**2).gt.1.0_dp) then
-        do
-          call random_number(rnd2)
-          rnd2 = 2.0_dp*(rnd2-0.5_dp)
-          if (sum(rnd2**2).le.1.0_dp) exit
-        end do
-      end if
-      rnd2 = 2.0_dp*(rnd2-0.5_dp)*latt_step
-      ! uniform random numbers in a circle centred at the origin
+      rnd2(1) = norm_rnd6(2*(roam_count-1) + 1)
+      rnd2(2) = norm_rnd6(2*(roam_count-1) + 2)
+      rnd2 = rnd2*latt_step
+      ! gaussian distributed iid random numbers with mean 0, std=latt_step
 
       do i = 1,3
         delta_vec(i) = rnd2(1)*orth1(i) + rnd2(2)*orth2(i)
@@ -155,9 +146,9 @@ contains
         h0_out = latt_save ! revert to previous saved lattice
       end if
     end do
-    if (change_flag == 0 .and. (.not. (present(skip_enth_calc).and.skip_enth_calc)) ) then 
-      ! calc new enth
-      enth_out = enthalpy( s, h0_out, V, pressure, cutoff, n_call_enthalpy=n_call_enth ) 
+    if (change_flag == 0 .and. (.not. (present(skip_ener_calc).and.skip_ener_calc)) ) then 
+      ! calc new ener
+      ener_out = energy( s, h0_out, V, cutoff, n_call_energy=n_call_ener ) 
     end if
 
   end subroutine roam_latticeshape_shear
@@ -168,7 +159,8 @@ contains
   !   * manifold det(h0) = 1 and cell_depth > min_height         *
   !   ************************************************************
   subroutine roam_latticeshape_stretch(h0_in, h0_out, s, V, latt_step, min_height, &
-                             & pressure, cutoff, change_flag, enth_out, n_call_enth, skip_enth_calc )
+                             & cutoff, univar_rnd6, change_flag, ener_out, n_call_ener, &
+                             & skip_ener_calc )
 
     real(dp), dimension(3,3), intent(in) :: h0_in   ! normalised cell matrix in
     real(dp), dimension(3,3), intent(out) :: h0_out ! normalised cell matrix out
@@ -176,32 +168,30 @@ contains
     real(dp), intent(in) :: V                       ! volume
     real(dp), intent(in)       :: latt_step         ! step length - element of (0.0,1.0)
     real(dp), intent(in) :: min_height              ! minimum cell height (see paper)
-    real(dp), intent(in) :: pressure                ! pressure defined in units of eps/(sigma**3)
     real(dp), intent(in) :: cutoff                  ! radial cutoff of potential, defined in units of sigma
+    real(dp), dimension(6), intent(in) :: univar_rnd6 ! an array of 6 iid univariate random numbers 
+                                                    ! on (0,1)
     integer , intent(inout) :: change_flag          ! flags whether the minimum cell height condition was met.
                                                     ! 0 : YES 
                                                     ! 1 : NO 
-                                                    ! enth_out has ONLY been calculated if change_flag=0
+                                                    ! ener_out has ONLY been calculated if change_flag=0
 
-    real(dp), intent(out)   :: enth_out             ! enthalpy of trial h0
-    real(dp), intent(inout) :: n_call_enth          ! tally of enthalpy calls.
-    logical, optional, intent(in) :: skip_enth_calc ! if .true. do not perform enthalpy calculation
+    real(dp), intent(out)   :: ener_out             ! energy of trial h0
+    real(dp), intent(inout) :: n_call_ener          ! tally of energy calls.
+    logical, optional, intent(in) :: skip_ener_calc ! if .true. do not perform energy calculation
 
     real(dp) :: rand_nm, rnd1, rnd2
-    real(dp), dimension(6) :: rnd_matrix
     real(dp), dimension(3,3) :: latt_save
     integer  :: i,i2, chosen_lv, roam_count, vs(2)
 
     h0_out = h0_in 
-
-    call random_number(rnd_matrix)
 
     change_flag = 1 ! default value indicating that the move was not successful
     latt_save = h0_out ! save
     do roam_count = 1,3
       ! choose random lattice vector to roam
       i2=(roam_count-1)*2
-      rand_nm = rnd_matrix(i2 + 1)
+      rand_nm = univar_rnd6(i2 + 1)
       chosen_lv = (rand_nm*3) + 1 ! from 1 to 3
       if (chosen_lv==1) then
         vs = (/ 2, 3 /)
@@ -211,7 +201,7 @@ contains
         vs = (/ 1, 2 /)
       end if
 
-      rnd1 = rnd_matrix(i2 + 2)
+      rnd1 = univar_rnd6(i2 + 2)
       rnd1 = 2.0_dp*(rnd1-0.5_dp)*latt_step
       rnd1 = exp(rnd1)
       rnd2 = 1.0_dp/rnd1
@@ -233,8 +223,8 @@ contains
       end if
     end do
 
-    if (change_flag == 0 .and. (.not. (present(skip_enth_calc).and.skip_enth_calc)) ) then 
-      enth_out = enthalpy( s, h0_out, V, pressure, cutoff, n_call_enthalpy=n_call_enth ) 
+    if (change_flag == 0 .and. (.not. (present(skip_ener_calc).and.skip_ener_calc)) ) then 
+      ener_out = energy( s, h0_out, V, cutoff, n_call_energy=n_call_ener ) 
     endif
 
   end subroutine roam_latticeshape_stretch
@@ -244,7 +234,8 @@ contains
   !   * MC accept/rejection guarantees V ~ V^(1/3) and V<v_max .
   !   ************************************************************
   subroutine roam_volume(V_in, V_out, s, h0, vol_step, v_max, &
-                             & pressure, cutoff, change_flag, enth_out, n_call_enth, skip_enth_calc )
+                        & cutoff, univar_rnd2, change_flag, ener_out, n_call_ener, &
+                        & flat_v_prior, skip_ener_calc )
 
     real(dp), intent(in) :: V_in                ! volume in
     real(dp), intent(out) :: V_out              ! volume out
@@ -252,23 +243,23 @@ contains
     real(dp), dimension(3,3), intent(in) :: h0  ! normalised cell matrix
     real(dp), intent(in)       :: vol_step      ! step length
     real(dp), intent(in) :: v_max               ! maximum allowed volume. "V_0" in the paper.
-    real(dp), intent(in) :: pressure            ! pressure defined in units of eps/(sigma**3)
     real(dp), intent(in) :: cutoff              ! radial cutoff of potential, defined in units of sigma
+    real(dp), intent(in) :: univar_rnd2(2)      ! an array of 2 iid univariate random numbers 
+                                                ! on (0,1)
     integer , intent(inout) :: change_flag      ! flags whether the trial move was accepted, 
                                                 ! according to the V**(1/3) distribution
                                                 ! 0 : YES 
                                                 ! 1 : NO 
-                                                ! enth_out has ONLY been calculated if change_flag=0
-    real(dp), intent(out)   :: enth_out         ! enthalpy of trial V
-    real(dp), intent(inout) :: n_call_enth      ! tally of enthalpy calls.
-    logical, optional, intent(in) :: skip_enth_calc ! if .true. do not perform enthalpy calculation
+                                                ! ener_out has ONLY been calculated if change_flag=0
+    real(dp), intent(out)   :: ener_out         ! energy of trial V
+    real(dp), intent(inout) :: n_call_ener      ! tally of energy calls.
+    logical, intent(in) :: flat_v_prior         ! if .true. do not perform MC accept/reject for 
+                                                ! prob(B) ~ V**N
+    logical, optional, intent(in) :: skip_ener_calc ! if .true. do not perform energy calculation
 
     real(dp) :: trial_volume, a_0, a_1, p
     integer  :: N
-    real(dp) :: rnd2(2)
     real(dp), parameter :: v_min = 0.0d0
-
-    call random_number(rnd2)
 
     V_out = V_in
     N = size(s)/3
@@ -287,7 +278,7 @@ contains
     end if ! This naturaly leaves trial_volume = volume if 
     ! the volume is exactly in the middle of the allowed volume range
 
-    trial_volume = trial_volume + (rnd2(1) - 0.5_dp)*(vol_step + a_0)
+    trial_volume = trial_volume + (univar_rnd2(1) - 0.5_dp)*(vol_step + a_0)
 
     ! calculate the closest boundary to trail_volume:
     a_1 = min(v_max - trial_volume, trial_volume - v_min )
@@ -295,18 +286,22 @@ contains
        a_1 = vol_step
     end if
 
-    p =  (trial_volume/V_in)**N
+    if (flat_v_prior) then
+      p = 1.0_dp
+    else
+      p =  (trial_volume/V_in)**N
+    end if
     p = p * (vol_step + a_0)/(vol_step + a_1)
 
     change_flag = 1 ! signals that the MC resulted in no volume change - default value
 
-    if ( rnd2(2) .lt. min( 1.0_dp, p ) ) then
+    if ( univar_rnd2(2) .lt. min( 1.0_dp, p ) ) then
        change_flag = 0 ! MC step resulted in a volume change
        V_out = trial_volume
-       if (.not. (present(skip_enth_calc).and.skip_enth_calc)) &
-         & enth_out = enthalpy( s, h0, V_out, pressure, cutoff, n_call_enthalpy=n_call_enth ) 
+       if (.not. (present(skip_ener_calc).and.skip_ener_calc)) &
+         & ener_out = energy( s, h0, V_out, cutoff, n_call_energy=n_call_ener ) 
     else
-      enth_out = huge(1.0d0)
+      ener_out = huge(1.0d0)
       V_out = V_in
 
     end if
@@ -317,7 +312,8 @@ contains
 !! ROUTINE FOR CREATING AN INITIAL CONFIGURATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine initialise_config(s,h0,V,enth,min_height,Vmax,N,pressure,cutoff)
+subroutine initialise_config(s,h0,V,ener,min_height,Vmax,N,cutoff, &
+                          & univar_3Nplus10001,univar_60k,univar_30k,nvar_60k,flat_v_prior)
 
   real(dp), dimension(:,:), allocatable, intent(inout) :: s ! uniformly random fractional coordinates
                                                             ! s is an element of (0,1)^(3N)
@@ -325,25 +321,40 @@ subroutine initialise_config(s,h0,V,enth,min_height,Vmax,N,pressure,cutoff)
                                                             ! chosen from det(h0)=1, and satisfying
                                                             ! cell_depth(h0) > min_height (See paper).
   real(dp), intent(out)                 :: V                ! Volume
-  real(dp), intent(out)                 :: enth             ! enthalpy of this initial configuration
+  real(dp), intent(out)                 :: ener             ! energy of this initial configuration
 
   real(dp), intent(in) :: Vmax                              ! maximum allowed volume. "V_0" in the paper.
   real(dp), intent(in) :: min_height                        ! minimum cell height (see paper)
-  real(dp), intent(in) :: pressure                          ! pressure defined in units of eps/(sigma**3)
   real(dp), intent(in) :: cutoff                            ! radial cutoff of potential, defined in units of sigma
+  real(dp), dimension(:), intent(in) :: univar_3Nplus10001  ! an array of 3N+10001 iid univariate random numbers
+                                                            ! on (0,1)
+  real(dp), dimension(60000), intent(in) :: univar_60k      ! an array of 60k iid univariate random numbers
+                                                            ! on (0,1)
+  real(dp), dimension(30000), intent(in) :: univar_30k      ! an array of 30k iid univariate random numbers
+                                                            ! on (0,1)
+  real(dp), dimension(60000), intent(in) :: nvar_60k        ! an array of 60k iid normally distributed random numbers
+                                                            ! each with mean 0 and standard deviation 1
   integer, intent(in) :: N                                  ! Number of atoms
+  logical, intent(in) :: flat_v_prior                       ! if .true. use uniform distribution for V 
+                                                            ! rather than prob(B) ~ V**N
 
   ! internal arguments
-  integer :: i, spare_int
+  integer :: i, j, spare_int
   real(dp) :: spare,spare2
   real(dp), dimension(3,3) :: h0_temp
+  real(dp) :: u_rnd3(3), u_rnd6(6), g_rnd6(6)
   
-  integer, parameter :: N_latt_moves_eq = 10000
-
+  integer, parameter :: N_latt_moves_eq = 10000 ! do not change without also changing the length of 
+                                                ! univar_3Nplus10001 (both here and in the 
+                                                ! calling routine)
   ! initialise s
   if (allocated(s)) deallocate(s)
   allocate(s(3,N))
-  call random_number(s) ! univariate intial coordinate s on (0,1)^(3N)
+  do i = 1, N
+    do j = 1, 3
+      s(j,i) = univar_3Nplus10001( 3*(i-1) + j ) ! univariate intial coordinate s on (0,1)^(3N)
+    end do
+  end do
 
   ! initialise h0 uniformly with min cell height > min_height
   h0 = 0.0d0
@@ -352,68 +363,75 @@ subroutine initialise_config(s,h0,V,enth,min_height,Vmax,N,pressure,cutoff)
   end do
   spare2 = 0.0d0
   do i = 1, N_latt_moves_eq
-    call random_number(spare)
+    spare = univar_3Nplus10001(3*N + i)
     if (spare > 0.5d0) then ! stretch move
+      u_rnd6 = univar_60k(6*(i-1)+1:6*(i-1)+6)
       call roam_latticeshape_stretch(h0, h0_temp, s, 1.0d0, 0.35d0, min_height, &
-                             & 1.0d0, 1.d0, spare_int, spare, spare2, skip_enth_calc=.true. )
+                             & 1.d0, u_rnd6, spare_int, spare, spare2, skip_ener_calc=.true. )
       h0=h0_temp
     else ! shear move
+      u_rnd3 = univar_30k(2*(i-1)+1:2*(i-1)+3)
+      g_rnd6 = nvar_60k(6*(i-1)+1:6*(i-1)+6)
       call roam_latticeshape_shear(h0, h0_temp, s, 1.0d0, 0.5d0, min_height, &
-                             & 1.0d0, 1.d0, spare_int, spare, spare2, skip_enth_calc=.true. )
+                             & 1.d0, u_rnd3, g_rnd6, spare_int, spare, spare2, &
+                             & skip_ener_calc=.true. )
       h0=h0_temp
     end if
   end do  
 
-  ! initialise volume with prior V^N over (0,Vmax)
-  call polynomial_rand(real(N,dp),Vmax,single=V)
+  if (flat_v_prior) then
+    V = univar_3Nplus10001(3*N + 10001)
+    V = V*Vmax
+  else
+    V = univar_3Nplus10001(3*N + 10001)
+    V = V**(1.0d0/real(N+1,dp))
+    V = V*Vmax
+  end if
 
-  enth = enthalpy( s, h0, V, pressure, cutoff )
+  ener = energy( s, h0, V, cutoff )
 
 end subroutine initialise_config
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! ROUTINES FOR CALCULATING THE ENTHALPY OF A LENNARD JONES SYSTEM !!!!!!!!!!!!!!!!!!!!!!!!!!
+!! ROUTINES FOR CALCULATING THE ENERGY OF A LENNARD JONES SYSTEM !!!!!!!!!!!!!!!!!!!!!!!!!!
 !! EPSILON = 1.0 , SIGMA = 1.0 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! STANDARD MEAN FIELD CORRECTION FOR r > cutoff !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   !***********************************************************************************
-  ! function to calculate the enthalpy PE + PV + longrange (mean field) correction
+  ! function to calculate the energy PE + longrange (mean field) correction
   ! if atom is specified, PE only contains the contribution due to the interactions of atom "atom"
   !***********************************************************************************
-  function enthalpy( s, h0, V, press, cutoff, atom, n_call_enthalpy )
+  function energy( s, h0, V, cutoff, atom, n_call_energy )
 
-    real(dp) :: enthalpy
+    real(dp) :: energy
 
     real(dp), dimension(:,:), intent(in) :: s ! fractional coordinates
     real(dp), dimension(3,3), intent(in) :: h0 ! normalised cell matrix
     real(dp), intent(in) :: V ! volume
-    real(dp), intent(in) :: press ! units of eps/(sigma**3)
     real(dp), intent(in) :: cutoff ! units of sigma
     integer, optional, intent(in)    :: atom
-    real(dp), optional, intent(inout)    :: n_call_enthalpy
+    real(dp), optional, intent(inout)    :: n_call_energy
 
     real(dp), parameter :: pi = 3.14159265358979323846264338327950288419716939937510_dp
     real(dp) :: mfc
 
     if ( present(atom) )  then
-       enthalpy = lj_energy_correct_longrange( &
+       energy = lj_energy_correct_longrange( &
          & s,h0,V,cutoff,iat=atom)
     else ! atom not specified
-       enthalpy = lj_energy_correct_longrange( &
+       energy = lj_energy_correct_longrange( &
          & s,h0,V,cutoff)
     end if
 
     ! add mean field correction beyond cutoff
     mfc = (2.0_dp/3.0_dp)*pi*4.0d0*dble((size(s)/3)**2)
     mfc = mfc*((((1.0d0/cutoff)**9)/3.0_dp)-((1.0d0/cutoff)**3))/V
-    enthalpy = enthalpy + mfc
+    energy = energy + mfc
 
-    enthalpy = enthalpy + ( press * V )
+    if(present(n_call_energy)) n_call_energy = n_call_energy + 1.0
 
-    if(present(n_call_enthalpy)) n_call_enthalpy = n_call_enthalpy + 1.0
-
-  end function enthalpy
+  end function energy
 
   function lj_energy_correct_longrange(s,h0,V,cutoff,iat)
     ! Calculate explicit interaction part of LJ potential energy 
@@ -711,47 +729,5 @@ end subroutine initialise_config
     end do
 
   end subroutine orthonormal_basis
-
-  subroutine polynomial_rand(expo,maximum,single,array)
-    ! generates random numbers distributed as
-    ! p(x) = x**expo : 0 <= x <= maximum
-
-    double precision, intent(in) :: maximum, expo
-    double precision, optional, intent(in out) :: single
-    double precision, optional, intent(in out) :: array(:)
-
-    logical :: present_flag = .false.
-    double precision :: exp_to_use
-   
-    if(abs(expo+1.0d0)>1.0d-12) then
-      exp_to_use = 1.0d0/(expo+1.0d0)
-    else
-      write(*,*) "Error, subroutine polynomial_rand: ", &
-                & "expo=",expo," Values at or very close to -1.0d0 are not allowed.", &
-                & "Skipping rest of routine."
-      return
-    end if
-
-    if (present(single)) then 
-      call random_number(single)
-      single = single**exp_to_use
-      single = single*maximum
-      present_flag = .true.
-    end if
-
-    if (present(array)) then 
-      call random_number(array)
-      array = array**exp_to_use
-      array = array*maximum
-      present_flag = .true.
-    end if
-
-    if (.not. present_flag) then
-      write(*,*) "Error, rands.F95, subroutine polynomial_rand: ", &
-                & "Routine called without specifying either single or array. ", &
-                & "No random numbers generated."
-    end if
-
-  end subroutine polynomial_rand
 
 end module twin_peaks_routines
