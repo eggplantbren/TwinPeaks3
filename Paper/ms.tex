@@ -163,8 +163,20 @@ function, and $Z$ is the normalising constant, usually known as the
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
-The main goal of NS is to approximate $Z$.
-This is done by drawing particles from the
+The main goal of NS is to approximate $Z$, but it can also be used to make
+Monte Carlo approximations of the posterior, and calculate the ``information'',
+or Kullback-Leibler divergence from the prior to the posterior:
+\begin{eqnarray}
+\mathcal{I} &=& \int p(\xx | \data, \II) \ln
+\left[\frac{p(\xx | \data, \II)}{p(\xx | \II)}\right] \, d\xx \\
+&=& \int \frac{\pi(\xx) L(\xx)}{Z} \ln
+\left[\frac{L(\xx)}{Z}\right] \, d\xx.
+\end{eqnarray}
+$\mathcal{I}$ quantifies how compressed the posterior distribution is with
+respect to the prior. For example, $\mathcal{I} = 10$ implies the posterior
+occupies a fraction $e^{-10}$ of the prior mass.
+
+NS works by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by an
 approximately-known factor. Like other related algorithms such as those
