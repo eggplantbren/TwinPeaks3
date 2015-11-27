@@ -8,6 +8,7 @@
 class CambridgeLJ
 {
 	private:
+		int N;
 		double* s;
 
 		std::vector<double> scalars;
@@ -16,6 +17,7 @@ class CambridgeLJ
 
 	public:
 		CambridgeLJ();
+		CambridgeLJ(const CambridgeLJ& other);
 		~CambridgeLJ();
 
 		// Generate the point from the prior
@@ -29,6 +31,8 @@ class CambridgeLJ
 		// Getter
 		const std::vector<double>& get_scalars() const
 		{ return scalars; }
+
+		CambridgeLJ& operator = (const CambridgeLJ& other);
 };
 
 #endif

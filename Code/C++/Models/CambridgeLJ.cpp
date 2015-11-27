@@ -2,6 +2,7 @@
 #include "RandomNumberGenerator.h"
 #include "Utils.h"
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 using namespace DNest3;
@@ -17,10 +18,26 @@ extern "C"
 }
 
 CambridgeLJ::CambridgeLJ()
-:scalars(2)
+:N(100)
+,scalars(2)
 {
-	int N = 100;
 	s = new double[3*N];
+}
+
+CambridgeLJ::CambridgeLJ(const CambridgeLJ& other)
+{
+	s = new double[3*N];
+	*this = other;
+}
+
+CambridgeLJ& CambridgeLJ::operator = (const CambridgeLJ& other)
+{
+	assert(N == other.N);
+	N = other.N;
+	for(int i=0; i<N; i++)
+		s[i] = other.s[i];
+	scalars = other.scalars;
+	return *this;
 }
 
 CambridgeLJ::~CambridgeLJ()
