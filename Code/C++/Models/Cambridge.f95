@@ -308,11 +308,6 @@ contains
 
   end subroutine roam_volume
 
-! Deallocate s
-subroutine destroy(s)
-  real(dp), dimension(:,:), allocatable, intent(inout) :: s ! uniformly random fractional coordinates
-  if (allocated(s)) deallocate(s)
-end
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! ROUTINE FOR CREATING AN INITIAL CONFIGURATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -353,9 +348,6 @@ subroutine initialise_config(s,h0,V,ener,min_height,Vmax,N,cutoff, &
   integer, parameter :: N_latt_moves_eq = 10000 ! do not change without also changing the length of 
                                                 ! univar_3Nplus10001 (both here and in the 
                                                 ! calling routine)
-  ! initialise s
-  if (allocated(s)) deallocate(s)
-  allocate(s(3,N))
   do i = 1, N
     do j = 1, 3
       s(j,i) = univar_3Nplus10001( 3*(i-1) + j ) ! univariate intial coordinate s on (0,1)^(3N)
