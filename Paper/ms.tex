@@ -357,8 +357,13 @@ values and not the values themselves.
 The standard Nested Sampling algorithm, (as well as alternatives such as
 Diffusive Nested Sampling \citep{dnest}) has these properties.
 
-Consider running standard NS using the objective function $L_1(\xx)$. After some
-time, we'd know the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
+Consider running standard NS with $N$ particles
+using the objective function $L_1(\xx)$.
+After $M$ iterations, we'd be able to approximate
+the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
+from $X\approx e^{-M/N}$ to $X=1$. Defining $Y=-\ln(X)$, we could also
+construct an approximation to the function
+$L(Y)$, a non-decreasing function of $Y$, from $Y=0$ to $Y\approx M/N$.
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
