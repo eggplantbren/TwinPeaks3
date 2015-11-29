@@ -46,6 +46,7 @@ CambridgeLJ::~CambridgeLJ()
 
 void CambridgeLJ::from_prior(RNG& rng)
 {
+	rng.rand();
 	compute_scalars();
 }
 
@@ -58,6 +59,8 @@ void CambridgeLJ::compute_scalars()
 double CambridgeLJ::perturb(RNG& rng)
 {
 	double logH = 0.;
+	logH += 5;
+	rng.rand();
 
 	compute_scalars();
 	return 0.;
@@ -65,6 +68,6 @@ double CambridgeLJ::perturb(RNG& rng)
 
 void CambridgeLJ::write_text(std::ostream& out) const
 {
-
+	out<<' ';
 }
 
