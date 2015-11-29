@@ -163,8 +163,20 @@ function, and $Z$ is the normalising constant, usually known as the
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
-The main goal of NS is to approximate $Z$.
-This is done by drawing particles from the
+The main goal of NS is to approximate $Z$, but it can also be used to make
+Monte Carlo approximations of the posterior, and calculate the ``information'',
+or Kullback-Leibler divergence from the prior to the posterior:
+\begin{eqnarray}
+\mathcal{I} &=& \int p(\xx | \data, \II) \ln
+\left[\frac{p(\xx | \data, \II)}{p(\xx | \II)}\right] \, d\xx \\
+&=& \int \frac{\pi(\xx) L(\xx)}{Z} \ln
+\left[\frac{L(\xx)}{Z}\right] \, d\xx.
+\end{eqnarray}
+$\mathcal{I}$ quantifies how compressed the posterior distribution is with
+respect to the prior. For example, $\mathcal{I} = 10$ implies the posterior
+occupies a fraction $e^{-10}$ of the prior mass.
+
+NS works by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
 the likelihood $L(\xx)$ that compress the prior mass by an
 approximately-known factor. Like other related algorithms such as those
@@ -179,6 +191,13 @@ function $L(X)$:
 \begin{eqnarray}
 Z &=& \int_0^1 L(X)\, dX.
 \end{eqnarray}
+Throughout this paper we use the popular `overloaded' notation for some
+functions and probability distributions.
+For example, $L(\xx)$ is the likelihood function, and $L(X)$ is the likelihood
+as a function of the enclosed prior mass $X$. These cannot literally be the
+same function as the inputs are not even necessarily of the same dimensionality.
+Therefore the symbol $L$ represents the output of the function.
+
 In addition to the marginal likelihood $Z$, NS also allows us
 to approximate properties of the posterior $\pi(\xx)L(\xx)/Z$.
 NS is required because Equation~\ref{eqn:evidence}
@@ -221,7 +240,10 @@ phase space (the set of possible positions and momenta of a collection of
 particles) or configuration space (the set of possible positions of a collection
 of particles). In this context we usually want to
 compute $Z(\beta)$ as a function of $\beta$, which is called the
-{\it partition function}. NS can achieve this, allowing the study of
+{\it partition function}. The quantity $\mathcal{I}(\beta)$ is, up to a sign
+change and an additive constant, the Gibbs entropy.
+
+NS can achieve this, allowing the study of
 the properties of materials from first principles, based on hypotheses about
 the atoms or molecules that make them up \citep[e.g.][]{2009arXiv0906.3544P,
 2014PhRvE..89b2302P, 2015arXiv150303404B}. The NS algorithm is invariant under
@@ -335,17 +357,34 @@ values and not the values themselves.
 The standard Nested Sampling algorithm, (as well as alternatives such as
 Diffusive Nested Sampling \citep{dnest}) has these properties.
 
-Consider running standard NS using the objective function $L_1(\xx)$. After some
-time, we'd know the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
+\section{Rationale}\label{sec:rationale}
+
+{\bf Here is where I'll attempt to provide a justify the
+algorithm}.
+
+Consider running standard NS with $N$ particles
+using the objective function $L_1(\xx)$.
+After $M$ iterations, we'd be able to approximate
+the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
+from $X\approx e^{-M/N}$ to $X=1$. Defining $Y=-\ln(X)$, we could also
+construct an approximation to the function
+$L(Y)$, a non-decreasing function of $Y$, from $Y=0$ to $Y\approx M/N$.
+
+
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
-Here we describe the proposed algorithm, which took three years of
+The proposed algorithm is given in Algorithm~\ref{alg:algorithm}
+and took three years of
 experimentation to develop. Please contact the first author for a list of
 failed ideas, some of which might lead to potential alternatives to this
-algorithm. 
+algorithm. The basic idea is to try to mimic a standard NS run, where the
+objective function being increased is
+\begin{eqnarray}
+Y(\xx) &=& -\ln\left[X\left(L_1(\xx), L_2(\xx)\right)\right].
+\end{eqnarray}
 
-\begin{algorithm}
+\begin{algorithm}[ht!]
 \begin{algorithmic}
 \State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
 $N$ should be odd and quite large (1001 or greater).
@@ -370,10 +409,10 @@ $\hat{X} \geq \hat{X}_{(k)}$. That is, set
 			of not being in the excluded region.
 \EndWhile
 \end{algorithmic}
+\caption{\label{alg:algorithm}}
 \end{algorithm}
 
-Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
-
+%Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
 \begin{figure}
 \centering
@@ -410,7 +449,7 @@ L_1(\xx) &=& -\sum_{i=1}^{100} \left(x_i - 0.5\right)^2.
 The second objective function upweights states where coordinates $\{x_i\}$
 are close to 0, 0.25, 0.5, 0.75, or 1:
 \begin{eqnarray} 
-L_2(\xx) &=& -\sum_{i=1}^{100} sin^2(4\pi x_i)
+L_2(\xx) &=& -\sum_{i=1}^{100} \sin^2(4\pi x_i)
 \end{eqnarray}
 
 The true partition function (computed numerically) and the Kullback-Leibler
