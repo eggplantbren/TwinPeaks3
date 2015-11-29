@@ -17,9 +17,10 @@ extern "C"
 					double* univar_30k, double* nvar_60k, bool* flat_v_prior);
 }
 
+const int CambridgeLJ::N = 100;
+
 CambridgeLJ::CambridgeLJ()
-:N(100)
-,scalars(2)
+:scalars(2)
 {
 	s = new double[3*N];
 }
@@ -32,8 +33,6 @@ CambridgeLJ::CambridgeLJ(const CambridgeLJ& other)
 
 CambridgeLJ& CambridgeLJ::operator = (const CambridgeLJ& other)
 {
-	assert(N == other.N);
-	N = other.N;
 	for(int i=0; i<N; i++)
 		s[i] = other.s[i];
 	scalars = other.scalars;

@@ -8,9 +8,8 @@
 class CambridgeLJ
 {
 	private:
-		int N;
+		static const int N;
 		double* s;
-
 		std::vector<double> scalars;
 
 		void compute_scalars();
