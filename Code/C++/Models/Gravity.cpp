@@ -8,7 +8,7 @@ using namespace DNest3;
 using namespace std;
 
 Gravity::Gravity()
-:x(1000), y(1000), z(1000), vx(1000), vy(1000), vz(1000)
+:x(100), y(100), z(100), vx(100), vy(100), vz(100)
 ,staleness(0)
 ,scalars(2)
 {
