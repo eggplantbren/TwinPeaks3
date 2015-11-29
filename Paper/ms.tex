@@ -357,6 +357,11 @@ values and not the values themselves.
 The standard Nested Sampling algorithm, (as well as alternatives such as
 Diffusive Nested Sampling \citep{dnest}) has these properties.
 
+\section{Rationale}\label{sec:rationale}
+
+{\bf Here is where I'll attempt to provide a justify the
+algorithm}.
+
 Consider running standard NS with $N$ particles
 using the objective function $L_1(\xx)$.
 After $M$ iterations, we'd be able to approximate
@@ -365,14 +370,21 @@ from $X\approx e^{-M/N}$ to $X=1$. Defining $Y=-\ln(X)$, we could also
 construct an approximation to the function
 $L(Y)$, a non-decreasing function of $Y$, from $Y=0$ to $Y\approx M/N$.
 
+
+
 \section{Proposed algorithm}\label{sec:algorithm}
 
-Here we describe the proposed algorithm, which took three years of
+The proposed algorithm is given in Algorithm~\ref{alg:algorithm}
+and took three years of
 experimentation to develop. Please contact the first author for a list of
 failed ideas, some of which might lead to potential alternatives to this
-algorithm. 
+algorithm. The basic idea is to try to mimic a standard NS run, where the
+objective function being increased is
+\begin{eqnarray}
+Y(\xx) &=& -\ln\left[X\left(L_1(\xx), L_2(\xx)\right)\right].
+\end{eqnarray}
 
-\begin{algorithm}
+\begin{algorithm}[ht!]
 \begin{algorithmic}
 \State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
 $N$ should be odd and quite large (1001 or greater).
@@ -397,10 +409,10 @@ $\hat{X} \geq \hat{X}_{(k)}$. That is, set
 			of not being in the excluded region.
 \EndWhile
 \end{algorithmic}
+\caption{\label{alg:algorithm}}
 \end{algorithm}
 
-Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
-
+%Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
 \begin{figure}
 \centering
