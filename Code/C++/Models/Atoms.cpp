@@ -7,8 +7,8 @@ using namespace std;
 using namespace DNest3;
 
 Atoms::Atoms()
-:x(50), y(50), z(50)
-,terms(50, vector<double>(50))
+:x(200), y(200), z(200)
+,terms(200, vector<double>(200))
 ,scalars(2)
 {
 
