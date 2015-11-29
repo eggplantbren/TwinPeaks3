@@ -34,6 +34,8 @@ Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
 template<class MyModel>
 void Sampler<MyModel>::initialise()
 {
+	std::cout<<"# Generating "<<num_particles<<" particles from the prior...";
+	std::cout<<std::flush;
 	for(int i=0; i<num_particles; i++)
 	{
 		particles[i].from_prior(rngs[0]);
@@ -44,6 +46,7 @@ void Sampler<MyModel>::initialise()
 		for(size_t j=0; j<scalars[i].size(); j++)
 			scalars[i][j].from_prior(rngs[0]);
 	}
+	std::cout<<"done."<<std::endl<<std::endl;
 }
 
 template<class MyModel>
