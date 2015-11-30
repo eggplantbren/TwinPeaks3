@@ -8,23 +8,31 @@ using namespace DNest3;
 using namespace std;
 
 Gravity::Gravity()
-:x(100), y(100), z(100), vx(100), vy(100), vz(100)
+:x(300), y(300), z(300), vx(300), vy(300), vz(300)
 ,staleness(0)
 ,scalars(2)
 {
 
 }
 
+
 void Gravity::from_prior(RNG& rng)
 {
 	for(size_t i=0; i<x.size(); i++)
 	{
-		x[i] = -10. + 20.*rng.rand();
-		y[i] = -10. + 20.*rng.rand();
-		z[i] = -10. + 20.*rng.rand();
-		vx[i] = -10. + 20.*rng.rand();
-		vy[i] = -10. + 20.*rng.rand();
-		vz[i] = -10. + 20.*rng.rand();
+		do
+		{
+			x[i] = -10. + 20.*rng.rand();
+			y[i] = -10. + 20.*rng.rand();
+			z[i] = -10. + 20.*rng.rand();
+		}while(x[i]*x[i] + y[i]*y[i] + z[i]*z[i] > 100.);
+
+		do
+		{
+			vx[i] = -10. + 20.*rng.rand();
+			vy[i] = -10. + 20.*rng.rand();
+			vz[i] = -10. + 20.*rng.rand();
+		}while(vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i] > 100.);
 	}
 
 	refresh();
@@ -39,19 +47,23 @@ void Gravity::increment(int i, int sign)
 	double rsq;
 	for(size_t j=0; j<x.size(); j++)
 	{
-		if(i != static_cast<int>(j))
-		{
-			rsq = pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2)
-				+ pow(z[i] - z[j], 2);
-			if(rsq <= 0.01)
-				rsq = 0.01;
-			PE += -1./sqrt(rsq)*sign;
-		}
+		rsq = pow(x[i], 2) + pow(y[i], 2) + pow(z[i], 2);
+		PE += 0.5*rsq*sign;
+//		if(i != static_cast<int>(j))
+//		{
+//			rsq = pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2)
+//				+ pow(z[i] - z[j], 2);
+//			if(rsq <= 0.01)
+//				rsq = 0.01;
+//			PE += -1./sqrt(rsq)*sign;
+//		}
 	}
 }
 
 double Gravity::perturb(RNG& rng)
 {
+	double logH = 0.;
+
 	int reps = 1;
 	if(rng.rand() <= 0.5)
 		reps += 1 + rng.rand_int(9);
@@ -82,15 +94,21 @@ double Gravity::perturb(RNG& rng)
 		vz[which] += 20.*rng.randh();
 		vz[which] = mod(vz[which] + 10., 20.) - 10.;
 
+		if(x[which]*x[which] + y[which]*y[which] + z[which]*z[which] > 100.)
+			logH = -1E250;
+
+		if(vx[which]*vx[which] + vy[which]*vy[which] + vz[which]*vz[which] > 100.)
+			logH = -1E250;
+
 		increment(which, +1);
 	}
 
 	staleness++;
-	if(staleness >= 1000)
+	if(staleness >= 100)
 		refresh();
 
 	compute_scalars();
-	return 0.;
+	return logH;
 }
 
 void Gravity::refresh()
