@@ -64,44 +64,50 @@ double Gravity::perturb(RNG& rng)
 {
 	double logH = 0.;
 
-	int reps = 1;
-	if(rng.rand() <= 0.5)
-		reps += 1 + rng.rand_int(9);
+	int which = rng.rand_int(x.size());
+	int what = rng.rand_int(6);
 
-	int which;
-	for(int i=0; i<reps; i++)
+	// Remove effect of this particle
+	increment(which, -1);
+
+	if(what == 0)
 	{
-		which = rng.rand_int(x.size());
-
-		// Remove effect of this particle
-		increment(which, -1);
-
 		x[which] += 20.*rng.randh();
 		x[which] = mod(x[which] + 10., 20.) - 10.;
-
+	}
+	else if(what == 1)
+	{
 		y[which] += 20.*rng.randh();
 		y[which] = mod(y[which] + 10., 20.) - 10.;
-
+	}
+	else if(what == 2)
+	{
 		z[which] += 20.*rng.randh();
 		z[which] = mod(z[which] + 10., 20.) - 10.;
-
+	}
+	else if(what == 3)
+	{
 		vx[which] += 20.*rng.randh();
 		vx[which] = mod(vx[which] + 10., 20.) - 10.;
-
+	}
+	else if(what == 4)
+	{
 		vy[which] += 20.*rng.randh();
 		vy[which] = mod(vy[which] + 10., 20.) - 10.;
-
+	}
+	else
+	{
 		vz[which] += 20.*rng.randh();
 		vz[which] = mod(vz[which] + 10., 20.) - 10.;
-
-		if(x[which]*x[which] + y[which]*y[which] + z[which]*z[which] > 100.)
-			logH = -1E250;
-
-		if(vx[which]*vx[which] + vy[which]*vy[which] + vz[which]*vz[which] > 100.)
-			logH = -1E250;
-
-		increment(which, +1);
 	}
+
+	if(x[which]*x[which] + y[which]*y[which] + z[which]*z[which] > 100.)
+		logH = -1E250;
+
+	if(vx[which]*vx[which] + vy[which]*vy[which] + vz[which]*vz[which] > 100.)
+		logH = -1E250;
+
+	increment(which, +1);
 
 	staleness++;
 	if(staleness >= 100)
