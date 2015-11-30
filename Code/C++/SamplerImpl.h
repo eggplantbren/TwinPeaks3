@@ -249,10 +249,10 @@ void Sampler<MyModel>::do_iteration()
 		accepted += c;
 
 	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<" (";
-	std::cout<<std::setprecision(3);
+	std::cout<<std::fixed<<std::setprecision(1);
 	std::cout<<(100.*accepted/(num_dying*mcmc_steps));
 	std::cout<<"%)."<<std::endl<<std::endl;
-	std::cout<<std::setprecision(6);
+	std::cout<<std::defaultfloat<<std::setprecision(6);
 
 	iteration++;
 }
