@@ -254,7 +254,7 @@ void Sampler<MyModel>::do_iteration()
 	std::cout<<"%)."<<std::endl<<std::endl;
 	std::cout<<std::setprecision(6);
 
-	iteration++;;
+	iteration++;
 }
 
 
