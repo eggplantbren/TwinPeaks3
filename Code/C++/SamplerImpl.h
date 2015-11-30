@@ -248,8 +248,13 @@ void Sampler<MyModel>::do_iteration()
 	for(const int& c: accepts)
 		accepted += c;
 
-	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<". "<<std::endl<<std::endl;
-	iteration++;
+	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<" (";
+	std::cout<<std::setprecision(3);
+	std::cout<<(100.*accepted/(num_dying*mcmc_steps));
+	std::cout<<"%)."<<std::endl<<std::endl;
+	std::cout<<std::setprecision(6);
+
+	iteration++;;
 }
 
 
