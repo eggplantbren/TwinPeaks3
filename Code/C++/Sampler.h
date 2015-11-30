@@ -55,11 +55,15 @@ class Sampler
 		void prune_rectangles();
 
 		// Functions to determine whether a point is within another point's
-		// rectangle.
+		// rectangle. Strict version
 		static bool is_in_lower_rectangle(const std::vector<ScalarType>& s1,
 											const std::vector<ScalarType>& s2);
-		static bool is_in_upper_rectangle(const std::vector<ScalarType>& s1,
+
+		// Non-strict version
+		static bool is_in_lower_rectangle2(const std::vector<ScalarType>& s1,
 											const std::vector<ScalarType>& s2);
+
+
 
 	public:
 		// Constructor

@@ -27,9 +27,11 @@ class ScalarType
 		{ return (value == other.value && tiebreaker == other.tiebreaker); }
 
 	friend bool operator < (const ScalarType& l1, const ScalarType& l2);
+	friend bool operator <= (const ScalarType& l1, const ScalarType& l2);
 };
 
 bool operator < (const ScalarType& l1, const ScalarType& l2);
+bool operator <= (const ScalarType& l1, const ScalarType& l2);
 
 #endif
 

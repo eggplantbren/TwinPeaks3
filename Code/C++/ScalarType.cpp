@@ -32,3 +32,13 @@ bool operator < (const ScalarType& s1, const ScalarType& s2)
 	return result;
 }
 
+bool operator <= (const ScalarType& s1, const ScalarType& s2)
+{
+	bool result = false;
+	if(s1.value < s2.value)
+		result = true;
+	else if(s1.value == s2.value && s1.tiebreaker <= s2.tiebreaker)
+		result = true;
+	return result;
+}
+
