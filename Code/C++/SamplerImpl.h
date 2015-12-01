@@ -51,33 +51,14 @@ void Sampler<MyModel>::initialise()
 }
 
 template<class MyModel>
-void Sampler<MyModel>::prune_rectangles()
+void Sampler<MyModel>::prune_rectangles(const std::vector<ScalarType>& latest)
 {
-	// Keep track of which are redundant
-	std::set<int> redundant;
-
-	int i = 0;
-	for(auto it1=rects.begin(); it1 != rects.end(); ++it1)
+	// Loop over all rectangles
+	for(auto it=rects.begin(); it != rects.end(); ++it)
 	{
-		int j = 0;
-		for(auto it2 = rects.begin(); it2 != rects.end(); ++it2)
-		{
-			if((i != j) && is_in_lower_rectangle2(*it1, *it2))
-				redundant.insert(i);
-			++j;
-		}
-		++i;
-	}
-
-	// Remove the redundant ones
-	int removed = 0;
-	for(auto it=redundant.begin(); it != redundant.end(); ++it)
-	{
-		auto deleting=rects.begin();
-		std::advance(deleting, *it - removed);
-		rects.erase(deleting);
-		++removed;
-	}
+		if(is_in_lower_rectangle2(*it, latest))
+			it = rects.erase(it);
+	}	
 }
 
 template<class MyModel>
@@ -208,9 +189,12 @@ void Sampler<MyModel>::do_iteration()
 			j--;
 
 		if(ucc[i][j] >= threshold)
-			rects.push_front({s1[num_particles-i-1], s2[j]});
+		{
+			std::vector<ScalarType> latest{s1[num_particles-i-1], s2[j]};
+			prune_rectangles(latest);
+			rects.push_front(latest);
+		}
 	}
-	prune_rectangles();
 
 	// Reduce remaining prior mass
 	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_dying) - log(num_particles));

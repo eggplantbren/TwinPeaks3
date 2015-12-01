@@ -51,8 +51,8 @@ class Sampler
 	public:
 		bool is_okay(const std::vector<ScalarType>& s);
 
-		// Remove redundant rectangles (only do this just after adding one)
-		void prune_rectangles();
+		// Remove redundant rectangles
+		void prune_rectangles(const std::vector<ScalarType>& latest);
 
 		// Functions to determine whether a point is within another point's
 		// rectangle. Strict version
