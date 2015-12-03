@@ -117,7 +117,8 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 % Abstract (Do not use inserted blank lines, i.e. \\)
 \abstract{We present a generalization of the Nested Sampling algorithm for
 estimating the partition function of a family of
-probability distributions indexed by two hyperparameters.}
+probability distributions indexed by two hyperparameters. These
+problems arise frequently in statistical mechanics.}
 
 % Keywords: add 3 to 10 keywords
 \keyword{nested sampling; bayesian computation; statistical mechanics}
@@ -144,8 +145,8 @@ probability distributions indexed by two hyperparameters.}
 
 \section{Introduction}
 
-Nested Sampling \citep[NS][]{skilling} is an effective and popular
-Monte Carlo algorithm which can solve a wide range of problems in Bayesian
+Nested Sampling \citep[NS][]{skilling} is popular general
+Monte Carlo algorithm that can solve a wide range of problems in Bayesian
 computation and statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
 In a Bayesian inference framework with unknown parameters denoted collectively
@@ -178,9 +179,9 @@ occupies a fraction $e^{-10}$ of the prior mass.
 
 NS works by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
-the likelihood $L(\xx)$ that compress the prior mass by an
-approximately-known factor. Like other related algorithms such as those
-based on `annealing', NS
+the likelihood $L(\xx)$ that compress the prior mass by a (roughly) known
+and constant factor. Like related algorithms such as those
+based on `annealing' or `tempering', NS
 moves through a sequence of probability distributions beginning from the
 prior. This sequence of distributions is defined by
 \begin{eqnarray}
@@ -226,8 +227,8 @@ Alternatives to NS include methods based on `annealing', where a sequence of
 distributions of the form of Equation~\ref{eqn:power_posterior} is used.
 There are many different methods based on this idea, such as the popular
 parallel tempering method \citep{pt}.
-However, unlike annealing methods, NS continues
-to work when the problem contains a phase transition.
+However, unlike annealing methods, NS requires only a small number of
+tuning parameters, and still works on problems involvin phase transitions.
 
 In statistical mechanics, Equation~\ref{eqn:power_posterior} defines the
 family of {\it canonical distributions}, usually written as:
@@ -242,7 +243,6 @@ of particles). In this context we usually want to
 compute $Z(\beta)$ as a function of $\beta$, which is called the
 {\it partition function}. The quantity $\mathcal{I}(\beta)$ is, up to a sign
 change and an additive constant, the Gibbs entropy.
-
 NS can achieve this, allowing the study of
 the properties of materials from first principles, based on hypotheses about
 the atoms or molecules that make them up \citep[e.g.][]{2009arXiv0906.3544P,
@@ -251,42 +251,48 @@ monotonic transformations of $L$ or $E$ and therefore there we can discuss the
 algorithm in Bayesian or statistical mechanical terms without loss of
 generality.
 
+Throughout this paper we will refer to $L(\xx)$ or
+$-E(\xx)$ as `objective functions',
+by analogy with the terminology used when
+discussing optimization methods. Although we are interested in sampling rather
+than optimization, we still want to increase the values of $L$ or decrease
+the values of $E$ relative to what is typical of the prior.
+
 In some inference and
 statistical mechanics problems, there are two or more scalar functions of
 $\xx$ that are relevant. Suppose our prior is $\pi(\xx)$ as before, and
-we obtain testable information that fixes the expected values of two scalar
+we obtain information that fixes the expected values of two scalar
 functions of $\xx$, $L_1(\xx)$ and $L_2(\xx)$.
 It is well known that the
 updated probability distribution that takes into account the constraints is
-of the `canonical' form:
+of the canonical form:
 \begin{eqnarray}
 p(\xx; \beta_1, \beta_2) &=& \frac{\pi(\xx)\exp\left[\beta_1L_1(\xx)+\beta_2L_2(\xx)\right]}
 {Z(\beta_1, \beta_2)}
 \end{eqnarray}
-where $\beta_1$ and $\beta_2$ are two `inverse temperatures'. In a Bayesian
+where $\beta_1$ and $\beta_2$ are two `inverse temperatures' (the temperatures
+themselves are $T_1 = \beta_1^{-1}$ and $T_2 = \beta_2^{-1}$).
+In a Bayesian
 context, this distribution (when $\beta_1 = \beta_2 = 1$) could be the
 posterior distribution for parameters $\xx$
 given two datasets, where $L_1$ and $L_2$ are the
 likelihood functions for each dataset. In statistical mechanics, $L_1$ might
 be $\exp\left(-\textnormal{energy}\right)$ and $L_2$ might be the total
-angular momentum.
-If we were only interested in a single canonical distribution, for example
-with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we could estimate its normalising
-constant and by running standard Nested Sampling with `likelihood'
+angular momentum, or be a term depending on an external field (so $\beta_2$
+would then describe the strength of the external field).
+
+If we are only interested in a single canonical distribution, for example
+with $\beta_1 = 0.3$ and $\beta_2 = 0.7$, we can estimate its normalising
+constant and by running standard Nested Sampling with objective function
 $L(\xx) = \exp\left[0.3L_1(\xx) + 0.7L_2(\xx)\right]$. However, usually we
 are interested in a range of values for $\beta_1$ and $\beta_2$, and we
-want to know the normalisation $Z(\beta_1, \beta_2)$, called the
-partition function. This work describes
+want to know the entire partition function $Z(\beta_1, \beta_2)$.
+This work describes
 progress towards solving this class of problems while maintaining the benefits
 of Nested Sampling, such as the ability to cope with first-order phase
 transitions. The algorithm is designed for problems with two objective
-functions, but should generalize to problems with more than two (though perhaps
-not more than a few). Throughout this paper we will refer $L_i(\xx)$ or
-$\exp\left[-E_i(\xx)\right]$ as `objective functions',
-by analogy with the terminology used when
-discussing optimizations methods. Although we are interested in sampling rather
-than optimization, we still want to increase the values of $L_i$ or decrease
-the values of $E_i$ relative to what is typical of the prior.
+functions, but may generalize to problems with more than two (though perhaps
+not more than a few).
 
 The prior $\pi(\xx)$ implies a certain prior for $L_1$ and $L_2$, which we
 denote $\pi(L_1, L_2)$. An example of a prior is shown as the
@@ -319,7 +325,6 @@ Since $X$ is a probability, it must satisfy a product rule:
 \begin{eqnarray}
 X(\ell_1, \ell_2) = X(\ell_1)X(\ell_2 | \ell_1) = X(\ell_2)X(\ell_1 | \ell_2).
 \end{eqnarray}
-
 
 When the prior $\pi$ is approximated with a set of $N$
 particles $\{\xx_i\}_{i=1}^N$
