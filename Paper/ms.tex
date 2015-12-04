@@ -366,8 +366,7 @@ single objective function.
 
 \section{Rationale}\label{sec:rationale}
 
-{\bf Here is where I'll attempt to provide a justify the
-algorithm}.
+{\bf Here is where I'll attempt to justify the algorithm}.
 
 Consider the following proposal. Imagine running standard NS with $N$ particles
 using the objective function $L_1(\xx)$.
@@ -386,6 +385,15 @@ $e^{(M_1 + M_2)/N}$ and therefore ended at a point in the $(L_1, L_2)$ plane
 where $X(L_1, L_2) \approx e^{-(M_1 + M_2)/N}$. Any such run consisting of
 $M_1 + M_2$ iterations will therefore appoximately finish on a contour line
 of the function $X(L_1, L_2)$.
+
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{figures/contours.pdf}
+\caption{\it The joint prior for the objective functions, and fifteen
+contours of the cumulative distribution $X(L_1, L_2)$, each enclosing half
+the prior mass of the previous one. \label{fig:contours}}
+\end{figure}
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
