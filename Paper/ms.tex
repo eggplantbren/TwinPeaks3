@@ -345,12 +345,13 @@ example.
 
 We seek an algorithm for computing the partition function
 $Z(\beta_1, \beta_2)$ for a range of values of the $\beta$s, from a single
-run. To be considered a variant of Nested Sampling, the method should satisfy
+run. To be a variant of Nested Sampling, the algorithm should satisfy
 the following properties:
 \begin{enumerate}
-\item The algorithm should begin with $N$ points drawn from the prior $\pi(\xx)$.
-\item The algorithm should seek to explore regions where the values of
-$L_1(\xx)$ and $L_2(\xx)$ are higher than the prior would typically predict.
+\item It should begin with $N$ points drawn from the prior $\pi(\xx)$.
+\item It should seek to explore regions where the values of
+$L_1(\xx)$ and $L_2(\xx)$ are higher than the prior $\pi(L_1, L_2)$
+would typically imply.
 \item The algorithm should consider a sequence of probability
 distributions proportional to $\pi$, but restricted to smaller and smaller
 domains for which the enclosed prior mass shrinks by a (roughly) constant and
@@ -360,34 +361,43 @@ $L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
 \end{enumerate}
 The standard Nested Sampling algorithm, (as well as alternatives such as
-Diffusive Nested Sampling \citep{dnest}) has these properties.
+Diffusive Nested Sampling \citep{dnest}) has these properties but for a
+single objective function.
 
 \section{Rationale}\label{sec:rationale}
 
 {\bf Here is where I'll attempt to provide a justify the
 algorithm}.
 
-Consider running standard NS with $N$ particles
+Consider the following proposal. Imagine running standard NS with $N$ particles
 using the objective function $L_1(\xx)$.
-After $M$ iterations, we'd be able to approximate
+After $M_1$ iterations, we'd be able to approximate
 the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
-from $X\approx e^{-M/N}$ to $X=1$. Defining $Y=-\ln(X)$, we could also
+from $X\approx e^{-M_1/N}$ to $X=1$. Defining $Y=-\ln(X)$, we could also
 construct an approximation to the function
-$L(Y)$, a non-decreasing function of $Y$, from $Y=0$ to $Y\approx M/N$.
+$L_1(Y)$, a non-decreasing function of $Y$, from $Y=0$ to $Y\approx M_1/N$.
+After $M$ iterations, we keep the last value of $L_1(\xx)$ obtained
+(call it $L_1^*$), and continue to impose the constraint $L_1(\xx) > L_1^*$.
 
-
+Subject to the constraint $L_1(\xx) > L_1^*$, standard NS can continue but
+attempting to increase $L_2$ instead of $L_1$. After $M_2$ such iterations,
+the algorithm would have compressed the prior by a factor
+$e^{(M_1 + M_2)/N}$ and therefore ended at a point in the $(L_1, L_2)$ plane
+where $X(L_1, L_2) \approx e^{-(M_1 + M_2)/N}$. Any such run consisting of
+$M_1 + M_2$ iterations will therefore appoximately finish on a contour line
+of the function $X(L_1, L_2)$.
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
-The proposed algorithm is given in Algorithm~\ref{alg:algorithm}
-and took three years of
-experimentation to develop. Please contact the first author for a list of
-failed ideas, some of which might lead to potential alternatives to this
-algorithm. The basic idea is to try to mimic a standard NS run, where the
+The basic idea of our algorithm is to try to mimic a standard NS run, where the
 objective function being increased is
 \begin{eqnarray}
 Y(\xx) &=& -\ln\left[X\left(L_1(\xx), L_2(\xx)\right)\right].
 \end{eqnarray}
+Standard NS cannot be applied simply because we cannot evaluate $X(L_1, L_2)$ and
+therefore cannot restrict the parameter space based on the value of $X$ (or
+equivalently $Y$. However, given a number of Monte Carlo samples, we
+can approximate this.
 
 \begin{algorithm}[ht!]
 \begin{algorithmic}
