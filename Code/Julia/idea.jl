@@ -4,15 +4,15 @@ using PyCall
 include("Utils.jl")
 
 # Number of pixels
-(ni, nj) = (1024, 1024)
+(ni, nj) = (256, 256)
 
 # Prior distribution
 log_prior = Array(Float64, (ni, nj))
 for(j in 1:nj)
-	x = (j - 0.5)/nj
+	x = 5.0*(j - 1)/(nj - 1)
 	for(i in 1:ni)
-		y = 1.0 - (i - 0.5)/ni
-		log_prior[i, j] = -0.5*(x - 0.1)^2/0.03^2 - 0.5*(y - x^2)^2/0.03^2
+		y = 5.0 - 5*(i - 1)/(ni - 1)
+		log_prior[i, j] = -0.5*(x - 1.5)^2/1.0^2 - 0.5*((y - 5*(x/5)^2)^2)/1.0^2
 	end
 end
 log_prior -= logsumexp(vec(log_prior))
