@@ -208,6 +208,10 @@ void Sampler<MyModel>::do_iteration()
 	// Replace dead particles
 	int num_threads = rngs.size();
 
+	// Backup
+	backup_particles = particles;
+	backup_scalars = scalars;
+
 	// Assign particles to threads
 	std::vector< std::vector<int> > which_particles(num_threads);
 	int k=0;
@@ -262,11 +266,11 @@ int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 	{
 		copy = rngs[which_rng].rand_int(num_particles);
 	}
-	while(!is_okay(scalars[copy]));
+	while(!is_okay(backup_scalars[copy]));
 
 	// Clone it
-	particles[which] = particles[copy];
-	scalars[which] = scalars[copy];
+	particles[which] = backup_particles[copy];
+	scalars[which] = backup_scalars[copy];
 
 	// Do the MCMC
 	MyModel proposal;

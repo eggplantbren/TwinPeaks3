@@ -23,6 +23,10 @@ class Sampler
 		std::vector<MyModel> particles;
 		std::vector< std::vector<ScalarType> > scalars;
 
+		// Backup
+		std::vector<MyModel> backup_particles;
+		std::vector< std::vector<ScalarType> > backup_scalars;
+
 		// Forbidden rectangles
 		std::list< std::vector<ScalarType> > rects;
 
