@@ -22,16 +22,17 @@ int main(int argc, char** argv)
 	for(RNG& r: rngs)
 		r.set_seed(++seed);
 
-	constexpr int num_particles = 1001;
-	constexpr int num_mcmc_steps = 1000;
+	constexpr int num_particles = 3001;
+	constexpr int num_mcmc_steps = 2000;
 	constexpr double depth = 1000.;
+	constexpr int steps = depth/log(2.);
 
 	// Create a sampler
 	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
 	sampler.initialise();
 
 	// Do NS indefinitely
-	for(int i=0; i<static_cast<int>(depth); ++i)
+	for(int i=0; i<steps; ++i)
 		sampler.do_iteration();
 
 	return 0;
