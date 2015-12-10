@@ -23,11 +23,11 @@ double SimpleExample::perturb(RNG& rng)
 {
 	int which, count;
 	if(rng.rand() <= 0.5)
-		count = 0;
+		count = 1;
 	else
 		count = static_cast<int>(pow(10., 2.*rng.rand()));
 
-	for(int i=0; i<count; i++)
+	for(int i=0; i<count; ++i)
 	{
 		which = rng.rand_int(params.size());
 		params[which] += rng.randh();
