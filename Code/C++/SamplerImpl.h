@@ -117,7 +117,8 @@ void Sampler<MyModel>::do_iteration()
 	std::reverse(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
 
 	// Make a ucc threshold (particles on the threshold die too)
-	int threshold = particle_uccs_sorted[num_particles/2];
+	int threshold = particle_uccs_sorted
+						[static_cast<int>(0.63212*num_particles)];
 
 	// Assign particles to die
 	std::vector<bool> dying(num_particles, false);
