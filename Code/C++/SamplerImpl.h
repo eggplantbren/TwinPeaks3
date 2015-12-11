@@ -152,7 +152,7 @@ void Sampler<MyModel>::do_iteration()
 		if(dying[i])
 		{
 			// Assign prior weight
-			double logw = log_prior_mass - log(num_particles);
+			double logw = log_prior_mass - log(num_particles+1);
 
 			// Write it out to an output file
 			std::fstream fout;
@@ -197,7 +197,7 @@ void Sampler<MyModel>::do_iteration()
 	}
 
 	// Reduce remaining prior mass
-	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_dying) - log(num_particles));
+	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_dying) - log(num_particles + 1));
 
 	// Print messages
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
