@@ -27,6 +27,9 @@ class Sampler
 		std::vector<MyModel> backup_particles;
 		std::vector< std::vector<ScalarType> > backup_scalars;
 
+		// Dying flags
+		std::vector<bool> dying;
+
 		// Forbidden rectangles
 		std::list< std::vector<ScalarType> > rects;
 

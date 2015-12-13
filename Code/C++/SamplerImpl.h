@@ -16,6 +16,7 @@ Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
 ,num_particles(num_particles)
 ,particles(num_particles)
 ,scalars(num_particles)
+,dying(num_particles)
 ,mcmc_steps(mcmc_steps)
 ,saves_per_iteration(saves_per_iteration)
 ,initialised(false)
@@ -120,7 +121,7 @@ void Sampler<MyModel>::do_iteration()
 	int threshold = particle_uccs_sorted[num_particles/2];
 
 	// Assign particles to die
-	std::vector<bool> dying(num_particles, false);
+	dying.assign(num_particles, false);
 	int num_dying = 0;
 	for(int i=0; i<num_particles; i++)
 	{
@@ -190,7 +191,7 @@ void Sampler<MyModel>::do_iteration()
 
 		if(ucc[i][j] >= threshold)
 		{
-			std::vector<ScalarType> latest{s1[num_particles-i-1], s2[j]};
+			std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
 			prune_rectangles(latest);
 			rects.push_front(latest);
 		}
@@ -266,7 +267,7 @@ int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 	{
 		copy = rngs[which_rng].rand_int(num_particles);
 	}
-	while(!is_okay(backup_scalars[copy]));
+	while(dying[copy]);
 
 	// Clone it
 	particles[which] = backup_particles[copy];
