@@ -23,12 +23,12 @@ class Sampler
 		std::vector<MyModel> particles;
 		std::vector< std::vector<ScalarType> > scalars;
 
+		// Particle status
+		std::vector<int> status;
+
 		// Backup
 		std::vector<MyModel> backup_particles;
 		std::vector< std::vector<ScalarType> > backup_scalars;
-
-		// Dying flags
-		std::vector<bool> dying;
 
 		// Forbidden rectangles
 		std::list< std::vector<ScalarType> > rects;

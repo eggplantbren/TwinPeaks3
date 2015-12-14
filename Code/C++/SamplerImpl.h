@@ -16,7 +16,6 @@ Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
 ,num_particles(num_particles)
 ,particles(num_particles)
 ,scalars(num_particles)
-,dying(num_particles)
 ,mcmc_steps(mcmc_steps)
 ,saves_per_iteration(saves_per_iteration)
 ,initialised(false)
@@ -120,21 +119,46 @@ void Sampler<MyModel>::do_iteration()
 	// Make a ucc threshold (particles on the threshold die too)
 	int threshold = particle_uccs_sorted[num_particles/2];
 
-	// Assign particles to die
-	dying.assign(num_particles, false);
-	int num_dying = 0;
+	// Place forbidding rectangles anywhere ucc >= threshold
 	for(int i=0; i<num_particles; i++)
 	{
-		if(particle_uccs[i] >= threshold)
+		int j = num_particles-1;
+		while(j > 0 && ucc[i][j] < threshold)
+			j--;
+
+		if(ucc[i][j] >= threshold)
 		{
-			dying[i] = true;
-			num_dying++;
+			std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
+			prune_rectangles(latest);
+			rects.push_front(latest);
 		}
 	}
 
+	// -1 <===> interior
+	//  0 <===> boundary
+	// +1 <===> exterior
+	status.assign(num_particles, 0);
+	int num_interior = 0;
+	int num_exterior = 0;
+	int num_boundary = 0;
+	for(int i=0; i<num_particles; i++)
+	{
+		if(particle_uccs[i] > threshold)
+		{
+			status[i] = -1;
+			++num_interior;
+		}
+		if(particle_uccs[i] < threshold)
+		{
+			status[i] = +1;
+			++num_exterior;
+		}
+	}
+	num_boundary = num_particles - (num_interior + num_exterior);
+
 	// Select some particles to save in their entirety
 	std::vector<bool> save(num_particles, false);
-	if(num_dying != 0)
+	if(num_interior != 0)
 	{
 		for(int i=0; i<saves_per_iteration; i++)
 		{
@@ -142,18 +166,18 @@ void Sampler<MyModel>::do_iteration()
 			do
 			{
 				ii = rngs[0].rand_int(num_particles);
-			}while(!dying[ii]);
+			}while(status[ii] != -1);
 			save[ii] = true;
 		}
 	}
 
-	// Save dying particles
+	// Save interior particles
 	for(int i=0; i<num_particles; i++)
 	{
-		if(dying[i])
+		if(status[i] == -1)
 		{
 			// Assign prior weight
-			double logw = log_prior_mass - log(num_particles+1);
+			double logw = log_prior_mass - log(num_particles - num_boundary);
 
 			// Write it out to an output file
 			std::fstream fout;
@@ -176,7 +200,7 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 
-	if(num_dying == num_particles)
+	if(num_exterior == 0)
 	{
 		std::cout<<"# Cannot continue."<<std::endl;
 		exit(0);
@@ -198,11 +222,11 @@ void Sampler<MyModel>::do_iteration()
 	}
 
 	// Reduce remaining prior mass
-	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_dying) - log(num_particles + 1));
+	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_interior) - log(num_particles - num_boundary));
 
 	// Print messages
 	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<"Killing "<<num_dying<<" particles. "<<std::endl;
+	std::cout<<"Killing "<<(num_interior + num_boundary)<<" particles. "<<std::endl;
 	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
 	std::cout<<log_prior_mass<<"."<<std::endl;
 
@@ -218,7 +242,7 @@ void Sampler<MyModel>::do_iteration()
 	int k=0;
 	for(int i=0; i<num_particles; ++i)
 	{
-		if(dying[i])
+		if(status[i] != 1)
 			which_particles[(k++)%num_threads].push_back(i);
 	}
 	// Store acceptance counts
@@ -237,9 +261,9 @@ void Sampler<MyModel>::do_iteration()
 	for(const int& c: accepts)
 		accepted += c;
 
-	std::cout<<"# Accepted "<<accepted<<"/"<<num_dying*mcmc_steps<<" (";
+	std::cout<<"# Accepted "<<accepted<<"/"<<(num_interior + num_boundary)*mcmc_steps<<" (";
 	std::cout<<std::fixed<<std::setprecision(1);
-	std::cout<<(100.*accepted/(num_dying*mcmc_steps));
+	std::cout<<(100.*accepted/((num_interior + num_boundary)*mcmc_steps));
 	std::cout<<"%)."<<std::endl<<std::endl;
 	std::cout<<std::defaultfloat<<std::setprecision(6);
 
@@ -267,7 +291,7 @@ int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 	{
 		copy = rngs[which_rng].rand_int(num_particles);
 	}
-	while(dying[copy]);
+	while(status[copy] != 1);
 
 	// Clone it
 	particles[which] = backup_particles[copy];
