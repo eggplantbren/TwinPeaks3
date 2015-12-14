@@ -421,16 +421,15 @@ $\emptyset$.
 	\State Calculate $\hat{X}(\ell_1, \ell_2)$ at the position of each particle
 			and sort the $\hat{X}$ values observed.
 	\State Find the median $\hat{X}$ value, $\hat{X}_{(k)}$, where $k = (N-1)/2$.
-	\While{$k > 1$ and $\hat{X}_{(k-1)} = \hat{X}_{(k)}$}
-		\State Set $k \leftarrow (k-1)$.
-	\EndWhile
-	\State Save all particles with $\hat{X} \geq \hat{X}_{(k)}$ to disk,
-			assigning each a prior weight of $M/N$.
+	\State Classify all particles as either ``interior'', ``boundary'', or
+			``exterior'', based on whether their $\hat{X}$ values are
+			greater than, equal to, or less than $\hat{X}_{(k)}$ respectively.
+	\State Save all ``interior'' particles to disk, assigning each a prior weight 				of $n_{\rm interior}/(n_{\rm interior} + n_{\rm exterior})$.
 	\State Exclude the region in the $L_1$-$L_2$ plane where
 $\hat{X} \geq \hat{X}_{(k)}$. That is, set
 	\State \hspace{20pt} $\mathcal{R} \leftarrow \mathcal{R} \cup \{(\ell_1, \ell_2) \in \mathbb{R}^2: \hat{X}(\ell_1, \ell_2) \geq \hat{X}_{(k)}\}$.
-	\State Update the remaining prior mass to $M \leftarrow M(1 - k/N)$.
-	\State Replace all particles with $\hat{X} \geq \hat{X}_{(k)}$ by new
+	\State Update the remaining prior mass to $M \leftarrow M n_{\rm exterior}/N$.
+	\State Replace all interior and boundary particles by new
 			particles generated from $\pi(\xx)$, subject to the constraint
 			of not being in the excluded region.
 \EndWhile
