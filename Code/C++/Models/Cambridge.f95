@@ -316,7 +316,7 @@ contains
 subroutine initialise_config(s,h0,V,ener,min_height,Vmax,N,cutoff, &
                           & univar_3Nplus10001,univar_60k,univar_30k,nvar_60k,flat_v_prior)
 
-  real(dp), dimension(:,:), allocatable, intent(inout) :: s ! uniformly random fractional coordinates
+  real(dp), dimension(:,:), intent(inout) :: s				! uniformly random fractional coordinates
                                                             ! s is an element of (0,1)^(3N)
   real(dp), dimension(3,3), intent(out) :: h0               ! uniformly random normalised cell matrix,
                                                             ! chosen from det(h0)=1, and satisfying

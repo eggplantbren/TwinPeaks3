@@ -4,20 +4,19 @@
 #include "Model.h"
 #include "RNG.h"
 #include <vector>
+#include <valarray>
 
 class CambridgeLJ
 {
 	private:
-		static const int N;
-		double* s;
+		int N;
+		std::valarray<double> s;
 		std::vector<double> scalars;
 
 		void compute_scalars();
 
 	public:
 		CambridgeLJ();
-		CambridgeLJ(const CambridgeLJ& other);
-		~CambridgeLJ();
 
 		// Generate the point from the prior
 		void from_prior(RNG& rng);

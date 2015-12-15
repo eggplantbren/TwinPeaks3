@@ -17,36 +17,44 @@ extern "C"
 					double* univar_30k, double* nvar_60k, bool* flat_v_prior);
 }
 
-const int CambridgeLJ::N = 100;
-
 CambridgeLJ::CambridgeLJ()
-:scalars(2)
+:N(100)
+,s(3*N)
+,scalars(2)
 {
-	s = new double[3*N];
-}
-
-CambridgeLJ::CambridgeLJ(const CambridgeLJ& other)
-{
-	s = new double[3*N];
-	*this = other;
-}
-
-CambridgeLJ& CambridgeLJ::operator = (const CambridgeLJ& other)
-{
-	for(int i=0; i<N; i++)
-		s[i] = other.s[i];
-	scalars = other.scalars;
-	return *this;
-}
-
-CambridgeLJ::~CambridgeLJ()
-{
-	delete[] s;
 }
 
 void CambridgeLJ::from_prior(RNG& rng)
 {
-	rng.rand();
+	// "Outputs" (along with s)
+	double h0, V, ener;
+
+	// "constants"
+	double min_height = 0.1;
+	double Vmax = 10.;
+	double cutoff = 20.;
+	bool flat_v_prior = false;
+
+	// Random numbers
+	std::vector<double> univar_3Nplus10001(3*N+10001);
+	std::vector<double> univar_60k(60000);
+	std::vector<double> univar_30k(30000);
+	std::vector<double> nvar_60k(60000);
+	for(double& u: univar_3Nplus10001)
+		u = rng.rand();
+	for(double& u: univar_60k)
+		u = rng.rand();
+	for(double& u: univar_30k)
+		u = rng.rand();
+	for(double& n: nvar_60k)
+		n = rng.rand();
+
+	// Call Rob's code
+	__twin_peaks_routines_MOD_initialise_config(&s[0], &h0, &V,
+					&ener, &min_height, &Vmax, &N, &cutoff,
+					&univar_3Nplus10001[0], &univar_60k[0],
+					&univar_30k[0], &nvar_60k[0], &flat_v_prior);
+
 	compute_scalars();
 }
 
@@ -59,8 +67,6 @@ void CambridgeLJ::compute_scalars()
 double CambridgeLJ::perturb(RNG& rng)
 {
 	double logH = 0.;
-	logH += 5;
-	rng.rand();
 
 	compute_scalars();
 	return 0.;
