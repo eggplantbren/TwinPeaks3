@@ -5,19 +5,16 @@ using namespace std;
 
 extern "C"
 {
-	void __junk_MOD_increment(double* x, int* N);
+	void __junk_MOD_increment(double* x, int* M, int* N);
 }
 
-void increment(valarray<double>& x)
-{
-	int N = x.size();
-	__junk_MOD_increment(&x[0], &N);
-}
 
 int main()
 {
-	valarray<double> x{1.0, 2.0, 3.0, 4.0, 5.0};
-	increment(x);
+	valarray<double> x{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+
+	int M{2}, N{3};
+	__junk_MOD_increment(&x[0], &M, &N);
 
 	for(const double& xx: x)
 		cout<<xx<<' ';
