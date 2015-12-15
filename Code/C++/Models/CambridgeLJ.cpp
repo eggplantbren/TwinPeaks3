@@ -19,7 +19,7 @@ extern "C"
 
 CambridgeLJ::CambridgeLJ()
 :N(100)
-,s(3*N)
+,s(0., 3*N)
 ,scalars(2)
 {
 }
@@ -27,7 +27,8 @@ CambridgeLJ::CambridgeLJ()
 void CambridgeLJ::from_prior(RNG& rng)
 {
 	// "Outputs" (along with s)
-	double h0, V, ener;
+	std::valarray<double> h0(9);
+	double V, ener;
 
 	// "constants"
 	double min_height = 0.1;
@@ -50,7 +51,7 @@ void CambridgeLJ::from_prior(RNG& rng)
 		n = rng.rand();
 
 	// Call Rob's code
-	__twin_peaks_routines_MOD_initialise_config(&s[0], &h0, &V,
+	__twin_peaks_routines_MOD_initialise_config(&s[0], &h0[0], &V,
 					&ener, &min_height, &Vmax, &N, &cutoff,
 					&univar_3Nplus10001[0], &univar_60k[0],
 					&univar_30k[0], &nvar_60k[0], &flat_v_prior);

@@ -316,7 +316,7 @@ contains
 subroutine initialise_config(s,h0,V,ener,min_height,Vmax,N,cutoff, &
                           & univar_3Nplus10001,univar_60k,univar_30k,nvar_60k,flat_v_prior)
 
-  real(dp), dimension(:,:), intent(inout) :: s				! uniformly random fractional coordinates
+  real(dp), dimension(3, N), intent(inout) :: s				! uniformly random fractional coordinates
                                                             ! s is an element of (0,1)^(3N)
   real(dp), dimension(3,3), intent(out) :: h0               ! uniformly random normalised cell matrix,
                                                             ! chosen from det(h0)=1, and satisfying
@@ -327,7 +327,7 @@ subroutine initialise_config(s,h0,V,ener,min_height,Vmax,N,cutoff, &
   real(dp), intent(in) :: Vmax                              ! maximum allowed volume. "V_0" in the paper.
   real(dp), intent(in) :: min_height                        ! minimum cell height (see paper)
   real(dp), intent(in) :: cutoff                            ! radial cutoff of potential, defined in units of sigma
-  real(dp), dimension(:), intent(in) :: univar_3Nplus10001  ! an array of 3N+10001 iid univariate random numbers
+  real(dp), dimension(3*N+10001), intent(in) :: univar_3Nplus10001  ! an array of 3N+10001 iid univariate random numbers
                                                             ! on (0,1)
   real(dp), dimension(60000), intent(in) :: univar_60k      ! an array of 60k iid univariate random numbers
                                                             ! on (0,1)
@@ -354,39 +354,39 @@ subroutine initialise_config(s,h0,V,ener,min_height,Vmax,N,cutoff, &
     end do
   end do
 
-  ! initialise h0 uniformly with min cell height > min_height
-  h0 = 0.0d0
-  do i = 1,3
-    h0(i,i) = 1.0d0
-  end do
-  spare2 = 0.0d0
-  do i = 1, N_latt_moves_eq
-    spare = univar_3Nplus10001(3*N + i)
-    if (spare > 0.5d0) then ! stretch move
-      u_rnd6 = univar_60k(6*(i-1)+1:6*(i-1)+6)
-      call roam_latticeshape_stretch(h0, h0_temp, s, 1.0d0, 0.35d0, min_height, &
-                             & 1.d0, u_rnd6, spare_int, spare, spare2, skip_ener_calc=.true. )
-      h0=h0_temp
-    else ! shear move
-      u_rnd3 = univar_30k(2*(i-1)+1:2*(i-1)+3)
-      g_rnd6 = nvar_60k(6*(i-1)+1:6*(i-1)+6)
-      call roam_latticeshape_shear(h0, h0_temp, s, 1.0d0, 0.5d0, min_height, &
-                             & 1.d0, u_rnd3, g_rnd6, spare_int, spare, spare2, &
-                             & skip_ener_calc=.true. )
-      h0=h0_temp
-    end if
-  end do  
+!  ! initialise h0 uniformly with min cell height > min_height
+!  h0 = 0.0d0
+!  do i = 1,3
+!    h0(i,i) = 1.0d0
+!  end do
+!  spare2 = 0.0d0
+!  do i = 1, N_latt_moves_eq
+!    spare = univar_3Nplus10001(3*N + i)
+!    if (spare > 0.5d0) then ! stretch move
+!      u_rnd6 = univar_60k(6*(i-1)+1:6*(i-1)+6)
+!      call roam_latticeshape_stretch(h0, h0_temp, s, 1.0d0, 0.35d0, min_height, &
+!                             & 1.d0, u_rnd6, spare_int, spare, spare2, skip_ener_calc=.true. )
+!      h0=h0_temp
+!    else ! shear move
+!      u_rnd3 = univar_30k(2*(i-1)+1:2*(i-1)+3)
+!      g_rnd6 = nvar_60k(6*(i-1)+1:6*(i-1)+6)
+!      call roam_latticeshape_shear(h0, h0_temp, s, 1.0d0, 0.5d0, min_height, &
+!                             & 1.d0, u_rnd3, g_rnd6, spare_int, spare, spare2, &
+!                             & skip_ener_calc=.true. )
+!      h0=h0_temp
+!    end if
+!  end do  
 
-  if (flat_v_prior) then
-    V = univar_3Nplus10001(3*N + 10001)
-    V = V*Vmax
-  else
-    V = univar_3Nplus10001(3*N + 10001)
-    V = V**(1.0d0/real(N+1,dp))
-    V = V*Vmax
-  end if
+!  if (flat_v_prior) then
+!    V = univar_3Nplus10001(3*N + 10001)
+!    V = V*Vmax
+!  else
+!    V = univar_3Nplus10001(3*N + 10001)
+!    V = V**(1.0d0/real(N+1,dp))
+!    V = V*Vmax
+!  end if
 
-  ener = energy( s, h0, V, cutoff )
+!  ener = energy( s, h0, V, cutoff )
 
 end subroutine initialise_config
 
