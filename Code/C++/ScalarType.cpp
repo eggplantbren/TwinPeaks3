@@ -1,5 +1,6 @@
 #include "ScalarType.h"
 #include "Utils.h"
+#include <cassert>
 
 ScalarType::ScalarType()
 {
@@ -8,6 +9,13 @@ ScalarType::ScalarType()
 ScalarType::ScalarType(double value)
 :value(value)
 {
+}
+
+ScalarType::ScalarType(double value, double tb)
+:value(value)
+,tiebreaker(tiebreaker)
+{
+	assert(tiebreaker > 0. && tiebreaker < 1.);
 }
 
 void ScalarType::from_prior(RNG& rng)

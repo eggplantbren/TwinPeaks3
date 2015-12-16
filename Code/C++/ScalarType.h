@@ -14,6 +14,7 @@ class ScalarType
 	public:
 		ScalarType();
 		ScalarType(double val);
+		ScalarType(double val, double tb);
 
 		// Randomise the tiebreaker
 		void from_prior(RNG& rng);
