@@ -68,6 +68,7 @@ void CambridgeLJ::compute_scalars()
 double CambridgeLJ::perturb(RNG& rng)
 {
 	double logH = 0.;
+	logH += rng.rand();
 
 	compute_scalars();
 	return 0.;
