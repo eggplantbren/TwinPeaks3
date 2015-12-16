@@ -15,7 +15,7 @@ ScalarType::ScalarType(double value, double tb)
 :value(value)
 ,tiebreaker(tb)
 {
-	assert(tiebreaker > 0. && tiebreaker < 1.);
+	assert(tiebreaker >= 0. && tiebreaker <= 1.);
 }
 
 void ScalarType::from_prior(RNG& rng)
