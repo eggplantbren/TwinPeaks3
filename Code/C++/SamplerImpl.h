@@ -119,21 +119,6 @@ void Sampler<MyModel>::do_iteration()
 	// Make a ucc threshold (particles on the threshold die too)
 	int threshold = particle_uccs_sorted[num_particles/2];
 
-	// Place forbidding rectangles anywhere ucc >= threshold
-	for(int i=0; i<num_particles; i++)
-	{
-		int j = num_particles-1;
-		while(j > 0 && ucc[i][j] < threshold)
-			j--;
-
-		if(ucc[i][j] >= threshold)
-		{
-			std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
-			prune_rectangles(latest);
-			rects.push_front(latest);
-		}
-	}
-
 	// -1 <===> interior
 	//  0 <===> boundary
 	// +1 <===> exterior
@@ -155,6 +140,28 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 	num_boundary = num_particles - (num_interior + num_exterior);
+
+	// Handle the case where there are no exterior particles
+	if(num_exterior == 0)
+	{
+		std::cout<<"# Cannot continue."<<std::endl;
+		exit(0);
+	}
+
+	// Place forbidding rectangles anywhere ucc >= threshold
+	for(int i=0; i<num_particles; i++)
+	{
+		int j = num_particles-1;
+		while(j > 0 && ucc[i][j] < threshold)
+			j--;
+
+		if(ucc[i][j] >= threshold)
+		{
+			std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
+			prune_rectangles(latest);
+			rects.push_front(latest);
+		}
+	}
 
 	// Select some particles to save in their entirety
 	std::vector<bool> save(num_particles, false);
@@ -198,12 +205,6 @@ void Sampler<MyModel>::do_iteration()
 			fout<<std::endl;
 			fout.close();
 		}
-	}
-
-	if(num_exterior == 0)
-	{
-		std::cout<<"# Cannot continue."<<std::endl;
-		exit(0);
 	}
 
 	// Place forbidding rectangles anywhere ucc >= threshold
