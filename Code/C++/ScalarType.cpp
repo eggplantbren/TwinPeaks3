@@ -13,7 +13,7 @@ ScalarType::ScalarType(double value)
 
 ScalarType::ScalarType(double value, double tb)
 :value(value)
-,tiebreaker(tiebreaker)
+,tiebreaker(tb)
 {
 	assert(tiebreaker > 0. && tiebreaker < 1.);
 }
