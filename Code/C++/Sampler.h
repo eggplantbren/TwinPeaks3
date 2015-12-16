@@ -81,7 +81,7 @@ class Sampler
 		void initialise();
 
 		// Do an iteration of Nested Sampling
-		void do_iteration();
+		double do_iteration();
 
 		// Do an indefinite number of iterations
 		void run();

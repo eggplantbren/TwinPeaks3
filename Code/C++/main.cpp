@@ -25,15 +25,16 @@ int main(int argc, char** argv)
 	constexpr int num_particles = 1001;
 	constexpr int num_mcmc_steps = 1000;
 	constexpr double depth = 1000.;
-	constexpr int steps = depth/log(2.);
 
 	// Create a sampler
 	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
 	sampler.initialise();
 
-	// Do NS indefinitely
-	for(int i=0; i<steps; ++i)
-		sampler.do_iteration();
+	double log_prior_mass = 0.;
+	do
+	{
+		log_prior_mass = sampler.do_iteration();
+	}while(-log_prior_mass < depth);
 
 	return 0;
 }

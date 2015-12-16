@@ -62,7 +62,7 @@ void Sampler<MyModel>::prune_rectangles(const std::vector<ScalarType>& latest)
 }
 
 template<class MyModel>
-void Sampler<MyModel>::do_iteration()
+double Sampler<MyModel>::do_iteration()
 {
 	// Extract and sort the two scalars
 	std::vector<ScalarType> s1(num_particles);
@@ -207,21 +207,6 @@ void Sampler<MyModel>::do_iteration()
 		}
 	}
 
-	// Place forbidding rectangles anywhere ucc >= threshold
-	for(int i=0; i<num_particles; i++)
-	{
-		int j = num_particles-1;
-		while(j > 0 && ucc[i][j] < threshold)
-			j--;
-
-		if(ucc[i][j] >= threshold)
-		{
-			std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
-			prune_rectangles(latest);
-			rects.push_front(latest);
-		}
-	}
-
 	// Reduce remaining prior mass
 	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_interior) - log(num_particles - num_boundary));
 
@@ -269,6 +254,7 @@ void Sampler<MyModel>::do_iteration()
 	std::cout<<std::defaultfloat<<std::setprecision(6);
 
 	iteration++;
+	return log_prior_mass;
 }
 
 
