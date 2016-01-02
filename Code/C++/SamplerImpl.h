@@ -22,8 +22,6 @@ Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
 ,iteration(0)
 ,log_prior_mass(0.)
 {
-	assert(num_particles%2 != 0);
-
 	// Open and close outputs file to clear them
 	std::fstream fout;
 	fout.open("sample.txt", std::ios::out);
@@ -117,7 +115,10 @@ double Sampler<MyModel>::do_iteration()
 	std::reverse(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
 
 	// Make a ucc threshold (particles on the threshold die too)
-	int threshold = particle_uccs_sorted[num_particles/2];
+	int threshold, threshold_id;
+	threshold_id = num_particles/2;
+	threshold_selection:
+	threshold = particle_uccs_sorted[threshold_id];
 
 	// -1 <===> interior
 	//  0 <===> boundary
@@ -142,24 +143,26 @@ double Sampler<MyModel>::do_iteration()
 	num_boundary = num_particles - (num_interior + num_exterior);
 
 	// Handle the case where there are no exterior particles
-	if(num_exterior == 0)
+	if(num_exterior == 0 || num_interior <= 0.01*num_particles)
 	{
-		std::cout<<"# Cannot continue."<<std::endl;
-		exit(0);
+		--threshold_id;
+		goto threshold_selection;
 	}
-
-	// Place forbidding rectangles anywhere ucc >= threshold
-	for(int i=0; i<num_particles; i++)
+	else // Standard TwinPeaks
 	{
-		int j = num_particles-1;
-		while(j > 0 && ucc[i][j] < threshold)
-			j--;
-
-		if(ucc[i][j] >= threshold)
+		// Place forbidding rectangles anywhere ucc >= threshold
+		for(int i=0; i<num_particles; i++)
 		{
-			std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
-			prune_rectangles(latest);
-			rects.push_front(latest);
+			int j = num_particles-1;
+			while(j > 0 && ucc[i][j] < threshold)
+				j--;
+
+			if(ucc[i][j] >= threshold)
+			{
+				std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
+				prune_rectangles(latest);
+				rects.push_front(latest);
+			}
 		}
 	}
 
@@ -211,8 +214,10 @@ double Sampler<MyModel>::do_iteration()
 	log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_interior) - log(num_particles - num_boundary));
 
 	// Print messages
-	std::cout<<"# Iteration "<<(iteration+1)<<". ";
-	std::cout<<"Killing "<<(num_interior + num_boundary)<<" particles. "<<std::endl;
+	std::cout<<"# Iteration "<<(iteration+1)<<"."<<std::endl;
+	std::cout<<"# (num_interior, num_boundary, num_exterior) = (";
+	std::cout<<num_interior<<", "<<num_boundary<<", "<<num_exterior<<")."<<std::endl;
+	std::cout<<"# Killing "<<(num_interior + num_boundary)<<" particles. "<<std::endl;
 	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
 	std::cout<<log_prior_mass<<"."<<std::endl;
 
