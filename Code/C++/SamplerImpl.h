@@ -143,8 +143,18 @@ double Sampler<MyModel>::do_iteration()
 	num_boundary = num_particles - (num_interior + num_exterior);
 
 	// Handle the case where there are no exterior particles
-	if(num_exterior == 0 || num_interior <= 0.01*num_particles)
+	if(num_interior <= 0.01*num_particles || num_exterior == 0)
 	{
+		if(num_interior == 0 || num_exterior == 0)
+		{
+			// Print messages
+			std::cout<<"# Iteration "<<(iteration+1)<<"."<<std::endl;
+			std::cout<<"# (num_interior, num_boundary, num_exterior) = (";
+			std::cout<<num_interior<<", "<<num_boundary<<", "<<num_exterior<<")."<<std::endl;
+			std::cout<<"# CANNOT CONTINUE."<<std::endl;
+			exit(0);
+		}
+
 		--threshold_id;
 		goto threshold_selection;
 	}
