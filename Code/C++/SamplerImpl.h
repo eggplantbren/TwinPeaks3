@@ -116,9 +116,12 @@ double Sampler<MyModel>::do_iteration()
 
 	// Make a ucc threshold (particles on the threshold die too)
 	int threshold, threshold_id;
+	int count_thresholds_tried = 0;
+
 	threshold_id = num_particles/2;
 	threshold_selection:
 	threshold = particle_uccs_sorted[threshold_id];
+	++count_thresholds_tried;
 
 	// -1 <===> interior
 	//  0 <===> boundary
@@ -142,12 +145,12 @@ double Sampler<MyModel>::do_iteration()
 	}
 	num_boundary = num_particles - (num_interior + num_exterior);
 
-	// Handle the case where there are no exterior particles
-	if(num_interior <= 0.01*num_particles || num_exterior == 0)
+	// Handle the case where there are no interior or exterior particles
+	if(num_interior == 0 || num_exterior == 0)
 	{
-		if(num_interior == 0 || num_exterior == 0)
+		if(count_thresholds_tried == num_particles)
 		{
-			// Print messages
+			// Print messages and quit
 			std::cout<<"# Iteration "<<(iteration+1)<<"."<<std::endl;
 			std::cout<<"# (num_interior, num_boundary, num_exterior) = (";
 			std::cout<<num_interior<<", "<<num_boundary<<", "<<num_exterior<<")."<<std::endl;
@@ -155,7 +158,13 @@ double Sampler<MyModel>::do_iteration()
 			exit(0);
 		}
 
-		--threshold_id;
+		if(threshold_id < num_particles/2 && threshold_id != (num_particles-1))
+			--threshold_id;
+		else if(threshold_id == (num_particles-1))
+			threshold_id = num_particles/2 - 1;
+		else
+			++threshold_id;
+
 		goto threshold_selection;
 	}
 	else // Standard TwinPeaks
