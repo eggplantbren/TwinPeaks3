@@ -116,9 +116,15 @@ of Zoology, University of Oxford, South Parks Road, Oxford, UK}
 
 % Abstract (Do not use inserted blank lines, i.e. \\)
 \abstract{We present a generalization of the Nested Sampling algorithm for
-estimating the partition function of a family of
-probability distributions indexed by two hyperparameters. These
-problems arise frequently in statistical mechanics.}
+estimating the partition function $Z(\beta_1, \beta_2)$ of a family of
+probability distributions indexed by two hyperparameters $\beta_1$ and
+$\beta_2$. These
+problems arise frequently in statistical mechanics and occasionally in
+Bayesian inference. We demonstrate the algorithm on a toy example where
+$Z(\beta_1, \beta_2)$ is known, and show empirically that the accuracy
+improves as XX as a function of the number of particles $N$. We also
+calculate the partition function for a Lennard-Jones system in an external
+field, as a function of the external field strength, in a single run.}
 
 % Keywords: add 3 to 10 keywords
 \keyword{nested sampling; bayesian computation; statistical mechanics}
@@ -149,6 +155,8 @@ Nested Sampling \citep[NS][]{skilling} is popular general
 Monte Carlo algorithm that can solve a wide range of problems in Bayesian
 computation and statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
+Its key strength its ability to cope with phase transitions which cause
+many other methods to fail.
 In a Bayesian inference framework with unknown parameters denoted collectively
 by a vector $\xx$, the
 posterior distribution for the parameters given data $\data$ (and prior
@@ -164,18 +172,23 @@ function, and $Z$ is the normalising constant, usually known as the
 \begin{eqnarray}
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
+
+$Z$ is useful because it is the probability of the data given $\xx$ is one of
+the possibilities in the space being integrated over, and thus plays the role
+of a likelihood for the parameter space as a whole.
 The main goal of NS is to approximate $Z$, but it can also be used to make
-Monte Carlo approximations of the posterior, and calculate the ``information'',
+Monte Carlo approximations of the posterior distribution, and to
+calculate the `information',
 or Kullback-Leibler divergence from the prior to the posterior:
 \begin{eqnarray}
-\mathcal{I} &=& \int p(\xx | \data, \II) \ln
+\mathcal{H} &=& \int p(\xx | \data, \II) \ln
 \left[\frac{p(\xx | \data, \II)}{p(\xx | \II)}\right] \, d\xx \\
 &=& \int \frac{\pi(\xx) L(\xx)}{Z} \ln
 \left[\frac{L(\xx)}{Z}\right] \, d\xx.
 \end{eqnarray}
-$\mathcal{I}$ quantifies how compressed the posterior distribution is with
-respect to the prior. For example, $\mathcal{I} = 10$ implies the posterior
-occupies a fraction $e^{-10}$ of the prior mass.
+$\mathcal{H}$ quantifies how compressed the posterior distribution is with
+respect to the prior. For example, $\mathcal{H} = 10$ implies (loosely speaking)
+that the posterior occupies a fraction $e^{-10}$ of the prior mass.
 
 NS works by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
@@ -186,6 +199,7 @@ moves through a sequence of probability distributions beginning from the
 prior. This sequence of distributions is defined by
 \begin{eqnarray}
 p(\xx; \ell) &=& \frac{1}{X(\ell)}\pi(\xx)\mathds{1}\left(L(\xx) > \ell\right).
+\label{eq:constrained_prior}
 \end{eqnarray}
 and the marginal likelihood can be computed by numerically integrating the
 function $L(X)$:
@@ -199,12 +213,15 @@ as a function of the enclosed prior mass $X$. These cannot literally be the
 same function as the inputs are not even necessarily of the same dimensionality.
 Therefore the symbol $L$ represents the output of the function.
 
-In addition to the marginal likelihood $Z$, NS also allows us
-to approximate properties of the posterior $\pi(\xx)L(\xx)/Z$.
+Naively, Equation~\ref{eqn:evidence} appears straightforward to compute because
+it is a simple expectation of $L$ with respect to the distribution $\pi$.
+However,
 NS is required because Equation~\ref{eqn:evidence}
 is the expected value of $L$ with respect to a very heavy-tailed distribution
 (the prior for the $L$ value implied by $\pi(\xx)$). Hence, there is a strong
-connection between NS and ideas from rare event simulation \citep{walter}.
+connection between NS and ideas from rare event simulation, which has been
+explicitly investigated by \citet{walter}.
+
 Using a single NS run, we can also calculate the properties of any other distribution that
 is in some sense intermediate
 between the prior and the posterior. For example, we might be interested in
@@ -218,7 +235,8 @@ instead of the usual $L(\xx)$ used to obtain the posterior.
 An example application, in the case of
 a Bayesian inference problem with a `gaussian noise' likelihood assumption,
 computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
-posterior distribution would have been if the noise variance had been greater.
+posterior distribution would have been if the noise variance had been greater,
+without having to re-run the algorithm.
 This is different from including an extra parameter to allow the noise variance
 to be greater, because NS allows you to test the consequences of values of the
 variance that are very implausible given the data.
@@ -228,7 +246,11 @@ distributions of the form of Equation~\ref{eqn:power_posterior} is used.
 There are many different methods based on this idea, such as the popular
 parallel tempering method \citep{pt}.
 However, unlike annealing methods, NS requires only a small number of
-tuning parameters, and still works on problems involvin phase transitions.
+tuning parameters (just the number of particles $N$ is inherent to NS, although
+most NS implementations also have some tuning parameters related to their
+methods for sampling Equation~\ref{eq:constrained_prior}). Annealing methods
+also tend to fail on phase change problems \citep{skilling} which can arise
+in data analysis \citep{rjobject, exoplanet}.
 
 In statistical mechanics, Equation~\ref{eqn:power_posterior} defines the
 family of {\it canonical distributions}, usually written as:
@@ -589,6 +611,15 @@ The authors declare no conflict of interest.
 P{\'a}rtay, L.~v.~B., Bart{\'o}k, A.~P., Payne, M.~C., Cs{\'a}nyi, G.\ 
 2015.\ Determining pressure-temperature phase diagrams of materials.\ ArXiv 
 e-prints arXiv: 1503.03404. 
+
+\bibitem[Brewer and Donovan(2015)]{exoplanet} Brewer, B.~J., 
+Donovan, C.~P.\ 2015.\ Fast Bayesian inference for exoplanet discovery in 
+radial velocity data.\ Monthly Notices of the Royal Astronomical Society 
+448, 3206-3214. 
+
+\bibitem[Brewer(2014)]{rjobject} Brewer, B.~J.\ 2014.\ Inference 
+for Trans-dimensional Bayesian Models with Diffusive Nested Sampling.\ 
+ArXiv e-prints arXiv:1411.3921.
 
 \bibitem[\protect\citeauthoryear{Brewer, P{\'a}rtay,
 \& Cs{\'a}nyi}{2011}]{dnest} Brewer B.~J., P{\'a}rtay L.~B., Cs{\'a}nyi G., 2011,
