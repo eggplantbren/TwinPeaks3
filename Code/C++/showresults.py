@@ -134,6 +134,7 @@ good = logical_not(isnan(err1))
 imshow(err1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', vmin=-(abs(err1[good])).max(), vmax=(abs(err1[good])).max(), cmap='coolwarm')
 print("H_max = " + str(H[good].max()))
 print(err1[good].min(), err1[good].max())
+print(sqrt(mean(err1[good]**2)))
 print(4.*H[good].max()/(abs(err1[good]).max())**2)
 
 subplot(1,2,2)
@@ -142,5 +143,4 @@ good = logical_not(isnan(err1))
 imshow(err2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', vmin=-(abs(err2[good])).max(), vmax=(abs(err2[good])).max(), cmap='coolwarm')
 print(err2[good].min(), err2[good].max())
 show()
-
 
