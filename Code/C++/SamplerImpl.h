@@ -262,7 +262,7 @@ double Sampler<MyModel>::do_iteration()
 	std::vector<std::thread> threads;
 	for(int i=0; i<num_threads; i++)
 	{
-		threads.push_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]))));
+		threads.emplace_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]))));
 	}
 	for(int i=0; i<num_threads; i++)
 		threads[i].join();
