@@ -31,8 +31,8 @@ def grid():
   logZ = T1.copy()
   H = T1.copy()
 
-  for i in xrange(0, 51):
-    for j in xrange(0, 51):
+  for i in range(0, 51):
+    for j in range(0, 51):
       [logZ[i, j], H[i, j]] = truth(T1[i, j], T2[i, j])
     print(i+1)
 
