@@ -41,7 +41,7 @@ void Atoms::compute_scalars()
 	scalars[0] = -PE;
 	scalars[1] = 0.;
 	for(size_t i=0; i<x.size(); i++)
-		scalars[1] += -pow(x[i] - 0.5, 2) - pow(z[i] - 0.5, 2);
+		scalars[1] += -pow(x[i] - 0.5, 2) - pow(y[i] - 0.5, 2) - pow(z[i] - 0.5, 2);
 }
 
 void Atoms::calculate_PE()
@@ -61,7 +61,6 @@ void Atoms::calculate_PE(int i, int j)
 
 double Atoms::perturb(RNG& rng)
 {
-	top:
 	int which = rng.rand_int(x.size());
 	int what = rng.rand_int(3);
 
@@ -72,7 +71,6 @@ double Atoms::perturb(RNG& rng)
 	}
 	if(what == 1)
 	{
-		goto top;
 		y[which] += rng.randh();
 		wrap(y[which], 0., 1.);
 	}
