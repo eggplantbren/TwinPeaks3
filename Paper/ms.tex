@@ -382,15 +382,14 @@ known factor each iteration.
 $L_1$ and $L_2$, i.e. it should only depend on rankings of $L_1$ and $L_2$
 values and not the values themselves.
 \end{enumerate}
-The standard Nested Sampling algorithm, (as well as alternatives such as
-Diffusive Nested Sampling \citep{dnest}) has these properties but for a
-single objective function.
+The standard Nested Sampling algorithm has these properties but for a
+single objective function. The same is true of variants such as
+Diffusive Nested Sampling \citep{dnest}.
 
 \section{Rationale}\label{sec:rationale}
 
-{\bf Here is where I'll attempt to justify the algorithm}.
-
-Consider the following proposal. Imagine running standard NS with $N$ particles
+Consider the following proposal, which we label the `turn-the-corner idea'.
+Imagine running standard NS with $N$ particles
 using the objective function $L_1(\xx)$.
 After $M_1$ iterations, we'd be able to approximate
 the function $X(\ell_1) = \int \pi(\xx) \, d\xx$
@@ -401,13 +400,20 @@ After $M$ iterations, we keep the last value of $L_1(\xx)$ obtained
 (call it $L_1^*$), and continue to impose the constraint $L_1(\xx) > L_1^*$.
 
 Subject to the constraint $L_1(\xx) > L_1^*$, standard NS can continue but
-attempting to increase $L_2$ instead of $L_1$. After $M_2$ such iterations,
+attempting to increase $L_2$ instead of $L_1$. This is what we mean by
+`turning the corner'. After $M_2$ such iterations,
 the algorithm would have compressed the prior by a factor
 $e^{(M_1 + M_2)/N}$ and therefore ended at a point in the $(L_1, L_2)$ plane
 where $X(L_1, L_2) \approx e^{-(M_1 + M_2)/N}$. Any such run consisting of
 $M_1 + M_2$ iterations will therefore appoximately finish on a contour line
 of the function $X(L_1, L_2)$.
 
+Figure~\ref{fig:contours} shows the contour lines of $X(L_1, L_2)$ for the
+prior in Figure~\ref{fig:joint1}. Each contour line encloses half of the
+prior mass of the previous one. The fact that contours of $X(L_1, L_2)$ are
+relevant suggests that a standard NS run with objective function
+$X(L_1(\xx), L_2(\xx))$ would achieve a similar effect to the turn-the-corner
+idea.
 
 \begin{figure}
 \centering
@@ -417,36 +423,42 @@ contours of the cumulative distribution $X(L_1, L_2)$, each enclosing half
 the prior mass of the previous one. \label{fig:contours}}
 \end{figure}
 
-
-Try to relate this to \citet{vertical}.
+{\bf Try to relate this to \citet{vertical}}.
 
 \section{Proposed algorithm}\label{sec:algorithm}
 
 The basic idea of our algorithm is to try to mimic a standard NS run, where the
 objective function being increased is
 \begin{eqnarray}
-Y(\xx) &=& -\ln\left[X\left(L_1(\xx), L_2(\xx)\right)\right].
+Y(\xx) &=& 1/X\left(L_1(\xx), L_2(\xx)\right).
 \end{eqnarray}
 Standard NS cannot be applied simply because we cannot evaluate $X(L_1, L_2)$ and
 therefore cannot restrict the parameter space based on the value of $X$ (or
-equivalently $Y$. However, given a number of Monte Carlo samples, we
-can approximate this.
+equivalently, $Y$). However, given a number of Monte Carlo samples, we
+can {\em approximate} $X$ by $\hat{X}(L_1, L_2)$, and restrict the parameter
+space based on a contour of that approximation.
+The algorithm is presented in detail below.
 
 \begin{algorithm}[ht!]
 \begin{algorithmic}
 \State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
-$N$ should be odd and quite large (1001 or greater).
+$N$ should quite large (typically 1000 or greater), and the algorithm is
+slightly more elegant if $N$ is odd.
 \State Initialise the {\em remaining prior mass} to be $M=1$.
 \State Initialise the {\em excluded region} $\mathcal{R}$ to be the empty set
 $\emptyset$.
 \While{more iterations desired}
 	\State Calculate $\hat{X}(\ell_1, \ell_2)$ at the position of each particle
 			and sort the $\hat{X}$ values observed.
-	\State Find the median $\hat{X}$ value, $\hat{X}_{(k)}$, where $k = (N-1)/2$.
+	\State Find the median $\hat{X}$ value, $\hat{X}_{(k)}$.
 	\State Classify all particles as either ``interior'', ``boundary'', or
 			``exterior'', based on whether their $\hat{X}$ values are
 			greater than, equal to, or less than $\hat{X}_{(k)}$ respectively.
-	\State Save all ``interior'' particles to disk, assigning each a prior weight 				of $n_{\rm interior}/(n_{\rm interior} + n_{\rm exterior})$.
+	\State If the number of interior particles $n_{\rm interior}$ or the number
+			of exterior particles $n_{\rm exterior}$ is zero, replace $k$ by
+			$(k-1)$ (to try a percentile other than the median)
+			and go back to the previous step (if $k=1$ then set $k=N$ instead of zero).
+	\State Save all ``interior'' particles to disk, assigning each a prior weight of $n_{\rm interior}/(n_{\rm interior} + n_{\rm exterior})$.
 	\State Exclude the region in the $L_1$-$L_2$ plane where
 $\hat{X} \geq \hat{X}_{(k)}$. That is, set
 	\State \hspace{20pt} $\mathcal{R} \leftarrow \mathcal{R} \cup \{(\ell_1, \ell_2) \in \mathbb{R}^2: \hat{X}(\ell_1, \ell_2) \geq \hat{X}_{(k)}\}$.
