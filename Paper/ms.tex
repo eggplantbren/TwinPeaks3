@@ -449,29 +449,29 @@ The algorithm is presented in detail below.
 
 \begin{algorithm}[ht!]
 \begin{algorithmic}
-\State Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
+\State 1) Generate $N$ particles $\{\xx_1, ..., \xx_N\}$ from $\pi(\xx)$.
 $N$ should quite large (typically 1000 or greater), and the algorithm is
 slightly more elegant if $N$ is odd.
-\State Initialise the {\em remaining prior mass} to be $M=1$.
-\State Initialise the {\em excluded region} $\mathcal{R}$ to be the empty set
+\State 2) Initialise the {\em remaining prior mass} to be $M=1$.
+\State 3) Initialise the {\em excluded region} $\mathcal{R}$ to be the empty set
 $\emptyset$.
 \While{more iterations desired}
-	\State Calculate $\hat{X}(\ell_1, \ell_2)$ at the position of each particle
+	\State i) Calculate $\hat{X}(\ell_1, \ell_2)$ at the position of each particle
 			and sort the $\hat{X}$ values observed.
-	\State Find the median $\hat{X}$ value, $\hat{X}_{(k)}$.
-	\State Classify all particles as either ``interior'', ``boundary'', or
+	\State ii) Find the median $\hat{X}$ value, $\hat{X}_{(k)}$.
+	\State iii) Classify all particles as either ``interior'', ``boundary'', or
 			``exterior'', based on whether their $\hat{X}$ values are
 			greater than, equal to, or less than $\hat{X}_{(k)}$ respectively.
-	\State If the number of interior particles $n_{\rm interior}$ or the number
+	\State iv) If the number of interior particles $n_{\rm interior}$ or the number
 			of exterior particles $n_{\rm exterior}$ is zero, replace $k$ by
 			$(k-1)$ (to try a percentile other than the median)
-			and go back to the previous step (if $k=1$ then set $k=N$ instead of zero).
-	\State Save all ``interior'' particles to disk, assigning each a prior weight of $n_{\rm interior}/(n_{\rm interior} + n_{\rm exterior})$.
-	\State Exclude the region in the $L_1$-$L_2$ plane where
+			and go to step iii) (if $k=1$ then set $k=N$ instead of zero).
+	\State v) Save all ``interior'' particles to disk, assigning each a prior weight of $n_{\rm interior}/(n_{\rm interior} + n_{\rm exterior})$.
+	\State vi) Exclude the region in the $L_1$-$L_2$ plane where
 $\hat{X} \geq \hat{X}_{(k)}$. That is, set
 	\State \hspace{20pt} $\mathcal{R} \leftarrow \mathcal{R} \cup \{(\ell_1, \ell_2) \in \mathbb{R}^2: \hat{X}(\ell_1, \ell_2) \geq \hat{X}_{(k)}\}$.
-	\State Update the remaining prior mass to $M \leftarrow M n_{\rm exterior}/N$.
-	\State Replace all interior and boundary particles by new
+	\State vii) Update the remaining prior mass to $M \leftarrow M n_{\rm exterior}/N$.
+	\State viii) Replace all interior and boundary particles by new
 			particles generated from $\pi(\xx)$, subject to the constraint
 			of not being in the excluded region.
 \EndWhile
@@ -592,6 +592,10 @@ p(B) &=& P(M_1)p(B|M_1) + P(M_2)p(B|M_2)\\
 &=& \int_0^1 \left<\ln p(D|\theta) \right>_\beta \, d\beta
 \end{eqnarray}
 
+\section{Failure modes}
+
+If $L_1(\xx)$ and $L_2(\xx)$ are inversely and strongly dependent...
+
 
 %Use Skilling's argument about the prior distribution of a log Bayes factor.
 %Even though the performance of this algorithm won't be great for high $H$, it
@@ -606,6 +610,8 @@ and Robert Baldock (Cambridge) for valuable conversations.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \authorcontributions{Author Contributions}
+
+BJB initiated the project and explored various ideas which did not work.
 
 Required if more than one author. Authorship must include and be strictly limited to researchers who have substantially contributed to the reported work. Please carefully review our criteria regarding the Qualification for Authorship: \web /instructions.
 
