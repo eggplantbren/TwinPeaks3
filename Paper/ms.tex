@@ -51,6 +51,7 @@
 \usepackage{amssymb}
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
+\usepackage{natbib}
 
 \DeclareUnicodeCharacter{00A0}{ }
 \newcommand{\xx}{\boldsymbol{x}}
@@ -407,6 +408,13 @@ $e^{(M_1 + M_2)/N}$ and therefore ended at a point in the $(L_1, L_2)$ plane
 where $X(L_1, L_2) \approx e^{-(M_1 + M_2)/N}$. Any such run consisting of
 $M_1 + M_2$ iterations will therefore appoximately finish on a contour line
 of the function $X(L_1, L_2)$.
+We have explored the idea of using multiple turn-the-corner runs, with
+the corner being turned at different times (i.e. using different values of
+$M_1$), and combining the results using biased sampling
+\citep{vardi, cameron} in order to estimate $Z(\beta_1, \beta_2)$. However,
+this was very computationally intensive. We presented the turn-the-corner idea
+here in order to provide an intuitive rationale for our actual algorithm given in
+Section~\ref{sec:algorithm}.
 
 Figure~\ref{fig:contours} shows the contour lines of $X(L_1, L_2)$ for the
 prior in Figure~\ref{fig:joint1}. Each contour line encloses half of the
@@ -637,6 +645,10 @@ ArXiv e-prints arXiv:1411.3921.
 \& Cs{\'a}nyi}{2011}]{dnest} Brewer B.~J., P{\'a}rtay L.~B., Cs{\'a}nyi G., 2011,
 Statistics and Computing, 21, 4, 649-656. arXiv:0912.2380
 
+\bibitem[Cameron and Pettitt(2014)]{cameron} Cameron, E., and Pettitt, A., 2014,
+``Recursive pathways to marginal likelihood estimation with
+prior-sensitivity analysis.'' Statistical Science 29.3 (2014): 397-419.
+
 \bibitem[Hansmann(1997)]{pt} Hansmann, Ulrich HE., 1997, ``Parallel tempering algorithm for conformational studies of biological molecules.'', Chemical Physics Letters 281, no. 1 (1997): 140-150.
 
 \bibitem[P{\'a}rtay et al.(2014)]{2014PhRvE..89b2302P} P{\'a}rtay, L.~B., 
@@ -652,6 +664,9 @@ Polson, Nicholas G., and James G. Scott. ``Vertical-likelihood Monte Carlo
 Integration.'' arXiv preprint arXiv:1409.3601 (2014).
 
 \bibitem[\protect\citeauthoryear{Skilling}{2006}]{skilling} Skilling, J., 2006, Nested Sampling for General Bayesian Computation, Bayesian Analysis 4, pp. 833-860.
+
+\bibitem[Vardi (1985)]{vardi}
+Vardi, Yehuda. ``Empirical distributions in selection bias models.'', The Annals of Statistics (1985): 178-203.
 
 \bibitem[Walter(2015)]{walter}
 Walter, C.\ Point Process-based Monte Carlo estimation.\ arXiv: 1412.6368.
