@@ -1,10 +1,16 @@
 from pylab import *
 import scipy
-from postprocess import logsumexp
 import colormaps as cmaps
 
 rc("font", size=18, family="serif", serif="Computer Sans")
 rc("text", usetex=True)
+
+def logsumexp(values):
+	biggest = np.max(values)
+	x = values - biggest
+	result = np.log(np.sum(np.exp(x))) + biggest
+	return result
+
 
 # Temperatures
 T1, T2 = 0.1, 1.
