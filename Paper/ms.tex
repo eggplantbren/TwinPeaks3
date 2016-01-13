@@ -572,24 +572,30 @@ where $Z_1 = \int \pi(\xx_1)L(\xx_1) \, d\xx_1$ and
 $Z_2 = \int \pi(\xx_2)L(\xx_2) \, d\xx_2$.
 In large problems, the log of the Bayes Factor is usually more convenient:
 \begin{eqnarray}
-\ln B = \ln Z_1 - \ln Z_2.
+\Delta := \ln B = \ln Z_1 - \ln Z_2.
 \end{eqnarray}
-Naively, we want $\ln B$ to an accuracy of about 0.1, so that we can reliably
+Naively, we want $\Delta$ to an accuracy of about 0.1, so that we can reliably
 quantify the strength of the evidence when the two models are similarly
 supported by the data. But is this a realistic situation?
-Prior to the data, we don't know the
-value of $B$. Rather, $B$ has a prior distribution:
+
+Prior to knowing the data $D$, we don't know how much information we will get
+about the question of $M_1$ vs. $M_2$, quantified by the KL divergence:
 \begin{eqnarray}
-p(B) &=& P(M_1)p(B|M_1) + P(M_2)p(B|M_2)\\
-&=& P(M_1)\int p(\xx_1, D, B | M_1)\,d\xx_1\,dD
-    + P(M_2)\int p(\xx_2, D, B | M_2)\,d\xx_2\,dD
+\mathcal{H} &=& \sum_{i=1}^2 P(M_i | D)
+\ln\left[
+\frac{P(M_i | D)}{P(M_i)}
+\right].
 \end{eqnarray}
 
-{\bf Need thought here}
-{\bf Thermodynamic integral might be helpful?}
+The expected value of $\mathcal{H}$ (with respect to the prior over datasets)
+is the mutual information:
 \begin{eqnarray}
-\ln\left[\int p(\theta)p(D|\theta) \, d\theta\right]
-&=& \int_0^1 \left<\ln p(D|\theta) \right>_\beta \, d\beta
+\mathcal{I} &=& \mathds{E}\left[\mathcal{H}\right]\\
+&=&
+\sum_{i=1}^2 \int P(M_i, D)
+\ln\left[
+\frac{P(M_i, D)}{P(M_i)P(D)}
+\right] \, dD.
 \end{eqnarray}
 
 \section{Failure modes}\label{sec:failure_modes}
