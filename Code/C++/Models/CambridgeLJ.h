@@ -1,10 +1,10 @@
 #ifndef _CambridgeLJ_
 #define _CambridgeLJ_
 
-#include "Model.h"
 #include "RNG.h"
 #include <vector>
 #include <valarray>
+#include <ostream>
 
 class CambridgeLJ
 {

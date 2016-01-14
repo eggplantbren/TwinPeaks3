@@ -1,11 +1,9 @@
 #include "CambridgeLJ.h"
-#include "RandomNumberGenerator.h"
 #include "Utils.h"
 #include <cmath>
 #include <cassert>
 
 using namespace std;
-using namespace DNest3;
 
 // To call Rob's Fortran functions
 extern "C"

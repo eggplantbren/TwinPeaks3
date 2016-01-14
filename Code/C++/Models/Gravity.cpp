@@ -1,10 +1,7 @@
 #include "Gravity.h"
-#include "RandomNumberGenerator.h"
 #include "Utils.h"
-
 #include <cmath>
 
-using namespace DNest3;
 using namespace std;
 
 Gravity::Gravity()

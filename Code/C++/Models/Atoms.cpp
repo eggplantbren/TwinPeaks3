@@ -1,10 +1,8 @@
 #include "Atoms.h"
-#include "RandomNumberGenerator.h"
 #include "Utils.h"
 #include <cmath>
 
 using namespace std;
-using namespace DNest3;
 
 Atoms::Atoms()
 :x(200), y(200), z(200)

@@ -1,8 +1,8 @@
 #ifndef _Atoms_
 #define _Atoms_
 
-#include "Model.h"
 #include "RNG.h"
+#include <ostream>
 #include <vector>
 
 class Atoms
