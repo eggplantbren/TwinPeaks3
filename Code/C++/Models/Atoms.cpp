@@ -4,10 +4,12 @@
 
 using namespace std;
 
+constexpr int Atoms::num_atoms = 50;
+
 Atoms::Atoms()
-:x(50), y(50), z(50)
-,terms1(50, vector<double>(50))
-,terms2(50, vector<double>(50))
+:x(num_atoms), y(num_atoms), z(num_atoms)
+,terms1(num_atoms, vector<double>(num_atoms))
+,terms2(num_atoms, vector<double>(num_atoms))
 ,scalars(2)
 {
 

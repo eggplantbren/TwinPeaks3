@@ -8,6 +8,8 @@
 class Atoms
 {
 	private:
+		static const int num_atoms;
+
 		// Positions
 		std::vector<double> x, y, z;
 		std::vector< std::vector<double> > terms1;
