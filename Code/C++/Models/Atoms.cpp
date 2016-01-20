@@ -6,7 +6,8 @@ using namespace std;
 
 Atoms::Atoms()
 :x(200), y(200), z(200)
-,terms(200, vector<double>(200))
+,terms1(200, vector<double>(200))
+,terms2(200, vector<double>(200))
 ,scalars(2)
 {
 
@@ -26,8 +27,8 @@ void Atoms::from_prior(RNG& rng)
 		z[i] = rng.rand();
 	}
 
-	for(size_t i=0; i<terms.size(); i++)
-		for(size_t j=(i+1); j<terms[i].size(); j++)
+	for(size_t i=0; i<terms1.size(); i++)
+		for(size_t j=(i+1); j<terms1[i].size(); j++)
 			calculate_PE(i, j);
 
 	calculate_PE();
@@ -36,25 +37,29 @@ void Atoms::from_prior(RNG& rng)
 
 void Atoms::compute_scalars()
 {
-	scalars[0] = -PE;
-	scalars[1] = 0.;
-	for(size_t i=0; i<x.size(); i++)
-		scalars[1] += -pow(x[i] - 0.5, 2) - pow(y[i] - 0.5, 2) - pow(z[i] - 0.5, 2);
+	scalars[0] = -PE1;
+	scalars[1] = -PE2;
 }
 
 void Atoms::calculate_PE()
 {
-	PE = 0.;
+	PE1 = 0.;
 	for(size_t i=0; i<x.size(); i++)
 		for(size_t j=(i+1); j<x.size(); j++)
-			PE += terms[i][j];
+			PE1 += terms1[i][j];
+
+	PE2 = 0.;
+	for(size_t i=0; i<x.size(); i++)
+		for(size_t j=(i+1); j<x.size(); j++)
+			PE2 += terms2[i][j];
 }
 
 void Atoms::calculate_PE(int i, int j)
 {
 	constexpr double Rmsq = pow(0.02, 2);
 	double rsq = pow(x[i] - x[j], 2) + pow(z[i] - z[j], 2);
-	terms[i][j] = pow(Rmsq/rsq, 6) - 2.*pow(Rmsq/rsq, 3);
+	terms1[i][j] = pow(Rmsq/rsq, 6) - 2.*pow(Rmsq/rsq, 3);
+	terms2[i][j] = rsq;
 }
 
 double Atoms::perturb(RNG& rng)

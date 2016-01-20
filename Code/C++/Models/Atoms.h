@@ -10,13 +10,13 @@ class Atoms
 	private:
 		// Positions
 		std::vector<double> x, y, z;
-
-		std::vector< std::vector<double> > terms;
+		std::vector< std::vector<double> > terms1;
+		std::vector< std::vector<double> > terms2;
 
 		std::vector<double> scalars;
 
 		// Energy
-		double PE;
+		double PE1, PE2;
 
 		// From scratch, total
 		void calculate_PE();
