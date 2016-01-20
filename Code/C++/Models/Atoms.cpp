@@ -5,9 +5,9 @@
 using namespace std;
 
 Atoms::Atoms()
-:x(200), y(200), z(200)
-,terms1(200, vector<double>(200))
-,terms2(200, vector<double>(200))
+:x(50), y(50), z(50)
+,terms1(50, vector<double>(50))
+,terms2(50, vector<double>(50))
 ,scalars(2)
 {
 
