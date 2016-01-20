@@ -8,7 +8,8 @@
 class Atoms
 {
 	private:
-		static const int num_atoms;
+		static constexpr int num_atoms = 20;
+		static constexpr double L = 10.;
 
 		// Positions
 		std::vector<double> x, y, z;
@@ -29,7 +30,6 @@ class Atoms
 
 	public:
 		Atoms();
-		~Atoms();
 
 		// Generate the point from the prior
 		void from_prior(RNG& rng);

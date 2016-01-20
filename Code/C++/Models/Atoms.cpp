@@ -4,8 +4,6 @@
 
 using namespace std;
 
-constexpr int Atoms::num_atoms = 50;
-
 Atoms::Atoms()
 :x(num_atoms), y(num_atoms), z(num_atoms)
 ,terms1(num_atoms, vector<double>(num_atoms))
@@ -15,18 +13,13 @@ Atoms::Atoms()
 
 }
 
-Atoms::~Atoms()
-{
-
-}
-
 void Atoms::from_prior(RNG& rng)
 {
 	for(size_t i=0; i<x.size(); i++)
 	{
-		x[i] = rng.rand();
-		y[i] = rng.rand();
-		z[i] = rng.rand();
+		x[i] = L*rng.rand();
+		y[i] = L*rng.rand();
+		z[i] = L*rng.rand();
 	}
 
 	for(size_t i=0; i<terms1.size(); i++)
@@ -58,9 +51,8 @@ void Atoms::calculate_PE()
 
 void Atoms::calculate_PE(int i, int j)
 {
-	constexpr double Rmsq = pow(0.02, 2);
 	double rsq = pow(x[i] - x[j], 2) + pow(z[i] - z[j], 2);
-	terms1[i][j] = pow(Rmsq/rsq, 6) - 2.*pow(Rmsq/rsq, 3);
+	terms1[i][j] = 4*(pow(1./rsq, 6) - 2.*pow(1./rsq, 3));
 	terms2[i][j] = rsq;
 }
 
@@ -71,18 +63,18 @@ double Atoms::perturb(RNG& rng)
 
 	if(what == 0)
 	{
-		x[which] += rng.randh();
-		wrap(x[which], 0., 1.);
+		x[which] += L*rng.randh();
+		wrap(x[which], 0., L);
 	}
 	if(what == 1)
 	{
-		y[which] += rng.randh();
-		wrap(y[which], 0., 1.);
+		y[which] += L*rng.randh();
+		wrap(y[which], 0., L);
 	}
 	if(what == 2)
 	{
-		z[which] += rng.randh();
-		wrap(z[which], 0., 1.);
+		z[which] += L*rng.randh();
+		wrap(z[which], 0., L);
 	}
 
 	for(int i=0; i<which; i++)
