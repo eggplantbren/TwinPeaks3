@@ -7,7 +7,6 @@ using namespace std;
 Atoms::Atoms()
 :x(num_atoms), y(num_atoms), z(num_atoms)
 ,terms1(num_atoms, vector<double>(num_atoms))
-,terms2(num_atoms, vector<double>(num_atoms))
 ,scalars(2)
 {
 
@@ -33,7 +32,29 @@ void Atoms::from_prior(RNG& rng)
 void Atoms::compute_scalars()
 {
 	scalars[0] = -PE1;
-	scalars[1] = -PE2;
+	scalars[1] = 0.;
+
+	// Polymer potential
+	double k = 36*pow(2., 2./3);
+	double c = pow(2., 1./6);
+	double r;
+	// First sum
+	for(int i=0; i<(num_atoms-1); ++i)
+	{
+		r = sqrt(pow(x[i] - x[i+1], 2) + pow(y[i] - y[i+1], 2)
+						+ pow(z[i] - z[i+1], 2));
+		scalars[1] -= 0.5*k*pow(r - c, 2);
+	}
+
+	// Second sum
+	double dotprod;
+	for(int i=1; i<(num_atoms-1); ++i)
+	{
+		dotprod = (x[i] - x[i-1])*(x[i+1] - x[i])
+					+ (y[i] - y[i-1])*(y[i+1] - y[i])
+					+ (z[i] - z[i-1])*(z[i+1] - z[i]);
+		scalars[1] -= 0.5*k*pow(dotprod - 1., 2);
+	}
 }
 
 void Atoms::calculate_PE()
@@ -42,18 +63,12 @@ void Atoms::calculate_PE()
 	for(size_t i=0; i<x.size(); i++)
 		for(size_t j=(i+1); j<x.size(); j++)
 			PE1 += terms1[i][j];
-
-	PE2 = 0.;
-	for(size_t i=0; i<x.size(); i++)
-		for(size_t j=(i+1); j<x.size(); j++)
-			PE2 += terms2[i][j];
 }
 
 void Atoms::calculate_PE(int i, int j)
 {
 	double rsq = pow(x[i] - x[j], 2) + pow(z[i] - z[j], 2);
 	terms1[i][j] = 4*(pow(1./rsq, 6) - 2.*pow(1./rsq, 3));
-	terms2[i][j] = rsq;
 }
 
 double Atoms::perturb(RNG& rng)
