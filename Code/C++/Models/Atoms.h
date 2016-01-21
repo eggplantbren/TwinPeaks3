@@ -8,8 +8,8 @@
 class Atoms
 {
 	private:
-		static constexpr int num_atoms = 6;
-		static constexpr double L = 10.;
+		static constexpr int num_atoms = 30;
+		static constexpr double L = 100.;
 
 		// Positions
 		std::vector<double> x, y, z;
