@@ -10,3 +10,5 @@ scalars_thinned.txt
 sample.txt
 Paper/figures/*.pdf
 *.pyc
+Code/C++/Frames/*.png
+Code/C++/Frames/movie.avi
