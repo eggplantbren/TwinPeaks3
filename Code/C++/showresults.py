@@ -89,7 +89,7 @@ show()
 
 # Get partition function and entropy
 N = 51
-T1 = 10.**linspace(-2.5, 5., N)
+T1 = 10.**linspace(-2., 4., N)
 T2 = T1.copy()
 [T1, T2] = meshgrid(T1, T2)
 T2 = T2[::-1, :]
@@ -118,24 +118,33 @@ for i in range(0, N):
 
 figure(figsize=(11, 11))
 subplot(2, 2, 1)
-imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
+imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+xscale('log')
+yscale('log')
 title(r'$\log(Z)$')
 ylabel(r'$\log_{10}(T_2)$')
 
 subplot(2, 2, 2)
-imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
+imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+xscale('log')
+yscale('log')
 title(r'$H$')
 
 subplot(2, 2, 3)
-imshow(exp1, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
+imshow(exp1, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+xscale('log')
+yscale('log')
 title(r'$\left<\log L_1\right>$')
-xlabel(r'$\log_{10}(T_1)$')
-ylabel(r'$\log_{10}(T_2)$')
+xlabel(r'$T_1$')
+ylabel(r'$T_2$')
 
 subplot(2, 2, 4)
-imshow(exp2, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
+imshow(exp2, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+xscale('log')
+yscale('log')
 title(r'$\left<\log L_2\right>$')
-xlabel(r'$\log_{10}(T_1)$')
+xlabel(r'$T_1$')
+
 savefig('results.pdf', bbox_inches='tight')
 show()
 

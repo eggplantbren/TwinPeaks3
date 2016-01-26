@@ -24,7 +24,7 @@ def truth(T1, T2, do_plot=False):
 
 def grid():
   # Calculate log(Z) and H for some canonical distributions
-  T1 = 10.**(linspace(-2.5, 5., 51))
+  T1 = 10.**(linspace(-2., 4., 51))
   T2 = T1.copy()
   [T1, T2] = meshgrid(T1, T2)
   T2 = T2[::-1, :]
@@ -38,16 +38,19 @@ def grid():
 
   figure(1)
   subplot(1, 2, 1)
-  imshow(logZ, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
-  xlabel(r'$\log_{10}(T_1)$')
-  ylabel(r'$\log_{10}(T_2)$')
+  imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+  xlabel(r'$T_1$')
+  ylabel(r'$T_2$')
   title(r'$\ln(Z)$')
+  xscale('log')
+  yscale('log')
 
   subplot(1, 2, 2)
-  imshow(H, extent=(log10(T1.min()), log10(T1.max()), log10(T2.min()), log10(T2.max())), interpolation='nearest', cmap=cmaps.viridis)
-  xlabel(r'$\log_{10}(T_1)$')
-#  ylabel(r'$\log_{10}(T_2)$')
+  imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+  xlabel(r'$T_1$')
   title(r'$H$')
+  xscale('log')
+  yscale('log')
   print('H_max = ', H.max())
   savefig('truth.pdf', bbox_inches='tight')
   show()
