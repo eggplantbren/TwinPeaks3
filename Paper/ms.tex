@@ -101,14 +101,16 @@
 \Title{Nested sampling with two objective functions}
 
 % Authors (Add full first names)
-\Author{Brendon J. Brewer$^{1,}$* and Ewan Cameron$^{2}$}
+\Author{Brendon J. Brewer$^{1,}$*, Ewan Cameron$^{2}$, and
+Robert J. N. Baldock$^{3}$}
 
 % Affiliations / Addresses (Add [1] after \address if there is only one affiliation.)
 \address{%
 $^{1}$ Department of Statistics, The University of Auckland, Private Bag 92019,
 Auckland 1142, New Zealand\\
 $^{2}$ Spatial Ecology and Epidemiology Group, Tinbergen Building, Department
-of Zoology, University of Oxford, South Parks Road, Oxford, UK}
+of Zoology, University of Oxford, South Parks Road, Oxford, UK\\
+$^{3}$ Cavendish, University of Cambridge, Cambridge, UK}
 
 %\contributed{$^\dagger$ These authors contributed equally to this work.}
 
@@ -491,11 +493,7 @@ of $X(L_1, L_2)$.
 \label{fig:joint2}}
 \end{figure}
 
-
-
-
-\section{Test problem}
-
+\section{Example 1: Known solution}
 We tested the algorithm on a simple 100-dimensional example, where the
 prior is a uniform distribution between 0 and 1 for each coordinate:
 \begin{eqnarray}
@@ -549,6 +547,14 @@ $(T_1, T_2) = (0.1, 1)$ (black).\label{fig:output}}
 true partition function and KL divergence given in Figure~\ref{fig:truth}.
 \label{fig:results}}
 \end{figure}
+
+\section{Example 2: Lennard-Jones/Polymer Example}
+
+
+
+\section{Example 3: ``MaxEnt'' image deconvolution example}
+
+
 
 
 \section{What kind of accuracy can we expect?}
@@ -611,7 +617,7 @@ If $L_1(\xx)$ and $L_2(\xx)$ are inversely and strongly dependent...
 \acknowledgments{Acknowledgements}
 
 It is a pleasure to thank Gábor Csányi (Cambridge), Livia B. Pártay (Cambridge),
-Robert Baldock (Cambridge), and Will Handley (Cambridge)
+and Will Handley (Cambridge)
 for valuable conversations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
