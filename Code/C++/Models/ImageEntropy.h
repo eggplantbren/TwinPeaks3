@@ -9,13 +9,13 @@
 class ImageEntropy
 {
 	private:
-		std::vector< std::vector<double> > params;
+		std::vector<double> params;
 		std::vector<double> scalars;
 
 		void compute_scalars();
 
 	public:
-		SimpleExample();
+		ImageEntropy();
 
 		// Generate the point from the prior
 		void from_prior(RNG& rng);

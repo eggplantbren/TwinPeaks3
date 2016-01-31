@@ -1,25 +1,25 @@
-#include "SimpleExample.h"
+#include "ImageEntropy.h"
 #include "Utils.h"
 #include <cmath>
 #include <limits>
 
 using namespace std;
 
-SimpleExample::SimpleExample()
+ImageEntropy::ImageEntropy()
 :params(100)
 ,scalars(2)
 {
 
 }
 
-void SimpleExample::from_prior(RNG& rng)
+void ImageEntropy::from_prior(RNG& rng)
 {
 	for(double& x:params)
 		x = rng.rand();
 	compute_scalars();
 }
 
-double SimpleExample::perturb(RNG& rng)
+double ImageEntropy::perturb(RNG& rng)
 {
 	int which, count;
 	if(rng.rand() <= 0.5)
@@ -38,7 +38,7 @@ double SimpleExample::perturb(RNG& rng)
 	return 0.;
 }
 
-void SimpleExample::compute_scalars()
+void ImageEntropy::compute_scalars()
 {
 	scalars[0] = 0.;
 	scalars[1] = 0.;
@@ -49,7 +49,7 @@ void SimpleExample::compute_scalars()
 	}
 }
 
-void SimpleExample::write_text(std::ostream& out) const
+void ImageEntropy::write_text(std::ostream& out) const
 {
 	for(size_t i=0; i<params.size(); i++)
 		out<<params[i]<<' ';
