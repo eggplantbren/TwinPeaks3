@@ -9,7 +9,7 @@
 class ImageEntropy
 {
 	private:
-		std::vector<double> params;
+		std::vector< std::vector<double> > image;
 		std::vector<double> scalars;
 
 		void compute_scalars();
@@ -32,6 +32,13 @@ class ImageEntropy
 		// Getter
 		const std::vector<double>& get_scalars() const
 		{ return scalars; }
+
+
+	// STATIC STUFF
+	private:
+		// Dataset and PSF
+		static std::vector< std::vector<double> > data;
+		static PSF psf;
 };
 
 #endif
