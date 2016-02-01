@@ -16,11 +16,23 @@ ImageEntropy::ImageEntropy()
 
 void ImageEntropy::from_prior(RNG& rng)
 {
+	for(size_t i=0; i<image.size(); ++i)
+		for(size_t j=0; j<image.size(); ++j)
+			image[i][j] = 1E3*rng.rand();
 	compute_scalars();
 }
 
 double ImageEntropy::perturb(RNG& rng)
 {
+	int i, j;
+	int reps = static_cast<int>(pow(10., 2.*rng.rand()));
+	for(int rep=0; rep<reps; ++rep)
+	{
+		i = rng.rand_int(image.size());
+		j = rng.rand_int(image[0].size());
+		image[i][j] += 1E3*rng.randh();
+		wrap(image[i][j], 0., 1E3);
+	}
 	compute_scalars();
 	return 0.;
 }
@@ -33,6 +45,9 @@ void ImageEntropy::compute_scalars()
 
 void ImageEntropy::write_text(std::ostream& out) const
 {
+	for(size_t i=0; i<image.size(); ++i)
+		for(size_t j=0; j<image.size(); ++j)
+			out<<image[i][j]<<' ';
 }
 
 void ImageEntropy::load_data(const char* filename)
