@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
 	constexpr int num_particles = 1001;
 	constexpr int num_mcmc_steps = 1000;
-	constexpr double depth = 1000.;
+	constexpr double depth = 600.;
 
 	// Create a sampler
 	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
