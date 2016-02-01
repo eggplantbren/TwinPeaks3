@@ -39,6 +39,10 @@ class ImageEntropy
 		// Dataset and PSF
 		static std::vector< std::vector<double> > data;
 		static PSF psf;
+
+	public:
+		static void load_data(const char* filename);
+		static void load_psf(const char* filename);
 };
 
 #endif
