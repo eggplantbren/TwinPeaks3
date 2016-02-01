@@ -62,5 +62,6 @@ void ImageEntropy::load_data(const char* filename)
 void ImageEntropy::load_psf(const char* filename)
 {
 	psf.load(filename);
+	psf.calculate_fft(data.size(), data[0].size());
 }
 
