@@ -7,7 +7,7 @@
 using namespace std;
 
 vector< vector<double> > ImageEntropy::data(100, vector<double>(100));
-PSF ImageEntropy::psf(3);
+PSF ImageEntropy::psf(21);
 
 ImageEntropy::ImageEntropy()
 :scalars(2)
