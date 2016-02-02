@@ -143,7 +143,7 @@ void PSF::blur_image2(vector< vector<double> >& img) const
 void PSF::test()
 {
 	PSF psf(5);
-	psf.load("Data/test_psf.txt");
+	psf.load("psf.txt");
 	psf.calculate_fft(20, 20);
 
 	// Point image
