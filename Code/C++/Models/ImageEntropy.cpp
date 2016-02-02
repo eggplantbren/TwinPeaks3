@@ -45,10 +45,10 @@ double ImageEntropy::perturb(RNG& rng)
 {
 	int reps = 1;
 	if(rng.rand() <= 0.9)
-		reps = (int)pow(10., 4.*rng.rand());
+		reps = (int)pow(10., 3.*rng.rand());
 
 	int ii, jj;
-	for(int i=0; i<reps; i++)
+	for(int i=0; i<reps; ++i)
 	{
 		ii = rng.rand_int(image.size());
 		jj = rng.rand_int(image[ii].size());
@@ -70,8 +70,8 @@ void ImageEntropy::compute_scalars()
 
 	// Find image entropy
 	double S = 0.;
-	for(size_t i=0; i<image.size(); i++)
-		for(size_t j=0; j<image[i].size(); j++)
+	for(size_t i=0; i<image.size(); ++i)
+		for(size_t j=0; j<image[i].size(); ++j)
 			S += -(image[i][j]/tot)*log(image[i][j]/tot + 1E-300);
 	scalars[0] = S;
 
@@ -84,8 +84,8 @@ void ImageEntropy::compute_scalars()
 	for(size_t i=0; i<image.size(); i++)
 		for(size_t j=0; j<image[i].size(); j++)
 			logL += -0.5*pow((data[i][j] - blurred[i][j])/0.2, 2);
-	scalars[1] = S;
-	scalars[0] = S;//logL;
+	scalars[0] = S;
+	scalars[1] = logL;
 }
 
 void ImageEntropy::write_text(ostream& out) const
