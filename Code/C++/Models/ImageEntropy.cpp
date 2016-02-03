@@ -1,8 +1,7 @@
 #include "ImageEntropy.h"
 #include <cassert>
 #include <cmath>
-#include <RandomNumberGenerator.h>
-#include <Utils.h>
+#include "Utils.h"
 #include <fstream>
 
 using namespace std;
@@ -19,10 +18,10 @@ void ImageEntropy::load_data()
 			fin>>data[i][j];
 	fin.close();
 
-	psf.load("psf.txt");
+	psf.load("Models/psf.txt");
 	psf.calculate_fft(100, 100);
 
-	preblur.load("preblur.txt");
+	preblur.load("Models/preblur.txt");
 	preblur.calculate_fft(100, 100);
 }
 
