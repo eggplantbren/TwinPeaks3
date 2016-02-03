@@ -12,7 +12,7 @@ PSF ImageEntropy::preblur(5);
 
 void ImageEntropy::load_data()
 {
-	fstream fin("data.txt", ios::in);
+	fstream fin("Models/data.txt", ios::in);
 	for(size_t i=0; i<data.size(); i++)
 		for(size_t j=0; j<data[i].size(); j++)
 			fin>>data[i][j];
@@ -82,7 +82,7 @@ void ImageEntropy::compute_scalars()
 	double logL = 0.;
 	for(size_t i=0; i<image.size(); i++)
 		for(size_t j=0; j<image[i].size(); j++)
-			logL += -0.5*pow((data[i][j] - blurred[i][j])/0.2, 2);
+			logL += -0.5*pow((data[i][j] - blurred[i][j])/0.1, 2);
 	scalars[0] = S;
 	scalars[1] = logL;
 }
