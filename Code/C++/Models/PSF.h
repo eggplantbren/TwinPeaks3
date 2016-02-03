@@ -1,5 +1,5 @@
-#ifndef TwinPeaks3_PSF
-#define TwinPeaks3_PSF
+#ifndef _PSF_
+#define _PSF_
 
 #include <vector>
 #include <armadillo>

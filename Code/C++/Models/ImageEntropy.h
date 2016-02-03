@@ -1,48 +1,39 @@
-#ifndef TwinPeaks3_ImageEntropy
-#define TwinPeaks3_ImageEntropy
+#ifndef _ImageEntropy_
+#define _ImageEntropy_
+
+/*
+* An object of this class represents a
+* point in the parameter space.
+*/
 
 #include <vector>
-#include <iostream>
-#include "RNG.h"
+#include <ostream>
 #include "PSF.h"
+#include "RNG.h"
 
 class ImageEntropy
 {
 	private:
-		std::vector< std::vector<double> > image;
-		std::vector<double> scalars;
+		// Data and PSF
+		static PSF psf;
+		static std::vector< std::vector<double> > data;
+		static PSF preblur;
 
+		std::vector< std::vector<double> > image;
 		void compute_scalars();
+		std::vector<double> scalars;
 
 	public:
 		ImageEntropy();
 
-		// Generate the point from the prior
 		void from_prior(RNG& rng);
-
-		// Metropolis-Hastings proposals
 		double perturb(RNG& rng);
 
-		// Likelihood function
-		double log_likelihood() const;
+		static void load_data();
 
-		// Write to stream (text format)
 		void write_text(std::ostream& out) const;
-
-		// Getter
 		const std::vector<double>& get_scalars() const
 		{ return scalars; }
-
-
-	// STATIC STUFF
-	private:
-		// Dataset and PSF
-		static std::vector< std::vector<double> > data;
-		static PSF psf;
-
-	public:
-		static void load_data(const char* filename);
-		static void load_psf(const char* filename);
 };
 
 #endif
