@@ -19,14 +19,14 @@ void ImageEntropy::load_data()
 	fin.close();
 
 	psf.load("Models/psf.txt");
-	psf.calculate_fft(100, 100);
+	psf.calculate_fft(data.size(), data[0].size());
 
 	preblur.load("Models/preblur.txt");
-	preblur.calculate_fft(100, 100);
+	preblur.calculate_fft(data.size(), data[0].size());
 }
 
 ImageEntropy::ImageEntropy()
-:image(100, vector<double>(100))
+:image(data.size(), vector<double>(data[0].size()))
 ,scalars(2)
 {
 
@@ -61,18 +61,11 @@ double ImageEntropy::perturb(RNG& rng)
 
 void ImageEntropy::compute_scalars()
 {
-	// Find image total (use entropy of normalised image)
-	double tot = 0.;
-	for(size_t i=0; i<image.size(); i++)
-		for(size_t j=0; j<image[i].size(); j++)
-			tot += image[i][j];
-
 	// Find image entropy
 	double S = 0.;
 	for(size_t i=0; i<image.size(); ++i)
 		for(size_t j=0; j<image[i].size(); ++j)
-			S += -(image[i][j]/tot)*log(image[i][j]/tot + 1E-300);
-	scalars[0] = S;
+			S += -image[i][j]*log(image[i][j] + 1E-300);
 
 	vector< vector<double> > blurred = image;
 	preblur.blur_image2(blurred);
@@ -83,6 +76,7 @@ void ImageEntropy::compute_scalars()
 	for(size_t i=0; i<image.size(); i++)
 		for(size_t j=0; j<image[i].size(); j++)
 			logL += -0.5*pow((data[i][j] - blurred[i][j])/0.1, 2);
+
 	scalars[0] = S;
 	scalars[1] = logL;
 }
@@ -102,7 +96,7 @@ void ImageEntropy::write_text(ostream& out) const
 	double logL = 0.;
 	for(size_t i=0; i<image.size(); i++)
 		for(size_t j=0; j<image[i].size(); j++)
-			logL += -0.5*pow((ImageEntropy::data[i][j] - blurred[i][j])/0.2, 2);
+			logL += -0.5*pow((ImageEntropy::data[i][j] - blurred[i][j])/0.1, 2);
 
 	out<<logL<<' ';
 }
