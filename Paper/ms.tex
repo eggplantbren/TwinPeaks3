@@ -554,6 +554,19 @@ true partition function and KL divergence given in Figure~\ref{fig:truth}.
 
 \section{Example 3: ``MaxEnt'' image deconvolution example}
 
+The unknown parameters are a set of pixel intensities
+$\{m_i\}_{i=1}^n$ where $n$ is the number of pixels and $m_i \geq 0$.
+The dataset is also a collection of pixel intensities $\{D_i\}_{i=1}^n$.
+The prior for the dataset given the parameters is a normal distribution
+with mean given by the underlying image $\{m_i\}$ convolved by
+a point spread function. The standard deviation of each pixel is
+$\sigma$, assumed known. This is usually written as
+
+\begin{eqnarray}
+\boldsymbol{D} = \boldsymbol{P}\boldsymbol{m} + \boldsymbol{n}
+\end{eqnarray}
+where $\boldsymbol{n}$ is the noise in each pixel and $\boldsymbol{P}$ is
+the blurring operator written in matrix form.
 
 
 
