@@ -568,6 +568,16 @@ $\sigma$, assumed known. This is usually written as
 where $\boldsymbol{n}$ is the noise in each pixel and $\boldsymbol{P}$ is
 the blurring operator written in matrix form.
 
+The posterior for the underlying image given the data is
+\begin{eqnarray}
+p(\boldsymbol{m} | \boldsymbol{D})
+&=& \frac{p(\boldsymbol{m})p(\boldsymbol{D}|\boldsymbol{m})}
+{\int p(\boldsymbol{m})p(\boldsymbol{D}|\boldsymbol{m}) \,d^n\boldsymbol{m}}\\
+&=& \frac{\exp\left[-\lambda \sum_i m_i\ln m_i
+-\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]}
+{\int \exp\left[-\lambda \sum_i m_i\ln m_i
+-\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]\, d^n\boldsymbol{m}}
+\end{eqnarray}
 
 
 \section{What kind of accuracy can we expect?}
