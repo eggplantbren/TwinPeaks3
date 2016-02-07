@@ -40,7 +40,7 @@ for i in range(0, steps):
 	plt.xlabel(r'$X(L_1)$', fontsize=18)
 	plt.ylabel(r'$X(L_2 | L_1)$', fontsize=18)
 	plt.axis([0, 1, 0, 1])
-	plt.title('$X = {X:.4f}$'.format(X=X), fontsize=16)
+	plt.title('$X = {X:.4f}$'.format(X=X), fontsize=18)
 
 	yy = y.copy()
 	yy[y > 1.] = 1.
