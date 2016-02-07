@@ -10,17 +10,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def deriv(state):
-	return (state*np.log(state) - state)
+	return (state - state*np.log(state))/np.log(state)
 
 # Let x=X1, y=X2|X1
 x = np.linspace(1E-6, 1, 1001)
 
 # Timestep
-t_final, dt = 10., 0.005
+t_final, dt = 10., 0.001
 steps = int(t_final/dt)
 
 # Initial condition for threshold
-C = 1.
+C = 0.99
 
 # Set up plotting
 plt.figure(figsize=(8, 8))
@@ -44,7 +44,6 @@ for i in range(0, steps):
 	yy = y.copy()
 	yy[y > 1.] = 1.
 	plt.fill_between(x, yy, color='cyan', alpha=0.3)
-	print(f1/C)
 	plt.draw()
 
 # Finalise plotting
