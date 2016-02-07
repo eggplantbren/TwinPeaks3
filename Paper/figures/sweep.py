@@ -16,7 +16,7 @@ def deriv(state):
 x = np.linspace(1E-6, 1, 1001)
 
 # Timestep
-t_final, dt = 10., 0.001
+t_final, dt = 10., 0.003
 steps = int(t_final/dt)
 
 # Initial condition for threshold
@@ -35,15 +35,19 @@ for i in range(0, steps):
 	C += dt/6*(f1 + 2*f2 + 2*f3 + f4)
 
 	y = C/x
+	X = C - C*np.log(C)
 	plt.plot(x, y, 'k-', linewidth=2)
-	plt.xlabel('$x$', fontsize=18)
-	plt.ylabel('$y$', fontsize=18)
+	plt.xlabel(r'$X(L_1)$', fontsize=18)
+	plt.ylabel(r'$X(L_2 | L_1)$', fontsize=18)
 	plt.axis([0, 1, 0, 1])
-	plt.title('$X = {X:.4f}$'.format(X=C-C*np.log(C)), fontsize=16)
+	plt.title('$X = {X:.4f}$'.format(X=X), fontsize=16)
 
 	yy = y.copy()
 	yy[y > 1.] = 1.
-	plt.fill_between(x, yy, color='cyan', alpha=0.3)
+	plt.fill_between(x, yy, color='cyan', alpha=0.1)
+
+	plt.axhline(X, linestyle='--', color='g')
+	plt.axvline(X, linestyle='--', color='r')
 	plt.draw()
 
 # Finalise plotting
