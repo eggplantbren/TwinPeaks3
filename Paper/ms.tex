@@ -176,7 +176,8 @@ function, and $Z$ is the normalising constant, usually known as the
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
 
-$Z$ is useful because it is the probability of the data given $\xx$ is one of
+$Z$ is useful because it is the probability of the data given that
+$\xx$ is {\em one of}
 the possibilities in the space being integrated over, and thus plays the role
 of a likelihood for the parameter space as a whole.
 The main goal of NS is to approximate $Z$, but it can also be used to make
@@ -192,6 +193,8 @@ or Kullback-Leibler divergence from the prior to the posterior:
 $\mathcal{H}$ quantifies how compressed the posterior distribution is with
 respect to the prior. For example, $\mathcal{H} = 10$ implies (loosely speaking)
 that the posterior occupies a fraction $e^{-10}$ of the prior mass.
+$\mathcal{H}$ can be interpreted quite literally as a measure of how much
+the data $\data$ told you about $\xx$.
 
 NS works by drawing particles from the
 prior $\pi(\xx)$ and successively imposing constraints on the value of
@@ -214,7 +217,10 @@ functions and probability distributions.
 For example, $L(\xx)$ is the likelihood function, and $L(X)$ is the likelihood
 as a function of the enclosed prior mass $X$. These cannot literally be the
 same function as the inputs are not even necessarily of the same dimensionality.
-Therefore the symbol $L$ represents the output of the function.
+Therefore the symbol $L$ implies that the output of the function is a
+likelihood value; so $L(\xx)$ represents a likelihood value computed from
+the parameters $\xx$, and $L(X)$ represents a likelihood value that
+corresponds to an amount $X$ of prior mass.
 
 Naively, Equation~\ref{eqn:evidence} appears straightforward to compute because
 it is a simple expectation of $L$ with respect to the distribution $\pi$.
@@ -247,7 +253,7 @@ variance that are very implausible given the data.
 Alternatives to NS include methods based on `annealing', where a sequence of
 distributions of the form of Equation~\ref{eqn:power_posterior} is used.
 There are many different methods based on this idea, such as the popular
-parallel tempering method \citep{pt}.
+parallel tempering method \citep{pt, gregory}.
 However, unlike annealing methods, NS requires only a small number of
 tuning parameters (just the number of particles $N$ is inherent to NS, although
 most NS implementations also have some tuning parameters related to their
@@ -702,6 +708,9 @@ prior-sensitivity analysis.'' Statistical Science 29.3 (2014): 397-419.
 \bibitem[Caticha(2008)]{caticha} Caticha, A.\ 2008.\ Lectures 
 on Probability, Entropy, and Statistical Physics.\ ArXiv e-prints 
 arXiv:0808.0012. 
+
+\bibitem[\protect\citeauthoryear{Gregory}{2005}]{gregory}
+Gregory, Phil. Bayesian Logical Data Analysis for the Physical Sciences: A Comparative Approach with Mathematica® Support. Cambridge University Press, 2005.
 
 \bibitem[Gull and Daniell(1978)]{gull} Gull, Stephen F., and Daniell, G., 1978
 Image reconstruction from incomplete and noisy data. Nature (1978): 686-690.
