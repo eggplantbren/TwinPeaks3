@@ -68,7 +68,7 @@ void ImageEntropy::compute_scalars()
 			S += -image[i][j]*log(image[i][j] + 1E-300);
 
 	vector< vector<double> > blurred = image;
-	preblur.blur_image2(blurred);
+//	preblur.blur_image2(blurred);
 	psf.blur_image2(blurred);
 
 	// Log likelihood
@@ -84,7 +84,7 @@ void ImageEntropy::compute_scalars()
 void ImageEntropy::write_text(ostream& out) const
 {
 	vector< vector<double> > blurred = image;
-	preblur.blur_image2(blurred);
+	//preblur.blur_image2(blurred);
 
 	for(size_t i=0; i<image.size(); i++)
 		for(size_t j=0; j<image[i].size(); j++)
