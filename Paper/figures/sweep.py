@@ -16,7 +16,7 @@ def deriv(state):
 x = np.linspace(1E-6, 1, 1001)
 
 # Timestep
-t_final, dt = 10., 0.003
+t_final, dt = 10., 0.01
 steps = int(t_final/dt)
 
 # Initial condition for threshold
@@ -48,6 +48,7 @@ for i in range(0, steps):
 
 	plt.axhline(X, linestyle='--', color='g')
 	plt.axvline(X, linestyle='--', color='r')
+	plt.savefig('%0.4d' % (i + 1) + '.png', bbox_inches='tight')
 	plt.draw()
 
 # Finalise plotting
