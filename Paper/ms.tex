@@ -577,6 +577,22 @@ U_{\rm LJ}(\boldsymbol{r}_i, \boldsymbol{r}_j)
 \end{eqnarray}
 We adopted the Lennard Jones units by setting $\epsilon=1$ and $\sigma=1$.
 
+In terms of the Lennard Jones parameters $\epsilon$ and $\sigma$, the
+``polymer'' potential is
+\begin{eqnarray}
+U_{\rm polymer} &=&
+\sum_{i=1}^{n-1} \phi^{(1)}_{i,i+1} + \sum_{i=2}^{n-1} \phi^{(2)}_{i-1, i, i+1}
+\end{eqnarray}
+where
+
+\begin{eqnarray}
+\phi^{(1)}_{i,i+1} &=& \frac{k}{2}\left(|\boldsymbol{r}_i - \boldsymbol{r}_{i+1}|- 2^{1/6}\sigma\right)^2,\\
+\phi^{(2)}_{i-1, i, i+1} &=& \frac{k}{2}
+\left((\boldsymbol{r}_i - \boldsymbol{r}_{i-1})\cdot(\boldsymbol{r}_{i-1} - \boldsymbol{r}_{i}) - 1\right)^2,
+\end{eqnarray}
+and $k=\frac{36 \times 2^{2/3}\epsilon}{\sigma^2}$ has been chosen to match
+the curvature of $U_LJ(\boldsymbol{r}_i, \boldsymbol{r}_j)$.
+
 
 \section{Example 3: ``MaxEnt'' image deconvolution example}
 Problems with more than one objective function can also arise in data
