@@ -556,6 +556,26 @@ true partition function and KL divergence given in Figure~\ref{fig:truth}.
 
 \section{Example 2: Lennard-Jones/Polymer Example}
 
+Consider $n$ Lennard-Jones atoms confined to the unit cube $[0, 1]^3$.
+The position of each atom is given by a vector
+$\boldsymbol{r}_i = (x_i, y_i, z_i)$.
+The potential energy of any configuration of the atoms is given by
+a sum over all pairs of atoms:
+\begin{eqnarray}
+U_{\rm LJ} &=& \sum_{i=1}^n\sum_{j=(i+1)}^n U_{\rm LJ}
+(\boldsymbol{r}_i, \boldsymbol{r}_j)
+\end{eqnarray}
+where the inter-atomic potential energy is given by:
+
+\begin{eqnarray}
+U_{\rm LJ}(\boldsymbol{r}_i, \boldsymbol{r}_j)
+&=& 4\epsilon
+\left[
+\left(\frac{\sigma}{|\boldsymbol{r}_i - \boldsymbol{r}_j|}\right)^12 -
+\left(\frac{\sigma}{|\boldsymbol{r}_i - \boldsymbol{r}_j|}\right)^6
+\right].
+\end{eqnarray}
+We adopted the Lennard Jones units by setting $\epsilon=1$ and $\sigma=1$.
 
 
 \section{Example 3: ``MaxEnt'' image deconvolution example}
@@ -591,9 +611,11 @@ p(\boldsymbol{m} | \boldsymbol{D})
 -\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]\, d^n\boldsymbol{m}}
 \end{eqnarray}
 
-
-Therefore, this is a `doubly intractable' problem, closely related to
-those studied (and solved) by \citep{murray}.
+Therefore, this is a `doubly intractable' problem \citep{murray}. An integral, whose
+result is a function of the parameters, appears in the {\em denominator} of the
+target density. However, in our case the integral in the
+denominator arises from the prior for the parameters, rather than from the
+likelihood function.
 
 \section{What kind of accuracy can we expect?}
 
@@ -664,7 +686,9 @@ for valuable conversations.
 
 BJB initiated the project and explored various ideas which did not work.
 EC worked on the biased sampling suggestion in Section~\ref{sec:rationale},
-discovered the failure mode in Section~\ref{sec:failure_modes}, ...
+discovered the failure mode in Section~\ref{sec:failure_modes}, and was involved
+in many other discussions about the project. RB suggested the statistical
+mechanics example and helped BJB to get it working and to interpret the results.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \conflictofinterests{Conflicts of Interest}
