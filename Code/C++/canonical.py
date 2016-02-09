@@ -18,7 +18,7 @@ def logsumexp(values):
 
 
 # Temperatures
-T1, T2 = 2., 10000.
+T1, T2 = 1., 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
 sample = loadtxt('sample.txt')
