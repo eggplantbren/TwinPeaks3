@@ -616,6 +616,22 @@ $\sigma$, assumed known. This is usually written as
 where $\boldsymbol{n}$ is the noise in each pixel and $\boldsymbol{P}$ is
 the blurring operator written in matrix form.
 
+The prior for the pixel intensities $\{m_i\}$ has an ``entropic'' form,
+where images are upweighted (relative to a uniform prior) if the pixel
+intensities have a low dynamic range. The prior density is
+\begin{eqnarray}
+p(\boldsymbol{m}) \propto \exp
+\left[
+-\lambda \sum_{i=1}^n m_i \ln m_i
+\right]
+\end{eqnarray}
+where $\lambda$ is a hyperparameter.
+
+In the 1980s, this prior was thought to have a fundamental status, but this
+is no longer the case \citep{massinf}. Instead, we can consider the configurational
+entropy $-\sum_{i=1}^n m_i \ln m_i$ as simply a function of an image that may
+be relevant somehow, and that we are uncertain about.
+
 The posterior for the underlying image given the data is
 \begin{eqnarray}
 p(\boldsymbol{m} | \boldsymbol{D})
@@ -771,6 +787,10 @@ configurational spaces.\ ArXiv e-prints arXiv: 0906.3544.
 \bibitem[Polson and Scott(2014)]{vertical}
 Polson, Nicholas G., and James G. Scott. ``Vertical-likelihood Monte Carlo
 Integration.'' arXiv preprint arXiv:1409.3601 (2014).
+
+\bibitem[\protect\citeauthoryear{Skilling}{1998}]{massinf}
+Skilling J., 1998, Massive Inference and Maximum Entropy, in Maximum Entropy
+and Bayesian Methods, Kluwer Academic Publishers, Dordrecht/Boston/London p.14
 
 \bibitem[\protect\citeauthoryear{Skilling}{2006}]{skilling} Skilling, J., 2006, Nested Sampling for General Bayesian Computation, Bayesian Analysis 4, pp. 833-860.
 
