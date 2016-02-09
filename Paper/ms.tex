@@ -620,13 +620,12 @@ The prior for the pixel intensities $\{m_i\}$ has an ``entropic'' form,
 where images are upweighted (relative to a uniform prior) if the pixel
 intensities have a low dynamic range. The prior density is
 \begin{eqnarray}
-p(\boldsymbol{m}) \propto \exp
+p(\boldsymbol{m} | \lambda) \propto \exp
 \left[
 -\lambda \sum_{i=1}^n m_i \ln m_i
 \right]
 \end{eqnarray}
 where $\lambda$ is a hyperparameter.
-
 In the 1980s, this prior was thought to have a fundamental status, but this
 is no longer the case \citep{massinf}. Instead, we can consider the configurational
 entropy $-\sum_{i=1}^n m_i \ln m_i$ as simply a function of an image that may
@@ -634,16 +633,16 @@ be relevant somehow, and that we are uncertain about.
 
 The posterior for the underlying image given the data is
 \begin{eqnarray}
-p(\boldsymbol{m} | \boldsymbol{D})
-&=& \frac{p(\boldsymbol{m})p(\boldsymbol{D}|\boldsymbol{m})}
-{\int p(\boldsymbol{m})p(\boldsymbol{D}|\boldsymbol{m}) \,d^n\boldsymbol{m}}\\
+p(\boldsymbol{m} | \boldsymbol{D}, \lambda)
+&=& \frac{p(\boldsymbol{m} | \lambda)p(\boldsymbol{D}|\boldsymbol{m}, \lambda)}
+{\int p(\boldsymbol{m}|\lambda)p(\boldsymbol{D}|\boldsymbol{m}, \lambda) \,d^n\boldsymbol{m}}\\
 &=& \frac{\exp\left[-\lambda \sum_i m_i\ln m_i
 -\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]}
 {\int \exp\left[-\lambda \sum_i m_i\ln m_i
 -\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]\, d^n\boldsymbol{m}}
 \end{eqnarray}
 
-Therefore, this is a `doubly intractable' problem \citep{murray}. An integral, whose
+This is a `doubly intractable' problem \citep{murray}, since an integral, whose
 result is a function of the parameters, appears in the {\em denominator} of the
 target density. However, in our case the integral in the
 denominator arises from the prior for the parameters, rather than from the
