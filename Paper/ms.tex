@@ -623,18 +623,41 @@ the blurring operator written in matrix form.
 
 The prior for the pixel intensities $\{x_i\}$ has an ``entropic'' form,
 where images are upweighted (relative to a uniform prior) if the pixel
-intensities have a low dynamic range. The prior density is
+intensities have a low dynamic range. The prior density is defined conditional
+on a hyperparameter $\lambda$:
 \begin{eqnarray}
-p(\boldsymbol{x} | \lambda) \propto \exp
-\left[
--\lambda \sum_{i=1}^n x_i \ln x_i
-\right]
+p(\boldsymbol{x} | \lambda) &=&
+\frac{\exp\left[\lambda S(\xx)\right]}{\int \exp\left[\lambda S(\xx)\right] \, d\xx}
+\label{eq:entropy_prior}
 \end{eqnarray}
-where $\lambda$ is a hyperparameter.
+where
+\begin{eqnarray}
+S(\xx) &=& -\sum_{i=1}^n x_i \ln x_i
+\end{eqnarray}
+is the ``configurational entropy'' of the image (crucially, this is a function of
+an image, and not a function of a probability distribution).
+The denominator in Equation~\ref{eq:entropy_prior} ensures the conditional prior
+is normalized.
+
 In the 1980s, this prior was thought to have a fundamental status, but this
-is no longer the case \citep{massinf}. Instead, we can consider the configurational
-entropy $-\sum_{i=1}^n x_i \ln x_i$ as simply a function of an image that may
-be relevant somehow, and that we are uncertain about.
+is no longer the case \citep{massinf}, although the function $S(\xx)$ does
+have special properties when its argument is a measure \citep{knuth_skilling}.
+However, it is still a prior whose
+consequences we might be interested in.
+
+Instead, we can consider the configurational
+entropy $S(\xx)$ as simply a function of an image that may
+be relevant somehow, and that we are uncertain about. The joint posterior
+for $\xx$ and $\lambda$ is:
+\begin{eqnarray}
+p(\lambda, \xx | \data) &=&
+\frac{p(\lambda)p(\xx | \lambda)p(\data | \xx)}
+{p(\data)}\\
+&=&
+\frac{p(\lambda)p(\xx | \lambda)p(\data | \xx)}
+{p(\data)}
+\end{eqnarray}
+
 
 The posterior for the underlying image given the data is
 \begin{eqnarray}
@@ -776,6 +799,11 @@ Gregory, Phil. Bayesian Logical Data Analysis for the Physical Sciences: A Compa
 Image reconstruction from incomplete and noisy data. Nature (1978): 686-690.
 
 \bibitem[Hansmann(1997)]{pt} Hansmann, Ulrich HE., 1997, ``Parallel tempering algorithm for conformational studies of biological molecules.'', Chemical Physics Letters 281, no. 1 (1997): 140-150.
+
+\bibitem[Knuth and Skilling(2010)]{knuth_skilling} Knuth, K.~H., 
+Skilling, J.\ 2010.\ Foundations of Inference.\
+Axioms 1.1 (2012): 38-73.\
+ArXiv e-prints arXiv:1008.4831. 
 
 \bibitem[Murray(2012)]{murray} Murray, Iain, Ghahramani, Zoubin, and MacKay, David.
 ``MCMC for doubly-intractable distributions.'' arXiv preprint arXiv:1206.6848 (2012).
