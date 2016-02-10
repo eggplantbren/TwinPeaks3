@@ -189,15 +189,15 @@ Monte Carlo approximations of the posterior distribution, and to
 calculate the `information',
 or Kullback-Leibler divergence from the prior to the posterior:
 \begin{eqnarray}
-\mathcal{H} &=& \int p(\xx | \data, \II) \ln
+H &=& \int p(\xx | \data, \II) \ln
 \left[\frac{p(\xx | \data, \II)}{p(\xx | \II)}\right] \, d\xx \\
 &=& \int \frac{\pi(\xx) L(\xx)}{Z} \ln
 \left[\frac{L(\xx)}{Z}\right] \, d\xx.
 \end{eqnarray}
-$\mathcal{H}$ quantifies how compressed the posterior distribution is with
-respect to the prior. For example, $\mathcal{H} = 10$ implies (loosely speaking)
+$H$ quantifies how compressed the posterior distribution is with
+respect to the prior. For example, $H = 10$ implies (loosely speaking)
 that the posterior occupies a fraction $e^{-10}$ of the prior mass.
-$\mathcal{H}$ can be interpreted quite literally as a measure of how much
+$H$ can be interpreted quite literally as a measure of how much
 the data $\data$ told you about $\xx$.
 
 NS works by drawing particles from the
@@ -599,6 +599,7 @@ the curvature of $U_{\rm LJ}(\boldsymbol{r}_i, \boldsymbol{r}_j)$.
 
 
 \section{Example 3: ``MaxEnt'' image deconvolution example}
+
 Problems with more than one objective function can also arise in data
 analysis. Consider, for example, the problem of deblurring a noisy
 image. A common approach to these problems is regularized inversion,
@@ -607,43 +608,43 @@ to distinguish between this method and the maximum entropy principle used
 to update or assign probabilities \citep{caticha}.
 
 The unknown parameters are a set of pixel intensities
-$\{m_i\}_{i=1}^n$ where $n$ is the number of pixels and $m_i \geq 0$.
+$\{x_i\}_{i=1}^n$ where $n$ is the number of pixels and $x_i \geq 0$.
 The dataset is also a collection of pixel intensities $\{D_i\}_{i=1}^n$.
 The prior for the dataset given the parameters is a normal distribution
-with mean given by the underlying image $\{m_i\}$ convolved by
+with mean given by the underlying image $\{xi\}$ convolved by
 a point spread function. The standard deviation of each pixel is
 $\sigma$, assumed known. This is usually written as
 
 \begin{eqnarray}
-\boldsymbol{D} = \boldsymbol{P}\boldsymbol{m} + \boldsymbol{n}
+\boldsymbol{D} = \boldsymbol{M}\boldsymbol{x} + \boldsymbol{n}
 \end{eqnarray}
-where $\boldsymbol{n}$ is the noise in each pixel and $\boldsymbol{P}$ is
+where $\boldsymbol{n}$ is the noise in each pixel and $\boldsymbol{M}$ is
 the blurring operator written in matrix form.
 
-The prior for the pixel intensities $\{m_i\}$ has an ``entropic'' form,
+The prior for the pixel intensities $\{x_i\}$ has an ``entropic'' form,
 where images are upweighted (relative to a uniform prior) if the pixel
 intensities have a low dynamic range. The prior density is
 \begin{eqnarray}
-p(\boldsymbol{m} | \lambda) \propto \exp
+p(\boldsymbol{x} | \lambda) \propto \exp
 \left[
--\lambda \sum_{i=1}^n m_i \ln m_i
+-\lambda \sum_{i=1}^n x_i \ln x_i
 \right]
 \end{eqnarray}
 where $\lambda$ is a hyperparameter.
 In the 1980s, this prior was thought to have a fundamental status, but this
 is no longer the case \citep{massinf}. Instead, we can consider the configurational
-entropy $-\sum_{i=1}^n m_i \ln m_i$ as simply a function of an image that may
+entropy $-\sum_{i=1}^n x_i \ln x_i$ as simply a function of an image that may
 be relevant somehow, and that we are uncertain about.
 
 The posterior for the underlying image given the data is
 \begin{eqnarray}
-p(\boldsymbol{m} | \boldsymbol{D}, \lambda)
-&=& \frac{p(\boldsymbol{m} | \lambda)p(\boldsymbol{D}|\boldsymbol{m}, \lambda)}
-{\int p(\boldsymbol{m}|\lambda)p(\boldsymbol{D}|\boldsymbol{m}, \lambda) \,d^n\boldsymbol{m}}\\
-&=& \frac{\exp\left[-\lambda \sum_i m_i\ln m_i
--\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]}
-{\int \exp\left[-\lambda \sum_i m_i\ln m_i
--\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}m_{j}\right)^2\right]\, d^n\boldsymbol{m}}
+p(\boldsymbol{x} | \boldsymbol{D}, \lambda)
+&=& \frac{p(\boldsymbol{x} | \lambda)p(\boldsymbol{D}|\boldsymbol{x}, \lambda)}
+{\int p(\boldsymbol{x}|\lambda)p(\boldsymbol{D}|\boldsymbol{x}, \lambda) \,d^n\boldsymbol{m}}\\
+&=& \frac{\exp\left[-\lambda \sum_i x_i\ln x_i
+-\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}x_{j}\right)^2\right]}
+{\int \exp\left[-\lambda \sum_i x_i\ln x_i
+-\frac{1}{2\sigma^2}\left(D_i - \sum_{j} P_{ij}x_{j}\right)^2\right]\, d^n\boldsymbol{m}}
 \end{eqnarray}
 
 This is a `doubly intractable' problem \citep{murray}, since an integral, whose
@@ -682,16 +683,16 @@ supported by the data. But is this a realistic situation?
 Prior to knowing the data $D$, we don't know how much information we will get
 about the question of $M_1$ vs. $M_2$, quantified by the KL divergence:
 \begin{eqnarray}
-\mathcal{H} &=& \sum_{i=1}^2 P(M_i | D)
+H &=& \sum_{i=1}^2 P(M_i | D)
 \ln\left[
 \frac{P(M_i | D)}{P(M_i)}
 \right].
 \end{eqnarray}
 
-The expected value of $\mathcal{H}$ (with respect to the prior over datasets)
+The expected value of $H$ (with respect to the prior over datasets)
 is the mutual information:
 \begin{eqnarray}
-\mathcal{I} &=& \mathds{E}\left[\mathcal{H}\right]\\
+\mathcal{I} &=& \mathds{E}\left[H\right]\\
 &=&
 \sum_{i=1}^2 \int P(M_i, D)
 \ln\left[
