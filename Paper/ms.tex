@@ -337,7 +337,7 @@ Simple Monte Carlo sampling from $\pi$ will not work except for values of
 $(\beta_1, \beta_2)$ where the canonical distribution remains similar to $\pi$.
 We need a sampler that explores regions where $L_1$ and $L_2$ are high in order
 to accurately estimate $Z(\beta_1, \beta_2)$.
-\begin{figure}
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.5]{figures/joint1.pdf}
 \caption{\it An example of a prior for $L_1$ and $L_2$, which is implied by
@@ -435,7 +435,7 @@ relevant suggests that a standard NS run with objective function
 $X(L_1(\xx), L_2(\xx))$ would achieve a similar effect to the turn-the-corner
 idea.
 
-\begin{figure}
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.5]{figures/contours.pdf}
 \caption{\it The joint prior for the objective functions, and fifteen
@@ -493,7 +493,7 @@ $\hat{X} \geq \hat{X}_{(k)}$. That is, set
 
 %Step 1 of the algorithm ensures that NS property 1 is trivially satisfied.
 
-\begin{figure}
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.5]{figures/joint2.pdf}
 \caption{\it The joint prior for the objective functions, and Monte Carlo
@@ -531,7 +531,7 @@ The true partition function (computed numerically) and the Kullback-Leibler
 divergence from the prior to the canonical distribution are shown in
 Figure~\ref{fig:truth} as a function of two temperatures.
 
-\begin{figure}
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.75]{figures/truth.pdf}
 \caption{The true partition function and KL divergence (from the prior to
@@ -540,7 +540,7 @@ test problem.\label{fig:truth}}
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=1]{figures/output.png}
 \caption{The sequence of discarded particles (yellow) and
@@ -550,7 +550,7 @@ $(T_1, T_2) = (0.1, 1)$ (black).\label{fig:output}}
 
 
 
-\begin{figure}
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.5]{figures/results.pdf}
 \caption{Numerical results for the test problem. These compare well with the
