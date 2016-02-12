@@ -78,14 +78,14 @@ double Sampler<MyModel>::do_iteration()
 	std::sort(s2.begin(), s2.end());
 
 	// Calculate empirical measure of ranks
-	std::vector< std::vector<int> > empirical_measure(num_particles,
-										std::vector<int>(num_particles, 0));
+	std::vector< std::vector<bool> > empirical_measure(num_particles,
+										std::vector<bool>(num_particles, 0));
 	for(int i=0; i<num_particles; i++)
-		empirical_measure[num_particles - r2[i] - 1][r1[i]] += 1;
+		empirical_measure[num_particles - r2[i] - 1][r1[i]] = 1;
 
 	// Integrate empirical measure to get (inclusive) upper corner count
-	std::vector< std::vector<int> > ucc(num_particles,
-										std::vector<int>(num_particles, 0));
+	std::vector< std::vector<unsigned short> > ucc(num_particles,
+										std::vector<unsigned short>(num_particles, 0));
 	int up, right, up_and_right;
 	for(int i=0; i<num_particles; i++)
 	{
