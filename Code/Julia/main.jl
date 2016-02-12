@@ -10,9 +10,11 @@ sampler = Sampler(1000)
 initialise!(sampler)
 
 # Plot scalars
-plt.scatter(sampler.all_scalars[:, 1], sampler.all_scalars[:, 2],
+plt.scatter(sampler.scalars[:, 1], sampler.scalars[:, 2],
 					marker="o", alpha=0.5)
 plt.axis("scaled")
 plt.axis([-0.01, 1.01, -0.01, 1.01])
 plt.show()
+
+calculate_ucc(sampler, (5, 3))
 
