@@ -2,10 +2,15 @@
 An object of this class is a Sampler, obviously.
 """ ->
 type Sampler
+	# The walkers/particles
 	num_particles::Int64
-	particles::Vector{Particle}
+	particles::Array{Particle, 1}
 	scalars::Array{Float64, 2}
-	scalars_sorted::Array{Float64, 2}
+
+	# Stuff related to the ordering of the scalars
+	# by scalar 1 (first column) and then by scalar two (second column)
+	indices::Array{Int64, 2}
+	ranks::Array{Int64, 2}
 end
 
 @doc """
@@ -14,7 +19,8 @@ A constructor. Input the number of particles.
 function Sampler(num_particles::Int64)
 	return Sampler(num_particles, Array(Particle, (num_particles, )),
 									Array(Float64, (num_particles, 2)),
-									Array(Float64, (num_particles, 2)))
+									Array(Int64, (num_particles, 2)),
+									Array(Int64, (num_particles, 2)))
 end
 
 @doc """
@@ -29,9 +35,25 @@ function initialise!(sampler::Sampler)
 		sampler.scalars[i, :] = calculate_scalars(sampler.particles[i])
 	end
 
-	# Sort the scalars
-	sampler.scalars_sorted[:,1] = sort(sampler.scalars[:,1])
-	sampler.scalars_sorted[:,2] = sort(sampler.scalars[:,2])
+	# Do some sorting.
+	sort_scalars!(sampler)
+	return nothing
+end
+
+@doc """
+Sort the scalars. Store various kinds of results
+""" ->
+function sort_scalars!(sampler::Sampler)
+	# Do an argsort
+	sampler.indices[:,1] = sortperm(sampler.scalars[:,1])
+	sampler.indices[:,2] = sortperm(sampler.scalars[:,2])
+
+	# Use the argsort to compute the ranks of the original array elements
+	for(i in 1:sampler.num_particles)
+		sampler.ranks[sampler.indices[i, 1], 1] = i
+		sampler.ranks[sampler.indices[i, 2], 2] = i
+	end
+	return nothing
 end
 
 @doc """

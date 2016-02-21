@@ -16,5 +16,3 @@ plt.axis("scaled")
 plt.axis([-0.01, 1.01, -0.01, 1.01])
 plt.show()
 
-calculate_ucc(sampler, (5, 3))
-
