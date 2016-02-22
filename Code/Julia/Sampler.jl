@@ -48,24 +48,12 @@ function sort_scalars!(sampler::Sampler)
 	sampler.indices[:,1] = sortperm(sampler.scalars[:,1])
 	sampler.indices[:,2] = sortperm(sampler.scalars[:,2])
 
-	# Use the argsort to compute the ranks of the original array elements
+	# Use the argsort resuls to compute
+	# the ranks of the original array elements
 	for(i in 1:sampler.num_particles)
 		sampler.ranks[sampler.indices[i, 1], 1] = i
 		sampler.ranks[sampler.indices[i, 2], 2] = i
 	end
 	return nothing
-end
-
-@doc """
-Calculate the ucc at a certain position (defined by a pair of ranks)
-""" ->
-function calculate_ucc(sampler::Sampler, ranks::Tuple{Int64, Int64})
-	@assert length(ranks) == 2
-
-	# Scalars corresponding to the pair of ranks
-	s = (sampler.scalars_sorted[ranks[1], 1],
-					sampler.scalars_sorted[ranks[2], 2])
-
-	
 end
 
