@@ -861,11 +861,14 @@ Walter, C.\ Point Process-based Monte Carlo estimation.\ arXiv: 1412.6368.
 The upper corner count of particle $i$ is defined as the value of
 $\hat{X}$ at the position of particle $i$. Less formally, it is the number
 of other particles that are `up and to the right' of particle $i$ in
-a plot like Figure~\ref{fig:joint1}.
+a plot like Figure~\ref{fig:joint1}, plus one.
 
 \begin{eqnarray}
-C_i = \sum_{\substack{j=1\\j \neq i}}^N
-\mathds{1}\left[L_1(\xx_j) \geq L_1(\xx_i), L_2(\xx_j) \geq L_2(\xx_i)\right]
+C_i &=& \sum_{j=1}^N
+\mathds{1}\left[L_1(\xx_j) \geq L_1(\xx_i), L_2(\xx_j) \geq L_2(\xx_i)\right]\\
+&=& \sum_{j=1}^N
+\mathds{1}\left[L_1(\xx_j) \geq L_1(\xx_i)\right]
+\mathds{1}\left[L_2(\xx_j) \geq L_2(\xx_i)\right]
 \end{eqnarray}
 
 

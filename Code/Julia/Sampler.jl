@@ -57,3 +57,12 @@ function sort_scalars!(sampler::Sampler)
 	return nothing
 end
 
+@doc """
+Calculate the ucc as a function of rank wrt two objective functions.
+""" ->
+function calculate_uccs(sampler::Sampler)
+	uccs = zeros(UInt16, (sampler.num_particles, sampler.num_particles))
+
+	return uccs
+end
+
