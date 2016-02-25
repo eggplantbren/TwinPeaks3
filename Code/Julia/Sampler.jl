@@ -61,29 +61,25 @@ end
 Calculate the ucc as a function of rank wrt two objective functions.
 """ ->
 function calculate_uccs(sampler::Sampler)
+    # First construct the empirical measure (i.e. put a 1 where particles are
+    # and 0s elsewhere)
 	uccs = zeros(UInt16, (sampler.num_particles, sampler.num_particles))
 	for(i in 1:sampler.num_particles)
-		uccs[1:sampler.ranks[i, 1], 1:sampler.ranks[i, 2]] += 1
-	end
-	# Flip vertically
-	uccs = uccs[sampler.num_particles:-1:1, :]
-	return uccs
-end
-
-@doc """
-Calculate the ucc as a function of rank wrt two objective functions.
-""" ->
-function calculate_uccs2(sampler::Sampler)
-	empirical_measure = zeros(Bool, (sampler.num_particles, sampler.num_particles))
-	for(i in 1:sampler.num_particles)
-		empirical_measure[sampler.ranks[i, 1], sampler.ranks[i, 2]] = true
+		uccs[sampler.ranks[i, 1], sampler.ranks[i, 2]] = 1
 	end
 
-	uccs = zeros(UInt16, (sampler.num_particles, sampler.num_particles))
-	for(i in 1:sampler.num_particles)
-		for(j in 1:sampler.num_particles)
-			
-		end
+    # Sum over vertical dimension
+	for(j in 1:sampler.num_particles)
+		for(i in 2:sampler.num_particles)
+            uccs[i, j] += uccs[i-1, j]
+        end
+	end
+
+    # Sum over horizontal dimension
+	for(j in (sampler.num_particles-1):-1:1)
+		for(i in 1:sampler.num_particles)
+            uccs[i, j] += uccs[i, j+1]
+        end
 	end
 
 	return uccs
