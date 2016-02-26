@@ -109,6 +109,7 @@ end
 Do an NS iteration
 """ ->
 function update!(sampler::Sampler)
+    # Find the index of the worst particle (highest ucc)
     temp = -(sampler.particle_uccs + sampler.tiebreakers)
     worst = 1
     for(i in 2:sampler.num_particles)
@@ -117,7 +118,16 @@ function update!(sampler::Sampler)
         end
     end
 
-    println("Iteration ", sampler.iteration,
-                ". Worst ucc = ", sampler.particle_uccs[worst])
+    # Write out worst particle's details
+    mode = "w"
+    if(sampler.iteration > 0)
+        mode = "a"
+    end
+    f = open("output.txt", mode)
+    write(f, string(sampler.scalars[worst, :]))
+    close(f)
+
+    # Increment iteration
+    sampler.iteration += 1
 end
 
