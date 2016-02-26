@@ -7,6 +7,9 @@ type Sampler
 	particles::Array{Particle, 1}
 	scalars::Array{Float64, 2}
 
+    # Break ucc ties with these
+    tiebreakers::Array{Float64, 1}
+
 	# Stuff related to the ordering of the scalars
 	# by scalar 1 (first column) and then by scalar two (second column)
 	indices::Array{Int64, 2}
@@ -23,6 +26,7 @@ A constructor. Input the number of particles.
 function Sampler(num_particles::Int64)
 	return Sampler(num_particles, Array(Particle, (num_particles, )),
 									Array(Float64, (num_particles, 2)),
+                                    Array(Float64, (num_particles, )),
 									Array(Int64, (num_particles, 2)),
 									Array(Int64, (num_particles, 2)),
                                     Array(UInt16, (num_particles, num_particles)),
@@ -39,6 +43,7 @@ function initialise!(sampler::Sampler)
 		sampler.particles[i] = Particle()
 		from_prior!(sampler.particles[i])
 		sampler.scalars[i, :] = calculate_scalars(sampler.particles[i])
+        sampler.tiebreakers[i] = rand()
 	end
 
 	sort_scalars!(sampler)
