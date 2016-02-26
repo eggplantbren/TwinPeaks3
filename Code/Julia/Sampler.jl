@@ -2,6 +2,8 @@
 An object of this class is a Sampler, obviously.
 """ ->
 type Sampler
+    iteration::UInt64
+
 	# The walkers/particles
 	num_particles::Int64
 	particles::Array{Particle, 1}
@@ -15,6 +17,7 @@ type Sampler
 	indices::Array{Int64, 2}
 	ranks::Array{Int64, 2}
     uccs::Array{UInt16, 2}
+    particle_uccs::Array{UInt16, 1}
 
     # Forbidden rectangles
     forbidden_rectangles::Array{Float64, 2}
@@ -24,12 +27,13 @@ end
 A constructor. Input the number of particles.
 """ ->
 function Sampler(num_particles::Int64)
-	return Sampler(num_particles, Array(Particle, (num_particles, )),
+	return Sampler(0, num_particles, Array(Particle, (num_particles, )),
 									Array(Float64, (num_particles, 2)),
                                     Array(Float64, (num_particles, )),
 									Array(Int64, (num_particles, 2)),
 									Array(Int64, (num_particles, 2)),
                                     Array(UInt16, (num_particles, num_particles)),
+                                    Array(UInt16, (num_particles, )),
                                     transpose([-Inf -Inf]))
 end
 
@@ -92,6 +96,12 @@ function calculate_uccs!(sampler::Sampler)
             sampler.uccs[i, j] += sampler.uccs[i, j+1]
         end
 	end
+
+    # Calculate particle uccs
+	for(i in 1:sampler.num_particles)
+        sampler.particle_uccs[i] = sampler.uccs[sampler.ranks[i,1],
+                                                    sampler.ranks[i, 2]]
+	end
 	return nothing
 end
 
@@ -99,7 +109,15 @@ end
 Do an NS iteration
 """ ->
 function update!(sampler::Sampler)
-    temp = sampler.uccs + sampler.tiebreakers
-    indices = sortperm(temp)
+    temp = -(sampler.particle_uccs + sampler.tiebreakers)
+    worst = 1
+    for(i in 2:sampler.num_particles)
+        if(temp[i] < temp[worst])
+            worst = i
+        end
+    end
+
+    println("Iteration ", sampler.iteration,
+                ". Worst ucc = ", sampler.particle_uccs[worst])
 end
 

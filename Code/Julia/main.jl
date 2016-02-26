@@ -7,6 +7,7 @@ include("Sampler.jl")
 # Create and initialise a Sampler
 sampler = Sampler(1000)
 initialise!(sampler)
+update!(sampler)
 
 # Plot scalars and ranks
 plt.figure(1, figsize=(13, 6))
