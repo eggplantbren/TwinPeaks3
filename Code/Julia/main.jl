@@ -18,7 +18,6 @@ plt.axis([0, 1+sampler.num_particles+1, 0, 1+sampler.num_particles])
 
 # Plot upper corner counts
 plt.figure(2)
-uccs = calculate_uccs(sampler)
-plt.imshow(uccs, interpolation="nearest", cmap="viridis")
+plt.imshow(sampler.uccs, interpolation="nearest", cmap="viridis")
 plt.show()
 

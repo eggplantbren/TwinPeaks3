@@ -11,6 +11,10 @@ type Sampler
 	# by scalar 1 (first column) and then by scalar two (second column)
 	indices::Array{Int64, 2}
 	ranks::Array{Int64, 2}
+    uccs::Array{UInt16, 2}
+
+    # Forbidden rectangles
+    forbidden_rectangles::Array{Float64, 2}
 end
 
 @doc """
@@ -20,7 +24,9 @@ function Sampler(num_particles::Int64)
 	return Sampler(num_particles, Array(Particle, (num_particles, )),
 									Array(Float64, (num_particles, 2)),
 									Array(Int64, (num_particles, 2)),
-									Array(Int64, (num_particles, 2)))
+									Array(Int64, (num_particles, 2)),
+                                    Array(UInt16, (num_particles, num_particles)),
+                                    transpose([-Inf -Inf]))
 end
 
 @doc """
@@ -35,8 +41,8 @@ function initialise!(sampler::Sampler)
 		sampler.scalars[i, :] = calculate_scalars(sampler.particles[i])
 	end
 
-	# Do some sorting.
 	sort_scalars!(sampler)
+    calculate_uccs!(sampler)
 	return nothing
 end
 
@@ -60,28 +66,28 @@ end
 @doc """
 Calculate the ucc as a function of rank wrt two objective functions.
 """ ->
-function calculate_uccs(sampler::Sampler)
+function calculate_uccs!(sampler::Sampler)
     # First construct the empirical measure (i.e. put a 1 where particles are
     # and 0s elsewhere)
-	uccs = zeros(UInt16, (sampler.num_particles, sampler.num_particles))
+	sampler.uccs = zeros(UInt16, (sampler.num_particles, sampler.num_particles))
 	for(i in 1:sampler.num_particles)
-		uccs[sampler.ranks[i, 1], sampler.ranks[i, 2]] = 1
+		sampler.uccs[sampler.ranks[i, 1], sampler.ranks[i, 2]] = 1
 	end
 
     # Sum over vertical dimension
 	for(j in 1:sampler.num_particles)
 		for(i in 2:sampler.num_particles)
-            uccs[i, j] += uccs[i-1, j]
+            sampler.uccs[i, j] += sampler.uccs[i-1, j]
         end
 	end
 
     # Sum over horizontal dimension
 	for(j in (sampler.num_particles-1):-1:1)
 		for(i in 1:sampler.num_particles)
-            uccs[i, j] += uccs[i, j+1]
+            sampler.uccs[i, j] += sampler.uccs[i, j+1]
         end
 	end
 
-	return uccs
+	return nothing
 end
 
