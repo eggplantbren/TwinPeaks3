@@ -25,3 +25,18 @@ function logdiffexp(a::Float64, b::Float64)
 	return b + log(exp(a - b) - 1.)
 end
 
+@doc """
+Compare x and y, both vectors of floats (scalars).
+Returns 1 if x is higher, -1 if x is lower, and 0 if they're not
+comparable.
+""" ->
+function compare(x::Vector{Float64}, y::Vector{Float64})
+    @assert length(x) == length(y)
+    if all(x .> y)
+        return 1
+    elseif all(x .< y)
+        return -1
+    end
+    return 0
+end
+
