@@ -1,6 +1,9 @@
 #include "RNG.h"
 #include <cmath>
 
+namespace TwinPeaks
+{
+
 RNG::RNG()
 :uniform(0., 1.)
 ,normal(0., 1.)
@@ -32,4 +35,6 @@ int RNG::rand_int(int N)
 {
 	return static_cast<int>(floor(N*this->rand()));
 }
+
+} // namespace DNest4
 

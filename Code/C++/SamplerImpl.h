@@ -9,6 +9,9 @@
 #include <set>
 #include "Utils.h"
 
+namespace TwinPeaks
+{
+
 template<class MyModel>
 Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
 							int mcmc_steps,	int saves_per_iteration)
@@ -368,4 +371,6 @@ bool Sampler<MyModel>::is_in_lower_rectangle2(const std::vector<ScalarType>& s,
 	}
 	return true;
 }
+
+} // namespace TwinPeaks
 

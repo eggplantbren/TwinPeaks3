@@ -1,5 +1,5 @@
-#ifndef _Sampler_
-#define _Sampler_
+#ifndef TwinPeaks_Sampler
+#define TwinPeaks_Sampler
 
 #include <vector>
 #include <list>
@@ -7,8 +7,11 @@
 #include "RNG.h"
 #include "ScalarType.h"
 
+namespace TwinPeaks
+{
+
 /*
-* An object of this class is a classic Nested Sampler.
+* An object of this class is a Twinpeaks sampler.
 */
 
 template<class MyModel>
@@ -94,6 +97,8 @@ class Sampler
 		// to whatever's already in them
 		void clear_output_files();
 };
+
+} // namespace TwinPeaks
 
 #include "SamplerImpl.h"
 

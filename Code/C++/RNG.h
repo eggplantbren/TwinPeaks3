@@ -1,8 +1,14 @@
-#ifndef _RNG_
-#define _RNG_
+#ifndef TwinPeaks_RNG
+#define TwinPeaks_RNG
 
 #include <random>
 
+namespace TwinPeaks
+{
+
+/*
+* An object of this class represents a random number generator 
+*/
 class RNG
 {
 	private:
@@ -33,7 +39,9 @@ class RNG
 
 		// Integer from {0, 1, 2, ..., N-1}
 		int rand_int(int N);
-};
+}; // class RNG
+
+} // namespace TwinPeaks
 
 #endif
 

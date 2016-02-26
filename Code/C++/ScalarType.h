@@ -1,9 +1,12 @@
-#ifndef _ScalarType_
-#define _ScalarType_
+#ifndef TwinPeaks_ScalarType
+#define TwinPeaks_ScalarType
 
 #include <istream>
 #include <ostream>
 #include "RNG.h"
+
+namespace TwinPeaks
+{
 
 class ScalarType
 {
@@ -24,15 +27,12 @@ class ScalarType
 		double get_value() const { return value; }
 		void set_value(double val) { value = val; }
 
-		bool operator == (const ScalarType& other) const
-		{ return (value == other.value && tiebreaker == other.tiebreaker); }
-
-	friend bool operator < (const ScalarType& l1, const ScalarType& l2);
-	friend bool operator <= (const ScalarType& l1, const ScalarType& l2);
+        // Compare to another ScalarType object
+        // Return 1 if this is greater, -1 if less, 0 if incomparable
+        short compare(const ScalarType& other) const;
 };
 
-bool operator < (const ScalarType& l1, const ScalarType& l2);
-bool operator <= (const ScalarType& l1, const ScalarType& l2);
+} // namespace TwinPeaks
 
 #endif
 

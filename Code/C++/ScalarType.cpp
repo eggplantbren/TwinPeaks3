@@ -2,6 +2,9 @@
 #include "Utils.h"
 #include <cassert>
 
+namespace TwinPeaks
+{
+
 ScalarType::ScalarType()
 {
 }
@@ -30,23 +33,23 @@ double ScalarType::perturb(RNG& rng)
 	return 0.;
 }
 
-bool operator < (const ScalarType& s1, const ScalarType& s2)
+short ScalarType::compare(const ScalarType& other) const
 {
-	bool result = false;
-	if(s1.value < s2.value)
-		result = true;
-	else if(s1.value == s2.value && s1.tiebreaker < s2.tiebreaker)
-		result = true;
-	return result;
+    // Check for <
+    if(value < other.value)
+        return -1;
+    if(value == other.value && tiebreaker < other.tiebreaker)
+        return -1;
+
+    // Check for >
+    if(value > other.value)
+        return +1;
+    if(value == other.value && tiebreaker > other.tiebreaker)
+        return +1;
+
+    // Otherwise, they aren't comparable
+    return 0;
 }
 
-bool operator <= (const ScalarType& s1, const ScalarType& s2)
-{
-	bool result = false;
-	if(s1.value < s2.value)
-		result = true;
-	else if(s1.value == s2.value && s1.tiebreaker <= s2.tiebreaker)
-		result = true;
-	return result;
-}
+} // namespace TwinPeaks
 
