@@ -92,7 +92,14 @@ function calculate_uccs!(sampler::Sampler)
             sampler.uccs[i, j] += sampler.uccs[i, j+1]
         end
 	end
-
 	return nothing
+end
+
+@doc """
+Do an NS iteration
+""" ->
+function update!(sampler::Sampler)
+    temp = sampler.uccs + sampler.tiebreakers
+    indices = sortperm(temp)
 end
 
