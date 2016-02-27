@@ -28,8 +28,10 @@ int main(int argc, char** argv)
 	constexpr double depth = 600.;
 
 	// Create a sampler
-	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
+	Sampler<SimpleExample> sampler(num_particles, num_mcmc_steps, rngs);
 	sampler.initialise();
+
+    sampler.do_iteration();
 
 /*
 	double log_prior_mass = 0.;

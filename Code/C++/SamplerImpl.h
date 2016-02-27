@@ -1,54 +1,53 @@
 #include <iostream>
-#include <iomanip>
-#include <cstdlib>
-#include <limits>
-#include <fstream>
-#include <algorithm>
 #include <cassert>
-#include <thread>
-#include <set>
 #include "Utils.h"
 
 namespace TwinPeaks
 {
 
 template<class MyModel>
-Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
-							int mcmc_steps,	int saves_per_iteration)
-:rngs(rngs)
-,num_particles(num_particles)
-,particles(num_particles)
-,scalars(num_particles)
+Sampler<MyModel>::Sampler(unsigned int num_particles, unsigned int mcmc_steps,
+                            const std::vector<RNG>& rngs)
+:num_particles(num_particles)
 ,mcmc_steps(mcmc_steps)
-,saves_per_iteration(saves_per_iteration)
-,initialised(false)
-,iteration(0)
-,log_prior_mass(0.)
+,rngs(rngs)
+,particles(num_particles)
+,scalars(num_scalars, std::vector<ScalarType>(num_particles))
+,indices(num_scalars, std::vector<size_t>(num_particles))
+,ranks(num_scalars, std::vector<size_t>(num_particles))
+,particle_uccs(num_particles)
 {
-	// Open and close outputs file to clear them
-	std::fstream fout;
-	fout.open("sample.txt", std::ios::out);
-	fout.close();
-	fout.open("sample_info.txt", std::ios::out);
-	fout.close();
+    assert(num_particles > 0 && mcmc_steps > 0);
 }
 
 template<class MyModel>
 void Sampler<MyModel>::initialise()
 {
-	std::cout<<"# Generating "<<num_particles<<" particles from the prior...";
-	std::cout<<std::flush;
-	for(int i=0; i<num_particles; i++)
-	{
-		particles[i].from_prior(rngs[0]);
-		const std::vector<double>& s = particles[i].get_scalars();
-		scalars[i].clear();
-		for(size_t j=0; j<s.size(); j++)
-			scalars[i].push_back(ScalarType(s[j]));
-		for(size_t j=0; j<scalars[i].size(); j++)
-			scalars[i][j].from_prior(rngs[0]);
-	}
-	std::cout<<"done."<<std::endl<<std::endl;
+    std::cout<<"# Initialising TwinPeaks sampler."<<std::endl;
+    std::cout<<"# Generating "<<num_particles<<" particles from the prior...";
+    std::cout<<std::flush;
+    for(unsigned int i=0; i<num_particles; ++i)
+    {
+        particles[i].from_prior(rngs[0]);
+        const std::vector<double>& s = particles[i].get_scalars();
+        scalars[i].clear();
+        for(size_t j=0; j<s.size(); j++)
+            scalars[i].push_back(ScalarType(s[j]));
+        for(size_t j=0; j<scalars[i].size(); j++)
+            scalars[i][j].from_prior(rngs[0]);
+    }
+    std::cout<<"done."<<std::endl<<std::endl;
+}
+
+template<class MyModel>
+void Sampler<MyModel>::do_iteration()
+{
+    // Argsort by the two scalars
+    for(size_t i=0; i<scalars.size(); ++i)
+    {
+        indices[i] = argsort(scalars[i]);
+        ranks[i] = compute_ranks(indices[i]);
+    }
 }
 
 /*

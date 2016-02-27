@@ -75,3 +75,12 @@ double logdiffexp(double a, double b)
 	return log(exp(a) - exp(b)) + biggest;
 }
 
+std::vector<size_t> compute_ranks(const std::vector<size_t> indices)
+{
+	std::vector<size_t> r(indices.size());
+	for(size_t i=0; i<indices.size(); ++i)
+		r[indices[i]] = i;
+	return r;
+}
+
+
