@@ -43,5 +43,9 @@ class ScalarType
 
 } // namespace TwinPeaks
 
+// Less-than operator (uses compare)
+bool operator < (const TwinPeaks::ScalarType& s1,
+                    const TwinPeaks::ScalarType& s2);
+
 #endif
 

@@ -76,6 +76,12 @@ short ScalarType::compare(const vector<ScalarType>& s1,
 
 } // namespace TwinPeaks
 
+bool operator < (const TwinPeaks::ScalarType& s1,
+                    const TwinPeaks::ScalarType& s2)
+{
+    return TwinPeaks::ScalarType::compare(s1, s2) == -1;
+}
+
 /*
 
 #include <iostream>
