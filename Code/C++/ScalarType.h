@@ -3,6 +3,7 @@
 
 #include <istream>
 #include <ostream>
+#include <vector>
 #include "RNG.h"
 
 namespace TwinPeaks
@@ -28,8 +29,13 @@ class ScalarType
 		void set_value(double val) { value = val; }
 
         // Compare to another ScalarType object
-        // Return 1 if this is greater, -1 if less, 0 if incomparable
-        short compare(const ScalarType& other) const;
+        // Return 1 if first argument is greater, -1 if less, 0 if incomparable
+        static short compare(const ScalarType& s1, const ScalarType& s2);
+
+        // Compare vectors of ScalarTypes
+        // Return 1 if first argument is greater, -1 if less, 0 if incomparable
+        static short compare(const std::vector<ScalarType>& s1,
+                             const std::vector<ScalarType>& s2);
 };
 
 } // namespace TwinPeaks
