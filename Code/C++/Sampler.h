@@ -18,8 +18,6 @@ template<class MyModel>
 class Sampler
 {
 	private:
-        static constexpr size_t num_scalars = 2;
-
         // Sampler tuning parameters
         const unsigned int num_particles;
         const unsigned int mcmc_steps;
@@ -27,7 +25,7 @@ class Sampler
 		// The random number generators to use
 		std::vector<RNG> rngs;
 
-		/******** The particles, and metadata about them *******/
+		/**** The particles, and metadata about them ****/
 		std::vector<MyModel> particles;
 		std::vector< std::vector<ScalarType> > scalars;
 
@@ -37,7 +35,12 @@ class Sampler
 
         // UCCs of the particles (the non-integer part is for tiebreaking)
         std::vector<double> particle_uccs;
-        /******** END particle stuff ********/
+
+        /**** Things unassociated with particles ****/
+        std::vector< std::vector<unsigned short> > uccs;
+
+        /**** Private member functions ****/
+        void calculate_uccs();
 
 	public:
 		// Constructor

@@ -12,10 +12,11 @@ Sampler<MyModel>::Sampler(unsigned int num_particles, unsigned int mcmc_steps,
 ,mcmc_steps(mcmc_steps)
 ,rngs(rngs)
 ,particles(num_particles)
-,scalars(num_scalars, std::vector<ScalarType>(num_particles))
-,indices(num_scalars, std::vector<size_t>(num_particles))
-,ranks(num_scalars, std::vector<size_t>(num_particles))
+,scalars(2, std::vector<ScalarType>(num_particles))
+,indices(2, std::vector<size_t>(num_particles))
+,ranks(2, std::vector<size_t>(num_particles))
 ,particle_uccs(num_particles)
+,uccs(num_particles, std::vector<unsigned short>(num_particles))
 {
     assert(num_particles > 0 && mcmc_steps > 0);
 }
@@ -26,15 +27,12 @@ void Sampler<MyModel>::initialise()
     std::cout<<"# Initialising TwinPeaks sampler."<<std::endl;
     std::cout<<"# Generating "<<num_particles<<" particles from the prior...";
     std::cout<<std::flush;
-    for(unsigned int i=0; i<num_particles; ++i)
+    for(size_t k=0; k<num_particles; ++k)
     {
-        particles[i].from_prior(rngs[0]);
-        const std::vector<double>& s = particles[i].get_scalars();
-        scalars[i].clear();
-        for(size_t j=0; j<s.size(); j++)
-            scalars[i].push_back(ScalarType(s[j]));
-        for(size_t j=0; j<scalars[i].size(); j++)
-            scalars[i][j].from_prior(rngs[0]);
+        particles[k].from_prior(rngs[0]);
+        const std::vector<double>& s = particles[k].get_scalars();
+        for(size_t i=0; i<2; ++i)
+            scalars[i][k] = ScalarType(s[i], rngs[0].rand());
     }
     std::cout<<"done."<<std::endl<<std::endl;
 }
@@ -48,6 +46,22 @@ void Sampler<MyModel>::do_iteration()
         indices[i] = argsort(scalars[i]);
         ranks[i] = compute_ranks(indices[i]);
     }
+
+    // Calculate the UCCs
+}
+
+template<class MyModel>
+void Sampler<MyModel>::calculate_uccs()
+{
+    // Zero the uccs
+    for(size_t i=0; i<num_particles; ++i)
+        for(size_t j=0; j<num_particles; ++j)
+            uccs[i][j] = 0;
+
+    // First construct the empirical measure. That is, put ones where particle
+    // ranks are located, and zeroes elsewhere
+    for(size_t i=0; i<num_particles; ++i)
+        ++uccs[ranks[0][i]][ranks[1][i]];
 }
 
 /*
