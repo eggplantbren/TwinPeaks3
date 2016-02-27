@@ -1,9 +1,12 @@
-#ifndef _SimpleExample_
-#define _SimpleExample_
+#ifndef TwinPeaks_SimpleExample
+#define TwinPeaks_SimpleExample
 
 #include <vector>
 #include <iostream>
 #include "RNG.h"
+
+namespace TwinPeaks
+{
 
 class SimpleExample
 {
@@ -32,6 +35,8 @@ class SimpleExample
 		const std::vector<double>& get_scalars() const
 		{ return scalars; }
 };
+
+} // TwinPeaks
 
 #endif
 

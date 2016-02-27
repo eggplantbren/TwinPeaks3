@@ -5,6 +5,9 @@
 
 using namespace std;
 
+namespace TwinPeaks
+{
+
 SimpleExample::SimpleExample()
 :params(100)
 ,scalars(2)
@@ -54,4 +57,6 @@ void SimpleExample::write_text(std::ostream& out) const
 	for(size_t i=0; i<params.size(); i++)
 		out<<params[i]<<' ';
 }
+
+} // namespace TwinPeaks
 
