@@ -48,6 +48,7 @@ void Sampler<MyModel>::do_iteration()
     }
 
     // Calculate the UCCs
+    calculate_uccs();
 }
 
 template<class MyModel>
@@ -62,6 +63,23 @@ void Sampler<MyModel>::calculate_uccs()
     // ranks are located, and zeroes elsewhere
     for(size_t i=0; i<num_particles; ++i)
         ++uccs[ranks[0][i]][ranks[1][i]];
+
+    // Sum over horizontal direction
+    for(size_t i=0; i<num_particles; ++i)
+    {
+        for(int j=num_particles-1; j>=0; --j)
+            uccs[i][j] += uccs[i][j+1];
+    }
+    // Sum over vertical direction
+    for(size_t i=1; i<num_particles; ++i)
+    {
+        for(size_t j=0; j<num_particles; ++j)
+            uccs[i][j] += uccs[i-1][j];
+    }
+
+    // Assign the particle uccs, and add tiebreaking noise
+    for(size_t i=0; i<num_particles; ++i)
+        particle_uccs[i] = uccs[ranks[0][i]][ranks[1][i]] + rngs[0].rand();
 }
 
 /*
