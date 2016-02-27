@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cassert>
 #include "Utils.h"
 
@@ -10,6 +11,7 @@ Sampler<MyModel>::Sampler(unsigned int num_particles, unsigned int mcmc_steps,
                             const std::vector<RNG>& rngs)
 :num_particles(num_particles)
 ,mcmc_steps(mcmc_steps)
+,iteration(1)
 ,rngs(rngs)
 ,particles(num_particles)
 ,scalars(2, std::vector<ScalarType>(num_particles))
@@ -41,7 +43,7 @@ template<class MyModel>
 void Sampler<MyModel>::do_iteration()
 {
     // Argsort by the two scalars
-    for(size_t i=0; i<scalars.size(); ++i)
+    for(int i=0; i<2; ++i)
     {
         indices[i] = argsort(scalars[i]);
         ranks[i] = compute_ranks(indices[i]);
@@ -49,6 +51,19 @@ void Sampler<MyModel>::do_iteration()
 
     // Calculate the UCCs
     calculate_uccs();
+
+    // Find worst ucc (highest!)
+    size_t worst = 0;
+    for(size_t i=1; i<num_particles; ++i)
+        if(particle_uccs[i] > particle_uccs[worst])
+            worst = i;
+
+    std::cout<<std::setprecision(12);
+    std::cout<<(-static_cast<double>(iteration))/num_particles<<' ';
+    std::cout<<scalars[0][worst].get_value()<<' ';
+    std::cout<<scalars[1][worst].get_value()<<std::endl;
+
+    ++iteration;
 }
 
 template<class MyModel>

@@ -22,6 +22,9 @@ class Sampler
         const unsigned int num_particles;
         const unsigned int mcmc_steps;
 
+        // Iteration counter
+        unsigned int iteration;
+
 		// The random number generators to use
 		std::vector<RNG> rngs;
 
