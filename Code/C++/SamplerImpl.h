@@ -51,15 +51,16 @@ void Sampler<MyModel>::initialise()
 	std::cout<<"done."<<std::endl<<std::endl;
 }
 
+/*
 template<class MyModel>
 void Sampler<MyModel>::prune_rectangles(const std::vector<ScalarType>& latest)
 {
 	// Loop over all rectangles
 	for(auto it=rects.begin(); it != rects.end(); ++it)
 	{
-		if(is_in_lower_rectangle2(*it, latest))
+		if(it->compare(latest) == 1)
 			it = rects.erase(it);
-	}	
+	}
 }
 
 template<class MyModel>
@@ -335,42 +336,7 @@ int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 	}
 	return accepted;
 }
-
-template<class MyModel>
-bool Sampler<MyModel>::is_okay(const std::vector<ScalarType>& s)
-{
-	for(auto it=rects.begin();
-				it != rects.end(); it++)
-	{
-		if(is_in_lower_rectangle(s, *it))
-			return false;
-	}
-	return true;
-}
-
-template<class MyModel>
-bool Sampler<MyModel>::is_in_lower_rectangle(const std::vector<ScalarType>& s,
-											const std::vector<ScalarType>& rect)
-{
-	for(size_t i=0; i<s.size(); i++)
-	{
-		if(!(s[i] < rect[i]))
-			return false;
-	}
-	return true;
-}
-
-template<class MyModel>
-bool Sampler<MyModel>::is_in_lower_rectangle2(const std::vector<ScalarType>& s,
-											const std::vector<ScalarType>& rect)
-{
-	for(size_t i=0; i<s.size(); i++)
-	{
-		if(!(s[i] <= rect[i]))
-			return false;
-	}
-	return true;
-}
+*/
 
 } // namespace TwinPeaks
 

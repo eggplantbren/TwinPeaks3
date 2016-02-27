@@ -8,6 +8,7 @@
 #include "Sampler.h"
 #include "Models/SimpleExample.h"
 
+using namespace TwinPeaks;
 using namespace std;
 
 int main(int argc, char** argv)
@@ -30,11 +31,13 @@ int main(int argc, char** argv)
 	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
 	sampler.initialise();
 
+/*
 	double log_prior_mass = 0.;
 	do
 	{
 		log_prior_mass = sampler.do_iteration();
 	}while(-log_prior_mass < depth);
+*/
 
 	return 0;
 }

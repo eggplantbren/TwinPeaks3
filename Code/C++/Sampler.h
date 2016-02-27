@@ -64,17 +64,6 @@ class Sampler
 		// Remove redundant rectangles
 		void prune_rectangles(const std::vector<ScalarType>& latest);
 
-		// Functions to determine whether a point is within another point's
-		// rectangle. Strict version
-		static bool is_in_lower_rectangle(const std::vector<ScalarType>& s1,
-											const std::vector<ScalarType>& s2);
-
-		// Non-strict version
-		static bool is_in_lower_rectangle2(const std::vector<ScalarType>& s1,
-											const std::vector<ScalarType>& s2);
-
-
-
 	public:
 		// Constructor
 		Sampler(const std::vector<RNG>& rngs, int num_particles, int mcmc_steps,
