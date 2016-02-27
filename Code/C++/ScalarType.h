@@ -28,6 +28,9 @@ class ScalarType
 		double get_value() const { return value; }
 		void set_value(double val) { value = val; }
 
+        // Print to stream
+        void print(std::ostream& out) const;
+
         // Compare to another ScalarType object
         // Return 1 if first argument is greater, -1 if less, 0 if incomparable
         static short compare(const ScalarType& s1, const ScalarType& s2);

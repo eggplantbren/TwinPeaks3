@@ -35,6 +35,11 @@ double ScalarType::perturb(RNG& rng)
 	return 0.;
 }
 
+void ScalarType::print(std::ostream& out) const
+{
+    out<<value<<' '<<tiebreaker<<' ';
+}
+
 short ScalarType::compare(const ScalarType& s1, const ScalarType& s2)
 {
     // Check for <
@@ -71,3 +76,33 @@ short ScalarType::compare(const vector<ScalarType>& s1,
 
 } // namespace TwinPeaks
 
+/*
+
+#include <iostream>
+#include <ctime>
+using namespace TwinPeaks;
+
+int main()
+{
+    vector<ScalarType> s1, s2;
+    RNG rng;
+    rng.set_seed(time(0));
+
+    for(int i=0; i<2; ++i)
+    {
+        s1.push_back(ScalarType(rng.rand(), rng.rand()));
+        s2.push_back(ScalarType(rng.rand(), rng.rand()));
+    }
+
+    for(int i=0; i<2; ++i)
+        cout<<s1[i].get_value()<<' ';
+    cout<<endl;
+    for(int i=0; i<2; ++i)
+        cout<<s2[i].get_value()<<' ';
+    cout<<endl;
+    cout<<endl;
+    cout<<ScalarType::compare(s1, s2)<<endl;
+
+    return 0;
+}
+*/
