@@ -18,7 +18,7 @@ Sampler<MyModel>::Sampler(unsigned int num_particles, unsigned int mcmc_steps,
 ,indices(2, std::vector<size_t>(num_particles))
 ,ranks(2, std::vector<size_t>(num_particles))
 ,particle_uccs(num_particles)
-,uccs(num_particles, std::vector<unsigned short>(num_particles))
+,particle_ucc_tiebreakers(num_particles)
 {
     assert(num_particles > 0 && mcmc_steps > 0);
 }
@@ -35,6 +35,7 @@ void Sampler<MyModel>::initialise()
         const std::vector<double>& s = particles[k].get_scalars();
         for(size_t i=0; i<2; ++i)
             scalars[i][k] = ScalarType(s[i], rngs[0].rand());
+        particle_ucc_tiebreakers[k] = rngs[0].rand();
     }
     std::cout<<"done."<<std::endl<<std::endl;
 }
@@ -55,7 +56,10 @@ void Sampler<MyModel>::do_iteration()
     // Find worst ucc (highest!)
     size_t worst = 0;
     for(size_t i=1; i<num_particles; ++i)
-        if(particle_uccs[i] > particle_uccs[worst])
+        if(particle_uccs[i] > particle_uccs[worst] ||
+            (
+            particle_uccs[i] == particle_uccs[worst] &&
+            particle_ucc_tiebreakers[i] > particle_ucc_tiebreakers[worst]))
             worst = i;
 
     std::cout<<std::setprecision(12);
@@ -69,10 +73,9 @@ void Sampler<MyModel>::do_iteration()
 template<class MyModel>
 void Sampler<MyModel>::calculate_uccs()
 {
-    // Zero the uccs
-    for(size_t i=0; i<num_particles; ++i)
-        for(size_t j=0; j<num_particles; ++j)
-            uccs[i][j] = 0;
+    // Start with zeros
+    std::vector< std::vector<unsigned short> > uccs(num_particles,
+                        std::vector<unsigned short>(num_particles, 0));
 
     // First construct the empirical measure. That is, put ones where particle
     // ranks are located, and zeroes elsewhere
@@ -92,9 +95,9 @@ void Sampler<MyModel>::calculate_uccs()
             uccs[i][j] += uccs[i-1][j];
     }
 
-    // Assign the particle uccs, and add tiebreaking noise
+    // Assign the particle uccs (subtract 1 to not count self)
     for(size_t i=0; i<num_particles; ++i)
-        particle_uccs[i] = uccs[ranks[0][i]][ranks[1][i]] + rngs[0].rand();
+        particle_uccs[i] = uccs[ranks[0][i]][ranks[1][i]] - 1;
 }
 
 /*

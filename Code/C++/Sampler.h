@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <fstream>
+#include "Rectangle.h"
 #include "RNG.h"
 #include "ScalarType.h"
 
@@ -37,10 +38,11 @@ class Sampler
         std::vector< std::vector<size_t> > ranks;
 
         // UCCs of the particles (the non-integer part is for tiebreaking)
-        std::vector<double> particle_uccs;
+        std::vector<unsigned short> particle_uccs;
+        std::vector<double> particle_ucc_tiebreakers;
 
-        /**** Things unassociated with particles ****/
-        std::vector< std::vector<unsigned short> > uccs;
+        /**** The forbidden rectangles ****/
+        std::list<Rectangle> forbidden_rectangles;
 
         /**** Private member functions ****/
         void calculate_uccs();
