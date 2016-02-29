@@ -189,6 +189,11 @@ void Sampler<MyModel>::replace_particle(size_t which)
             logp = logp_proposal;
             ++accepted;
         }
+
+//        std::cout<<logp<<' ';
+//        for(int k=0; k<2; ++k)
+//            std::cout<<particle_scalars[k].get_value()<<' ';
+//        std::cout<<std::endl;
     }
 
     // Copy evolved particle back over to Sampler object arrays
@@ -228,24 +233,46 @@ void Sampler<MyModel>::calculate_uccs()
     // First construct the empirical measure. That is, put ones where particle
     // ranks are located, and zeroes elsewhere
     for(size_t i=0; i<num_particles; ++i)
-        ++uccs[ranks[0][i]][ranks[1][i]];
+        ++uccs[num_particles - ranks[1][i] - 1][ranks[0][i]];
 
-    // Sum over horizontal direction
+//    for(size_t i=0; i<num_particles; ++i)
+//    {
+//        for(size_t j=0; j<num_particles; ++j)
+//            std::cout<<uccs[i][j]<<' ';
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<std::endl;
+
+    // Cumsum each row (increase to the left)
     for(size_t i=0; i<num_particles; ++i)
     {
-        for(int j=num_particles-2; j>=0; --j)
+        // Cumsum the row
+        for(int j=(num_particles-2); j>=0; --j)
             uccs[i][j] += uccs[i][j+1];
     }
-    // Sum over vertical direction
-    for(size_t i=1; i<num_particles; ++i)
+    // Cumsum each column (increase downwards)
+    for(size_t j=0; j<num_particles; ++j)
     {
-        for(size_t j=0; j<num_particles; ++j)
+        // Cumsum the row
+        for(size_t i=1; i<num_particles; ++i)
             uccs[i][j] += uccs[i-1][j];
     }
 
+//    for(size_t i=0; i<num_particles; ++i)
+//    {
+//        for(size_t j=0; j<num_particles; ++j)
+//            std::cout<<uccs[i][j]<<' ';
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<std::endl;
+
     // Assign the particle uccs (subtract 1 to not count self)
     for(size_t i=0; i<num_particles; ++i)
-        particle_uccs[i] = uccs[ranks[0][i]][ranks[1][i]] - 1;
+    {
+        particle_uccs[i] = uccs[num_particles - ranks[1][i] - 1][ranks[0][i]] - 1;
+//        std::cout<<particle_uccs[i]<<' ';
+    }
+//    std::cout<<std::endl;
 }
 
 /*
