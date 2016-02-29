@@ -106,7 +106,7 @@ for i in range(0, N):
     [logZ[i,j], H[i,j], temp1, temp2, exp1[i, j], exp2[i, j],\
 				var1[i,j], var2[i,j]] = canonical_properties(T1[i, j], T2[i, j])
     # Blank out 'unreliable' results
-    if H[i, j] > 0.8*depth:
+    if H[i, j] > 0.6667*depth:
       H[i, j] = NaN
       logZ[i, j] = NaN
       exp1[i, j] = NaN
