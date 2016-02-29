@@ -75,7 +75,7 @@ void Sampler<MyModel>::do_iteration()
     }
 
     // Compression
-    double log_X = (-static_cast<double>(iteration))/num_particles;
+    double log_X = -static_cast<double>(iteration)/num_particles;
 
     // Print information to the screen
     std::cout<<"# Iteration "<<iteration<<". log(X) = "<<log_X<<std::endl;
@@ -131,6 +131,8 @@ void Sampler<MyModel>::forbid_rectangle(size_t which, bool unique)
 template<class MyModel>
 void Sampler<MyModel>::replace_particle(size_t which)
 {
+    std::cout<<"# There are now "<<forbidden_rectangles.size();
+    std::cout<<" forbidden rectangles."<<std::endl;
     std::cout<<"# Replacing particle by cloning and doing MCMC..."<<std::endl;
 
     // Choose another particle to clone
@@ -161,7 +163,7 @@ void Sampler<MyModel>::replace_particle(size_t which)
     {
         // Copy to do proposal
         proposal = particles[which];
-        proposal_scalars = {scalars[0][which], scalars[1][which]};
+        proposal_scalars = particle_scalars;
         proposal_ucc_tiebreaker = particle_ucc_tiebreakers[which];
 
         // Propose
