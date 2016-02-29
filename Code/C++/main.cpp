@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	for(RNG& r: rngs)
 		r.set_seed(++seed);
 
-	constexpr int num_particles = 7;
+	constexpr int num_particles = 100;
 	constexpr int num_mcmc_steps = 1000;
 
 	// Create a sampler

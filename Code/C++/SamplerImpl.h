@@ -112,13 +112,14 @@ void Sampler<MyModel>::forbid_rectangles(size_t which, bool unique)
 
     for(size_t i=0; i<num_particles; ++i)
     {
-        for(size_t j=0; j<num_particles; ++j)
+        for(int j=(num_particles-1); j>=0; --j)
         {
             if(uccs[i][j] == particle_uccs[which])
             {
+//                std::cout<<"i = "<<i<<", j = "<<j<<std::endl;
                 // The rectangle being added
                 latest = {scalars[0][indices[0][j]], 
-                          scalars[1][num_particles - indices[1][i] - 1]};
+                          scalars[1][indices[1][num_particles-i-1]]};
 
                 // Remove redundant rectangles
                 if(unique)
@@ -134,10 +135,39 @@ void Sampler<MyModel>::forbid_rectangles(size_t which, bool unique)
                     rects.push_front(Rectangle(latest, 1.0));
                 else
                     rects.push_front(Rectangle(latest, particle_ucc_tiebreakers[which]));
+                break;
             }
         }
     }
 
+
+//    std::cout<<"Particles:"<<std::endl;
+//    for(size_t i=0; i<num_particles; ++i)
+//    {
+//        std::cout<<std::setprecision(10);
+//        std::cout<<scalars[0][i].get_value()<<' ';
+//        std::cout<<scalars[1][i].get_value()<<' ';
+//        std::cout<<particle_uccs[i]<<std::endl;
+//    }
+
+//    std::cout<<"Scalars:"<<std::endl;
+//    for(size_t i=0; i<num_particles; ++i)
+//    {
+//        std::cout<<std::setprecision(10);
+//        std::cout<<scalars[0][indices[1][i]].get_value()<<' ';
+//        std::cout<<scalars[1][indices[1][i]].get_value()<<std::endl;
+//    }
+
+
+//    std::cout<<"Rectangles:"<<std::endl;
+//    for(auto it=rects.begin(); it != rects.end(); ++it)
+//    {
+//        std::cout<<std::setprecision(10);
+//        std::cout<<it->get_scalars()[0].get_value()<<' ';
+//        std::cout<<it->get_scalars()[1].get_value()<<"     ";
+//        std::cout<<it->get_opacity()<<std::endl;
+//    }
+//    exit(0);
 }
 
 template<class MyModel>
@@ -221,16 +251,19 @@ void Sampler<MyModel>::replace_particle(size_t which)
 template<class MyModel>
 double Sampler<MyModel>::log_prob(const std::vector<ScalarType>& s)
 {
+    // Alias
+    const auto& rects = forbidden_rectangles;
+
     double logp = 0.0;
-    for(const auto& rect: forbidden_rectangles)
+    for(auto it=rects.begin(); it != rects.end(); ++it)
     {
-        if(rect.get_opacity() >= 1.0)
+        if(it->get_opacity() >= 1.0)
         {
-            if(ScalarType::compare(s, rect.get_scalars()) == -1)
+            if(ScalarType::compare(s, it->get_scalars()) == -1)
                 return -std::numeric_limits<double>::max(); // -Infinity
         }
-        else if(ScalarType::compare(s, rect.get_scalars()) == -1)
-            logp += log(1.0 - rect.get_opacity());
+        else if(ScalarType::compare(s, it->get_scalars()) == -1)
+            logp += log(1.0 - it->get_opacity());
     }
     return logp;
 }
@@ -247,13 +280,13 @@ void Sampler<MyModel>::calculate_uccs()
     for(size_t i=0; i<num_particles; ++i)
         ++uccs[num_particles - ranks[1][i] - 1][ranks[0][i]];
 
-    for(size_t i=0; i<num_particles; ++i)
-    {
-        for(size_t j=0; j<num_particles; ++j)
-            std::cout<<uccs[i][j]<<' ';
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
+//    for(size_t i=0; i<num_particles; ++i)
+//    {
+//        for(size_t j=0; j<num_particles; ++j)
+//            std::cout<<uccs[i][j]<<' ';
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<std::endl;
 
     // Cumsum each row (increase to the left)
     for(size_t i=0; i<num_particles; ++i)
@@ -270,26 +303,21 @@ void Sampler<MyModel>::calculate_uccs()
             uccs[i][j] += uccs[i-1][j];
     }
 
-    // Subtract 1 where the particles are (don't include self)
-    for(size_t i=0; i<num_particles; ++i)
-        --uccs[num_particles - ranks[1][i] - 1][ranks[0][i]];
+//    for(size_t i=0; i<num_particles; ++i)
+//    {
+//        for(size_t j=0; j<num_particles; ++j)
+//            std::cout<<uccs[i][j]<<' ';
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<std::endl;
 
-    for(size_t i=0; i<num_particles; ++i)
-    {
-        for(size_t j=0; j<num_particles; ++j)
-            std::cout<<uccs[i][j]<<' ';
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
-
-    // Assign the particle uccs (subtract 1 to not count self)
+    // Assign the particle uccs
     for(size_t i=0; i<num_particles; ++i)
     {
         particle_uccs[i] = uccs[num_particles - ranks[1][i] - 1][ranks[0][i]];
-        std::cout<<particle_uccs[i]<<' ';
+//        std::cout<<particle_uccs[i]<<' ';
     }
-    std::cout<<std::endl;
-    exit(0);
+//    std::cout<<std::endl;
 }
 
 } // namespace TwinPeaks
