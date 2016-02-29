@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <cassert>
 #include "Utils.h"
@@ -73,12 +74,31 @@ void Sampler<MyModel>::do_iteration()
         }
     }
 
-    std::cout<<std::setprecision(12);
-    std::cout<<(-static_cast<double>(iteration))/num_particles<<' ';
-    std::cout<<scalars[0][worst].get_value()<<' ';
-    std::cout<<scalars[1][worst].get_value()<<std::endl;
+    // Compression
+    double log_X = (-static_cast<double>(iteration))/num_particles;
 
+    // Print information to the screen
+    std::cout<<"# Iteration "<<iteration<<". log(X) = "<<log_X<<std::endl;
+
+    // Open the output file
+    std::fstream fout;
+    if(iteration == 1)
+        fout.open("output.txt", std::ios::out);
+    else
+        fout.open("output.txt", std::ios::out | std::ios::app);
+
+    // Write info to disk
+    fout<<std::setprecision(12);
+    fout<<log_X<<' ';
+    fout<<scalars[0][worst].get_value()<<' ';
+    fout<<scalars[1][worst].get_value()<<std::endl;
+
+    // Close output file
+    fout.close();
+
+    // Restrict the space and generate a replacement particle
     forbid_rectangle(worst, unique);
+    replace_particle(worst);
     ++iteration;
 }
 
@@ -106,6 +126,89 @@ void Sampler<MyModel>::forbid_rectangle(size_t which, bool unique)
         rects.push_front(Rectangle(latest, 1.0));
     else
         rects.push_front(Rectangle(latest, particle_ucc_tiebreakers[which]));
+}
+
+template<class MyModel>
+void Sampler<MyModel>::replace_particle(size_t which)
+{
+    std::cout<<"# Replacing particle by cloning and doing MCMC..."<<std::endl;
+
+    // Choose another particle to clone
+    size_t copy;
+    do
+    {
+        copy = rngs[0].rand_int(num_particles);
+    }while(copy == which);
+
+    // Clone it
+    particles[which] = particles[copy];
+    std::vector<ScalarType> particle_scalars
+                            {scalars[0][copy], scalars[1][copy]};
+    double logp = log_prob(particle_scalars);
+
+    // Variables that we'll need to propose
+    MyModel proposal;
+    std::vector<ScalarType> proposal_scalars(2);
+    double proposal_ucc_tiebreaker;
+    double logp_proposal;
+
+    // Counter for M-H acceptance fraction
+    size_t accepted = 0;
+
+    // Do MCMC
+    double log_H;
+    for(size_t i=0; i<mcmc_steps; ++i)
+    {
+        // Copy to do proposal
+        proposal = particles[which];
+        proposal_scalars = {scalars[0][which], scalars[1][which]};
+        proposal_ucc_tiebreaker = particle_ucc_tiebreakers[which];
+
+        // Propose
+        log_H = proposal.perturb(rngs[0]);
+        for(size_t j=0; j<2; ++j)
+        {
+            proposal_scalars[j].set_value(proposal.get_scalars()[j]);
+            proposal_scalars[j].perturb(rngs[0]);
+        }
+        proposal_ucc_tiebreaker += rngs[0].randh();
+        wrap(proposal_ucc_tiebreaker, 0.0, 1.0);
+
+        // Measure the target density for the proposed point
+        logp_proposal = log_prob(proposal_scalars);
+
+        // Accept
+        if(rngs[0].rand() <= exp(logp_proposal - logp + log_H))
+        {
+            particles[which] = proposal;
+            particle_scalars = proposal_scalars;
+            particle_ucc_tiebreakers[which] = proposal_ucc_tiebreaker;
+            ++accepted;
+        }
+    }
+
+    scalars[0][which] = particle_scalars[0];
+    scalars[1][which] = particle_scalars[1];
+
+    std::cout<<"# Done. Accepted "<<accepted<<"/"<<mcmc_steps<<" steps.";
+    std::cout<<std::endl<<std::endl;
+}
+
+template<class MyModel>
+double Sampler<MyModel>::log_prob(const std::vector<ScalarType>& s)
+{
+    double logp = 0.0;
+    for(const auto& rect: forbidden_rectangles)
+    {
+        if(rect.get_opacity() >= 1.0)
+        {
+            if(ScalarType::compare(s, rect.get_scalars()) == -1)
+                return -std::numeric_limits<double>::max(); // -Infinity
+        }
+        else if(ScalarType::compare(s, rect.get_scalars()) == -1)
+            logp += log(1.0 - rect.get_opacity());
+    }
+    return logp;
 }
 
 template<class MyModel>
@@ -139,17 +242,6 @@ void Sampler<MyModel>::calculate_uccs()
 }
 
 /*
-template<class MyModel>
-void Sampler<MyModel>::prune_rectangles(const std::vector<ScalarType>& latest)
-{
-	// Loop over all rectangles
-	for(auto it=rects.begin(); it != rects.end(); ++it)
-	{
-		if(it->compare(latest) == 1)
-			it = rects.erase(it);
-	}
-}
-
 template<class MyModel>
 double Sampler<MyModel>::do_iteration()
 {

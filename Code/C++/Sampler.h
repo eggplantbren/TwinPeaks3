@@ -47,6 +47,8 @@ class Sampler
         /**** Private member functions ****/
         void calculate_uccs();
         void forbid_rectangle(size_t which_particle, bool unique);
+        void replace_particle(size_t which_particle);
+        double log_prob(const std::vector<ScalarType>& s);
 
 	public:
 		// Constructor
