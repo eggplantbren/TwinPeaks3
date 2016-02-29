@@ -89,7 +89,7 @@ void Sampler<MyModel>::forbid_rectangle(size_t which, bool unique)
     auto& rects = forbidden_rectangles;
 
     // The rectangle being added
-    std::vector<ScalarType> latest{scalars[which][0], scalars[which][1]};
+    std::vector<ScalarType> latest{scalars[0][which], scalars[1][which]};
 
     // Remove redundant rectangles
     if(unique)
@@ -123,7 +123,7 @@ void Sampler<MyModel>::calculate_uccs()
     // Sum over horizontal direction
     for(size_t i=0; i<num_particles; ++i)
     {
-        for(int j=num_particles-1; j>=0; --j)
+        for(int j=num_particles-2; j>=0; --j)
             uccs[i][j] += uccs[i][j+1];
     }
     // Sum over vertical direction
