@@ -1,6 +1,5 @@
 from pylab import *
 import scipy
-import colormaps as cmaps
 
 rc("font", size=18, family="serif", serif="Computer Sans")
 rc("text", usetex=True)
@@ -16,7 +15,7 @@ def logsumexp(values):
 T1, T2 = 0.1, 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
-output = loadtxt('sample_info.txt')
+output = loadtxt('output.txt')
 scalars = output[:,1:]
 logw = output[:,0]
 smallest = min([scalars.shape[0], logw.size])
@@ -118,20 +117,20 @@ for i in range(0, N):
 
 figure(figsize=(11, 11))
 subplot(2, 2, 1)
-imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap='viridis')
 xscale('log')
 yscale('log')
 title(r'$\log(Z)$')
 ylabel(r'$\log_{10}(T_2)$')
 
 subplot(2, 2, 2)
-imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap='viridis')
 xscale('log')
 yscale('log')
 title(r'$H$')
 
 subplot(2, 2, 3)
-imshow(exp1, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+imshow(exp1, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap='viridis')
 xscale('log')
 yscale('log')
 title(r'$\left<\log L_1\right>$')
@@ -139,7 +138,7 @@ xlabel(r'$T_1$')
 ylabel(r'$T_2$')
 
 subplot(2, 2, 4)
-imshow(exp2, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+imshow(exp2, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap='viridis')
 xscale('log')
 yscale('log')
 title(r'$\left<\log L_2\right>$')

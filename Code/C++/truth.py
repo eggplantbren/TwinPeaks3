@@ -1,5 +1,4 @@
 from pylab import *
-import colormaps as cmaps
 
 rc("font", size=18, family="serif", serif="Computer Sans")
 rc("text", usetex=True)
@@ -7,7 +6,7 @@ rc("text", usetex=True)
 x = linspace(0., 1., 10001)
 
 def truth(T1, T2, do_plot=False):
-  p = exp(-(x - 0.5)**2/T1 - x/T2)#sin(4.*pi*x)**2/T2)
+  p = exp(-(x - 0.5)**2/T1 - sin(4.*pi*x)**2/T2)
   Z = trapz(p, x=x)
   H = trapz(p/Z*log(p/Z + 1E-300), x=x)
 
@@ -38,7 +37,7 @@ def grid():
 
   figure(1)
   subplot(1, 2, 1)
-  imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+  imshow(logZ, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap='viridis')
   xlabel(r'$T_1$')
   ylabel(r'$T_2$')
   title(r'$\ln(Z)$')
@@ -46,7 +45,7 @@ def grid():
   yscale('log')
 
   subplot(1, 2, 2)
-  imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap=cmaps.viridis)
+  imshow(H, extent=(T1.min(), T1.max(), T2.min(), T2.max()), interpolation='nearest', cmap='viridis')
   xlabel(r'$T_1$')
   title(r'$H$')
   xscale('log')
