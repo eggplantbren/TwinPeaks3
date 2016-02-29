@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	Sampler<SimpleExample> sampler(num_particles, num_mcmc_steps, rngs);
 	sampler.initialise();
 
-    for(int i=0; i<1000000; ++i)
+    for(int i=0; i<10000; ++i)//000000; ++i)
         sampler.do_iteration();
 
 	return 0;

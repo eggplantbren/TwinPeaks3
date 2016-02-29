@@ -143,9 +143,10 @@ void Sampler<MyModel>::replace_particle(size_t which)
     }while(copy == which);
 
     // Clone it
-    particles[which] = particles[copy];
+    MyModel particle = particles[copy];
     std::vector<ScalarType> particle_scalars
                             {scalars[0][copy], scalars[1][copy]};
+    double particle_ucc_tiebreaker = particle_ucc_tiebreakers[copy];
     double logp = log_prob(particle_scalars);
 
     // Variables that we'll need to propose
@@ -162,9 +163,9 @@ void Sampler<MyModel>::replace_particle(size_t which)
     for(size_t i=0; i<mcmc_steps; ++i)
     {
         // Copy to do proposal
-        proposal = particles[which];
+        proposal = particle;
         proposal_scalars = particle_scalars;
-        proposal_ucc_tiebreaker = particle_ucc_tiebreakers[which];
+        proposal_ucc_tiebreaker = particle_ucc_tiebreaker;
 
         // Propose
         log_H = proposal.perturb(rngs[0]);
@@ -182,15 +183,19 @@ void Sampler<MyModel>::replace_particle(size_t which)
         // Accept
         if(rngs[0].rand() <= exp(logp_proposal - logp + log_H))
         {
-            particles[which] = proposal;
+            particle = proposal;
             particle_scalars = proposal_scalars;
-            particle_ucc_tiebreakers[which] = proposal_ucc_tiebreaker;
+            particle_ucc_tiebreaker = proposal_ucc_tiebreaker;
+            logp = logp_proposal;
             ++accepted;
         }
     }
 
+    // Copy evolved particle back over to Sampler object arrays
+    particles[which] = particle;
     scalars[0][which] = particle_scalars[0];
     scalars[1][which] = particle_scalars[1];
+    particle_ucc_tiebreakers[which] = particle_ucc_tiebreaker;
 
     std::cout<<"# Done. Accepted "<<accepted<<"/"<<mcmc_steps<<" steps.";
     std::cout<<std::endl<<std::endl;
