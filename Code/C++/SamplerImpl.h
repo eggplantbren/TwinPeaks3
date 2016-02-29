@@ -62,12 +62,50 @@ void Sampler<MyModel>::do_iteration()
             particle_ucc_tiebreakers[i] > particle_ucc_tiebreakers[worst]))
             worst = i;
 
+    // Check to see if the worst particle ucc is unique
+    bool unique = true;
+    for(size_t i=0; i<num_particles; ++i)
+    {
+        if(i != worst && particle_uccs[i] == particle_uccs[worst])
+        {
+            unique = false;
+            break;
+        }
+    }
+
     std::cout<<std::setprecision(12);
     std::cout<<(-static_cast<double>(iteration))/num_particles<<' ';
     std::cout<<scalars[0][worst].get_value()<<' ';
     std::cout<<scalars[1][worst].get_value()<<std::endl;
 
+    forbid_rectangle(worst, unique);
     ++iteration;
+}
+
+template<class MyModel>
+void Sampler<MyModel>::forbid_rectangle(size_t which, bool unique)
+{
+    // Shorter alias
+    auto& rects = forbidden_rectangles;
+
+    // The rectangle being added
+    std::vector<ScalarType> latest{scalars[which][0], scalars[which][1]};
+
+    // Remove redundant rectangles
+    if(unique)
+    {
+        for(auto it=rects.begin(); it != rects.end(); ++it)
+        {
+	        if(ScalarType::compare(latest, it->get_scalars()) == 1)
+		        it = rects.erase(it);
+        }
+    }
+
+    // Forbid the rectangle
+    if(unique)
+        rects.push_front(Rectangle(latest, 1.0));
+    else
+        rects.push_front(Rectangle(latest, particle_ucc_tiebreakers[which]));
 }
 
 template<class MyModel>

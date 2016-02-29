@@ -46,6 +46,7 @@ class Sampler
 
         /**** Private member functions ****/
         void calculate_uccs();
+        void forbid_rectangle(size_t which_particle, bool unique);
 
 	public:
 		// Constructor

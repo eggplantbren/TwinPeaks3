@@ -10,17 +10,23 @@ namespace TwinPeaks
 /*
 *   An object of this class defines a "forbidden rectangle" in the
 *   L1-L2 space. There is also a degree of forbiddenness, represented
-*   by the 'transparency' variable \in [0, 1].
+*   by the 'opacity' variable \in [0, 1].
 */
 class Rectangle
 {
     private:
         std::vector<ScalarType> scalars;
-        double transparency;
+        double opacity;
 
     public:
-        Rectangle(const ScalarType& s1, const ScalarType& s2,
-                        double transparency);
+        Rectangle();
+        Rectangle(const std::vector<ScalarType>& scalars, double opacity);
+
+        // Getters
+        const std::vector<ScalarType>& get_scalars() const
+        { return scalars; }
+        double get_opacity() const
+        { return opacity; }
 
 };
 
