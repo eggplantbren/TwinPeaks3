@@ -25,13 +25,15 @@ int main(int argc, char** argv)
 
 	constexpr int num_particles = 1000;
 	constexpr int num_mcmc_steps = 1000;
+    constexpr double depth = 600.0;
 
 	// Create a sampler
 	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
 	sampler.initialise();
 
-    for(int i=0; i<1000000; ++i)
-        sampler.do_iteration();
+    double log_X = 0.0;
+    while(log_X > -depth)
+        log_X = sampler.do_iteration();
 
 	return 0;
 }
