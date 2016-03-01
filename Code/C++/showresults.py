@@ -15,7 +15,7 @@ def logsumexp(values):
 T1, T2 = 0.1, 1.
 
 # First calculate things about the scalars (e.g. the normalising constant)
-output = loadtxt('output.txt')
+output = loadtxt('sample_info.txt')
 scalars = output[:,1:]
 logw = output[:,0]
 smallest = min([scalars.shape[0], logw.size])
@@ -106,7 +106,7 @@ for i in range(0, N):
     [logZ[i,j], H[i,j], temp1, temp2, exp1[i, j], exp2[i, j],\
 				var1[i,j], var2[i,j]] = canonical_properties(T1[i, j], T2[i, j])
     # Blank out 'unreliable' results
-    if H[i, j] > 0.6667*depth:
+    if H[i, j] > 0.8*depth:
       H[i, j] = NaN
       logZ[i, j] = NaN
       exp1[i, j] = NaN

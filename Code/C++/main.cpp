@@ -23,11 +23,11 @@ int main(int argc, char** argv)
 	for(RNG& r: rngs)
 		r.set_seed(++seed);
 
-	constexpr int num_particles = 100;
+	constexpr int num_particles = 1000;
 	constexpr int num_mcmc_steps = 1000;
 
 	// Create a sampler
-	Sampler<SimpleExample> sampler(num_particles, num_mcmc_steps, rngs);
+	Sampler<SimpleExample> sampler(rngs, num_particles, num_mcmc_steps, 1);
 	sampler.initialise();
 
     for(int i=0; i<1000000; ++i)

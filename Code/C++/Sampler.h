@@ -4,65 +4,87 @@
 #include <vector>
 #include <list>
 #include <fstream>
-#include "Rectangle.h"
 #include "RNG.h"
 #include "ScalarType.h"
 
+/*
+* An object of this class is a TwinPeaks sampler
+*/
+
 namespace TwinPeaks
 {
-
-/*
-* An object of this class is a Twinpeaks sampler.
-*/
 
 template<class MyModel>
 class Sampler
 {
 	private:
-        // Sampler tuning parameters
-        const unsigned int num_particles;
-        const unsigned int mcmc_steps;
-
-        // Iteration counter
-        unsigned int iteration;
-
-		// The random number generators to use
+		// The random number generator to use
 		std::vector<RNG> rngs;
 
-		/**** The particles, and metadata about them ****/
+		// The particles, and information about them
+		int num_particles;
 		std::vector<MyModel> particles;
 		std::vector< std::vector<ScalarType> > scalars;
 
-        // Indices that sort by the scalars (i.e. an argsort)
-        std::vector< std::vector<size_t> > indices;
-        std::vector< std::vector<size_t> > ranks;
+		// Particle status
+		std::vector<int> status;
 
-        // UCCs of the particles (the non-integer part is for tiebreaking)
-        std::vector<unsigned short> particle_uccs;
-        std::vector<double> particle_ucc_tiebreakers;
+		// Backup
+		std::vector<MyModel> backup_particles;
+		std::vector< std::vector<ScalarType> > backup_scalars;
 
-        /**** The forbidden rectangles ****/
-        std::list<Rectangle> forbidden_rectangles;
+		// Forbidden rectangles
+		std::list< std::vector<ScalarType> > rects;
 
-        // UCCs
-        std::vector< std::vector<unsigned short> > uccs;
+		// Number of equilibration steps
+		int mcmc_steps;
 
-        /**** Private member functions ****/
-        void calculate_uccs();
-        void forbid_rectangles(size_t which_particle, bool unique);
-        void replace_particle(size_t which_particle);
-        double log_prob(const std::vector<ScalarType>& s);
+		// How many samples (to save to sample.txt) per iteration
+		int saves_per_iteration;
+
+		// Whether from_prior has been called on all the particles
+		bool initialised;
+
+		// Count number of iterations done
+		int iteration;
+
+		// Remaining prior mass
+		long double log_prior_mass;
+
+		// Do MCMC to equilibrate a particle
+		int refresh_particle(int which, int which_rng);
+
+		// Do MCMC to equilibrate a set of particles
+		void refresh_particles(const std::vector<int>& indices, int which_rng,
+										int& accepts);
+
+	public:
+		bool is_okay(const std::vector<ScalarType>& s);
+
+		// Remove redundant rectangles
+		void prune_rectangles(const std::vector<ScalarType>& latest);
 
 	public:
 		// Constructor
-		Sampler(unsigned int num_particles, unsigned int mcmc_steps,
-                const std::vector<RNG>& rngs);
+		Sampler(const std::vector<RNG>& rngs, int num_particles, int mcmc_steps,
+														int saves_per_iteration);
 
 		// Call from_prior on all the particles
 		void initialise();
 
 		// Do an iteration of Nested Sampling
-		void do_iteration();
+		double do_iteration();
+
+		// Do an indefinite number of iterations
+		void run();
+
+		// Do a specified number of iterations
+		double run(int iterations);
+
+		// Open and close (i.e. clear the contents of)
+		// the output files. If not called, it will append
+		// to whatever's already in them
+		void clear_output_files();
 };
 
 } // namespace TwinPeaks
