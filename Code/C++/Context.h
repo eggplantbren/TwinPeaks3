@@ -17,9 +17,11 @@ class Context
 {
     private:
         std::list< std::vector<ScalarType> > points;
+        double opacity;
 
     public:
-        Context();
+        // Points starts empty, but you need to provide an opacity
+        Context(double opacity);
 
         // Add a point to the context
         void add_point(const std::vector<ScalarType>& point);
