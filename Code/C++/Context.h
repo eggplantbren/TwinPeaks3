@@ -16,18 +16,19 @@ namespace TwinPeaks
 class Context
 {
     private:
-        std::list< std::vector<ScalarType> > points;
-        double opacity;
+        std::list< std::vector<ScalarType> > rectangles;
+        std::list< double > opacities;
 
     public:
-        // Points starts empty, but you need to provide an opacity
-        Context(double opacity);
+        // Points starts empty
+        Context();
 
-        // Add a point to the context
-        void add_point(const std::vector<ScalarType>& point);
+        // Add a new rectangle
+        void add_rectangle(const std::vector<ScalarType>& latest,
+                           double opacity);
 
-        // Calculate the ucc of a point
-        size_t calculate_ucc(const std::vector<ScalarType>& point) const;
+        // Calculate the log-prob of a point according to this context
+        double log_prob(const std::vector<ScalarType>& point) const;
 };
 
 } // namespace TwinPeaks
