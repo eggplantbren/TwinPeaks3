@@ -27,7 +27,7 @@ class Sampler
 		std::vector< std::vector<ScalarType> > scalars;
 
 		// Particle status
-		std::vector<int> status;
+		std::vector<short> status;
 
 		// Backup
 		std::vector<MyModel> backup_particles;
