@@ -29,6 +29,9 @@ class Context
 
         // Calculate the log-prob of a point according to this context
         double log_prob(const std::vector<ScalarType>& point) const;
+
+        size_t get_num_rectangles() const
+        { return rectangles.size(); }
 };
 
 } // namespace TwinPeaks

@@ -14,25 +14,31 @@ Context::Context()
 
 void Context::add_rectangle(const vector<ScalarType>& latest, double opacity)
 {
+    // Check everything's ok with the input
     assert(latest.size() == 2 && opacity >= 0.0 && opacity <= 1.0);
 
     /* Remove redundant rectangles */
-    // Two iterators
-    auto it1 = rectangles.begin();
-    auto it2 = opacities.begin();
+    if(opacity == 1.0)
+    {
+        // Two iterators
+        auto it1 = rectangles.begin();
+        auto it2 = opacities.begin();
 
-    while(it1 != rectangles.end())
-	{
-		if(ScalarType::compare(latest, *it1) == 1)
-        {
-			it1 = rectangles.erase(it1);
-            it2 = opacities.erase(it2);
+        while(it1 != rectangles.end())
+	    {
+		    if(ScalarType::compare(latest, *it1) == 1)
+            {
+			    it1 = rectangles.erase(it1);
+                it2 = opacities.erase(it2);
+            }
+            ++it1;
+            ++it2;
         }
-        ++it1;
-        ++it2;
     }
 
+    // Add
     rectangles.push_front(latest);
+    opacities.push_front(opacity);
 }
 
 double Context::log_prob(const vector<ScalarType>& point) const
@@ -52,7 +58,6 @@ double Context::log_prob(const vector<ScalarType>& point) const
             else
                 logp += log(1.0 - *it2);
         }
-
         ++it1;
         ++it2;
     }
