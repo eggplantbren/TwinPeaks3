@@ -114,12 +114,12 @@ double Sampler<MyModel>::do_iteration()
 	}
 
 	// The uccs of the particles themselves
-	std::vector<int> particle_uccs(num_particles);
+	std::vector<unsigned short> particle_uccs(num_particles);
 	for(int i=0; i<num_particles; i++)
 		particle_uccs[i] = ucc[num_particles - r2[i] - 1][r1[i]];
 
 	// Sort the particle uccs from highest to lowest
-	std::vector<int> particle_uccs_sorted = particle_uccs;
+	std::vector<unsigned short> particle_uccs_sorted = particle_uccs;
 	std::sort(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
 	std::reverse(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
 
