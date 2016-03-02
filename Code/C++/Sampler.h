@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <fstream>
+#include "Context.h"
 #include "RNG.h"
 #include "ScalarType.h"
 
@@ -34,7 +35,7 @@ class Sampler
 		std::vector< std::vector<ScalarType> > backup_scalars;
 
 		// Forbidden rectangles
-		std::list< std::vector<ScalarType> > rects;
+		Context context;
 
 		// Number of equilibration steps
 		int mcmc_steps;

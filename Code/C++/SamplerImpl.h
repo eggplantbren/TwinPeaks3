@@ -52,17 +52,6 @@ void Sampler<MyModel>::initialise()
 }
 
 template<class MyModel>
-void Sampler<MyModel>::prune_rectangles(const std::vector<ScalarType>& latest)
-{
-	// Loop over all rectangles
-	for(auto it=rects.begin(); it != rects.end(); ++it)
-	{
-		if(ScalarType::compare(latest, *it) == 1)
-			it = rects.erase(it);
-	}	
-}
-
-template<class MyModel>
 double Sampler<MyModel>::do_iteration()
 {
 	// Extract and argsort the two scalars
@@ -188,8 +177,7 @@ double Sampler<MyModel>::do_iteration()
 			if(ucc[i][j] >= threshold)
 			{
 				std::vector<ScalarType> latest{s1[j], s2[num_particles-i-1]};
-				prune_rectangles(latest);
-				rects.push_front(latest);
+				context.add_rectangle(latest, 1.0);
 			}
 		}
 	}
@@ -246,7 +234,8 @@ double Sampler<MyModel>::do_iteration()
 	std::cout<<"# (num_interior, num_boundary, num_exterior) = (";
 	std::cout<<num_interior<<", "<<num_boundary<<", "<<num_exterior<<")."<<std::endl;
 	std::cout<<"# Killing "<<(num_interior + num_boundary)<<" particles. "<<std::endl;
-	std::cout<<"# "<<rects.size()<<" rectangles. Log(remaining prior mass) = ";
+	std::cout<<"# "<<context.get_num_rectangles();
+    std::cout<<" rectangles. Log(remaining prior mass) = ";
 	std::cout<<log_prior_mass<<"."<<std::endl;
 
 	// Replace dead particles
@@ -332,26 +321,15 @@ int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 			s_proposal[j].set_value(proposal.get_scalars()[j]);
 		logH += s_proposal[rngs[which_rng].rand_int(s_proposal.size())].perturb(rngs[which_rng]);
 
-		if(rngs[which_rng].rand() <= exp(logH) && is_okay(s_proposal))
+		if(rngs[which_rng].rand() <= exp(logH) &&
+           context.log_prob(s_proposal) == 0.0)
 		{
 			particles[which] = proposal;
 			scalars[which] = s_proposal;
-			accepted++;
+			++accepted;
 		}
 	}
 	return accepted;
-}
-
-template<class MyModel>
-bool Sampler<MyModel>::is_okay(const std::vector<ScalarType>& s)
-{
-	for(auto it=rects.begin();
-				it != rects.end(); ++it)
-	{
-		if(ScalarType::compare(s, *it) == -1)
-			return false;
-	}
-	return true;
 }
 
 } // namespace TwinPeaks
