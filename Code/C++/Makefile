@@ -1,5 +1,5 @@
 CFLAGS = -O3 -std=c++11 -Wall -Wextra -pedantic
-OBJECTS = Rectangle.o RNG.o ScalarType.o SimpleExample.o Utils.o
+OBJECTS = Context.o RNG.o ScalarType.o SimpleExample.o Utils.o
 
 default:
 	g++ -I . $(CFLAGS) -c *.cpp Models/SimpleExample.cpp
