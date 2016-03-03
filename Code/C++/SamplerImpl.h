@@ -157,155 +157,152 @@ double Sampler<MyModel>::do_iteration()
         }
     }
 
-//    // Select some particles to save in their entirety
-//    std::vector<bool> save(num_particles, false);
-//    if(num_interior != 0)
-//    {
-//        for(int i=0; i<saves_per_iteration; i++)
-//        {
-//            int ii;
-//            do
-//            {
-//                ii = rngs[0].rand_int(num_particles);
-//            }while(status[ii] != -1);
-//            save[ii] = true;
-//        }
-//    }
+    // Save particles with ucc > threshold
+    size_t count = 0;   // Count how many particles died.
+    for(int i=0; i<num_particles; ++i)
+    {
+        if(particle_uccs[i] > threshold)
+        {
+            // Assign prior weight
+            double logw = log_prior_mass - log(num_particles);
 
-//    // Save interior particles
-//    for(int i=0; i<num_particles; i++)
-//    {
-//        if(status[i] == -1)
-//        {
-//            // Assign prior weight
-//            double logw = log_prior_mass - log(num_particles - num_boundary);
+            // Write it out to an output file
+            std::fstream fout;
+            fout.open("sample.txt", std::ios::out|std::ios::app);
+            fout<<logw<<' ';
+            fout<<scalar1[i].get_value()<<' '<<scalar2[i].get_value()<<' ';
+            particles[i].write_text(fout);
+            fout<<std::endl;
+            fout.close();
 
-//            // Write it out to an output file
-//            std::fstream fout;
-//            if(save[i])
-//            {
-//                fout.open("sample.txt", std::ios::out|std::ios::app);
-//                fout<<logw<<' ';
-//                for(ScalarType s: scalars[i])
-//                    fout<<s.get_value()<<' ';
-//                particles[i].write_text(fout);
-//                fout<<std::endl;
-//                fout.close();
-//            }
-//            fout.open("sample_info.txt", std::ios::out|std::ios::app);
-//            fout<<logw<<' ';
-//            for(ScalarType s: scalars[i])
-//                fout<<s.get_value()<<' ';
-//            fout<<std::endl;
-//            fout.close();
-//        }
-//    }
+            fout.open("sample_info.txt", std::ios::out|std::ios::app);
+            fout<<logw<<' ';
+            fout<<scalar1[i].get_value()<<' '<<scalar2[i].get_value()<<' ';
+            fout<<std::endl;
+            fout.close();
 
-//    // Reduce remaining prior mass
-//    log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass + log(num_interior) - log(num_particles - num_boundary));
+            ++count;
+        }
+    }
 
-//    // Print messages
-//    std::cout<<"# Iteration "<<(iteration+1)<<"."<<std::endl;
-//    std::cout<<"# (num_interior, num_boundary, num_exterior) = (";
-//    std::cout<<num_interior<<", "<<num_boundary<<", "<<num_exterior<<")."<<std::endl;
-//    std::cout<<"# Killing "<<(num_interior + num_boundary)<<" particles. "<<std::endl;
-//    std::cout<<"# "<<context.get_num_rectangles();
-//    std::cout<<" rectangles. Log(remaining prior mass) = ";
-//    std::cout<<log_prior_mass<<"."<<std::endl;
+    // Reduce remaining prior mass
+    log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass
+                                + log(static_cast<double>(count)/num_particles));
 
-//    // Replace dead particles
-//    int num_threads = rngs.size();
+    // Print messages
+    std::cout<<"# Iteration "<<(iteration+1)<<"."<<std::endl;
+    std::cout<<"# Killing "<<count<<" particles. "<<std::endl;
+    std::cout<<"# There are now "<<context.get_num_rectangles();
+    std::cout<<" rectangles, and log(remaining prior mass) = ";
+    std::cout<<log_prior_mass<<"."<<std::endl;
 
-//    // Backup
-//    backup_particles = particles;
-//    backup_scalars = scalars;
+    replace_dead_particles(threshold);
 
-//    // Assign particles to threads
-//    std::vector< std::vector<int> > which_particles(num_threads);
-//    int k=0;
-//    for(int i=0; i<num_particles; ++i)
-//    {
-//        if(status[i] != 1)
-//            which_particles[(k++)%num_threads].push_back(i);
-//    }
-//    // Store acceptance counts
-//    std::vector<int> accepts(num_threads);
-
-//    // Do MCMC to generate new particles
-//    std::vector<std::thread> threads;
-//    for(int i=0; i<num_threads; i++)
-//    {
-//        threads.emplace_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]))));
-//    }
-//    for(int i=0; i<num_threads; i++)
-//        threads[i].join();
-//    // Sum acceptance counts
-//    int accepted = 0;
-//    for(const int& c: accepts)
-//        accepted += c;
-
-//    std::cout<<"# Accepted "<<accepted<<"/"<<(num_interior + num_boundary)*mcmc_steps<<" (";
-//    std::cout<<std::fixed<<std::setprecision(1);
-//    std::cout<<(100.*accepted/((num_interior + num_boundary)*mcmc_steps));
-//    std::cout<<"%)."<<std::endl<<std::endl;
-//    std::cout<<std::defaultfloat<<std::setprecision(6);
-
-//    iteration++;
+    ++iteration;
     return log_prior_mass;
 }
 
+
+template<class MyModel>
+void Sampler<MyModel>::replace_dead_particles(unsigned short threshold)
+{
+    // Replace dead particles
+    int num_threads = rngs.size();
+
+	// Backup
+    backup_particles = particles;
+    backup_scalar1 = scalar1;
+    backup_scalar2 = scalar2;
+
+    // Assign particles to threads
+    std::vector< std::vector<int> > which_particles(num_threads);
+    int k=0;
+    int count = 0;
+    for(int i=0; i<num_particles; ++i)
+    {
+        if(particle_uccs[i] > threshold)
+        {
+            ++count;
+            which_particles[(k++)%num_threads].push_back(i);
+        }
+    }
+    // Store acceptance counts
+    std::vector<int> accepts(num_threads);
+
+    // Do MCMC to generate new particles
+    std::vector<std::thread> threads;
+    for(int i=0; i<num_threads; i++)
+    {
+        threads.emplace_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]), threshold)));
+    }
+    for(int i=0; i<num_threads; i++)
+        threads[i].join();
+    // Sum acceptance counts
+    int accepted = 0;
+    for(const int& c: accepts)
+        accepted += c;
+
+    std::cout<<"# Accepted "<<accepted<<"/"<<count*mcmc_steps<<" (";
+    std::cout<<std::fixed<<std::setprecision(1);
+    std::cout<<(100.*accepted/(count*mcmc_steps));
+    std::cout<<"%)."<<std::endl<<std::endl;
+    std::cout<<std::defaultfloat<<std::setprecision(6);
+}
 
 // Refresh all the particles in indices
 template<class MyModel>
 void Sampler<MyModel>::refresh_particles(const std::vector<int>& indices,
                                                         int which_rng,
-                                                        int& accepts)
+                                                        int& accepts,
+                                                        unsigned short threshold)
 {
     accepts = 0;
     for(int i: indices)
-        accepts += refresh_particle(i, which_rng);
+        accepts += refresh_particle(i, which_rng, threshold);
 }
 
 template<class MyModel>
-int Sampler<MyModel>::refresh_particle(int which, int which_rng)
+int Sampler<MyModel>::refresh_particle(int which, int which_rng,
+                                        unsigned short threshold)
 {
-    return 0;
-//    // Choose a particle to clone
-//    int copy;
-//    do
-//    {
-//        copy = rngs[which_rng].rand_int(num_particles);
-//    }
-//    while(status[copy] != 1);
+    // Choose a particle to clone
+    int copy;
+    do
+    {
+        copy = rngs[which_rng].rand_int(num_particles);
+    }
+    while(particle_uccs[copy] > threshold);
 
-//    // Clone it
-//    particles[which] = backup_particles[copy];
-//    scalars[which] = backup_scalars[copy];
+    // Clone it
+    particles[which] = backup_particles[copy];
+    scalar1[which] = backup_scalar1[copy];
+    scalar2[which] = backup_scalar2[copy];
 
-//    // Do the MCMC
-//    MyModel proposal;
-//    std::vector<ScalarType> s_proposal;
-//    double logH;
-//    int accepted = 0;
-//    for(int i=0; i<mcmc_steps; i++)
-//    {
-//        proposal = particles[which];
-//        s_proposal = scalars[which];
+    // Do the MCMC
+    MyModel proposal;
+    std::vector<ScalarType> s_proposal;
+    double logH;
+    int accepted = 0;
+    for(int i=0; i<mcmc_steps; i++)
+    {
+        proposal = particles[which];
+        s_proposal = {scalar1[which], scalar2[which]};
 
-//        logH = proposal.perturb(rngs[which_rng]);
-//        for(size_t j=0; j<s_proposal.size(); j++)
-//            s_proposal[j].set_value(proposal.get_scalars()[j]);
-//        logH += s_proposal[rngs[which_rng].rand_int(s_proposal.size())].perturb(rngs[which_rng]);
+        logH = proposal.perturb(rngs[which_rng]);
+        for(size_t j=0; j<s_proposal.size(); j++)
+            s_proposal[j].set_value(proposal.get_scalars()[j]);
+        logH += s_proposal[rngs[which_rng].rand_int(s_proposal.size())].perturb(rngs[which_rng]);
 
-//        if(rngs[which_rng].rand() <= exp(logH) &&
-//           context.log_prob(s_proposal) == 0.0)
-//        {
-//            particles[which] = proposal;
-//            scalars[which] = s_proposal;
-//            ++accepted;
-//        }
-//    }
-//    return accepted;
+        if(rngs[which_rng].rand() <= exp(logH) &&
+           context.log_prob(s_proposal) == 0.0)
+        {
+            particles[which] = proposal;
+            scalar1[which] = s_proposal[0];
+            scalar2[which] = s_proposal[1];
+            ++accepted;
+        }
+    }
+    return accepted;
 }
 
 } // namespace TwinPeaks

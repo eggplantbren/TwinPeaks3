@@ -35,10 +35,6 @@ class Sampler
         std::vector< std::vector<unsigned short> > uccs;
         std::vector<unsigned short> particle_uccs;
 
-		// Backup
-		std::vector<MyModel> backup_particles;
-		std::vector< std::vector<ScalarType> > backup_scalars;
-
 		// Forbidden rectangles
 		Context context;
 
@@ -57,7 +53,10 @@ class Sampler
 		// Remaining prior mass
 		long double log_prior_mass;
 
-
+        // Backups
+        std::vector<MyModel> backup_particles;
+        std::vector<ScalarType> backup_scalar1;
+        std::vector<ScalarType> backup_scalar2;
 
         /* Private member functions, just used to divide up the job
            of doing a TwinPeaks iteration. */
@@ -65,13 +64,14 @@ class Sampler
         // Calculate the uccs and particle_uccs
         void calculate_uccs();
         unsigned short choose_ucc_threshold() const;
+        void replace_dead_particles(unsigned short threshold);
 
 		// Do MCMC to equilibrate a particle
-		int refresh_particle(int which, int which_rng);
+		int refresh_particle(int which, int which_rng, unsigned short threshold);
 
 		// Do MCMC to equilibrate a set of particles
 		void refresh_particles(const std::vector<int>& indices, int which_rng,
-										int& accepts);
+										int& accepts, unsigned short threshold);
 
 	public:
 		bool is_okay(const std::vector<ScalarType>& s);
