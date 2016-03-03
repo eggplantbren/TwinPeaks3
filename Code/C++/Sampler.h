@@ -34,6 +34,7 @@ class Sampler
         // UCCS and particle uccs
         std::vector< std::vector<unsigned short> > uccs;
         std::vector<unsigned short> particle_uccs;
+        std::vector<short> status;
 
 		// Forbidden rectangles
 		Context context;
@@ -63,21 +64,16 @@ class Sampler
 
         // Calculate the uccs and particle_uccs
         void calculate_uccs();
-        unsigned short choose_ucc_threshold() const;
-        void replace_dead_particles(unsigned short threshold);
+        unsigned short choose_ucc_threshold();
+        void replace_dead_particles();
 
 		// Do MCMC to equilibrate a particle
-		int refresh_particle(int which, int which_rng, unsigned short threshold);
+		int refresh_particle(int which, int which_rng);
 
 		// Do MCMC to equilibrate a set of particles
 		void refresh_particles(const std::vector<int>& indices, int which_rng,
-										int& accepts, unsigned short threshold);
+										int& accepts);
 
-	public:
-		bool is_okay(const std::vector<ScalarType>& s);
-
-		// Remove redundant rectangles
-		void prune_rectangles(const std::vector<ScalarType>& latest);
 
 	public:
 		// Constructor

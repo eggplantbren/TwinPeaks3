@@ -22,8 +22,9 @@ Sampler<MyModel>::Sampler(const std::vector<RNG>& rngs, int num_particles,
 ,scalar2(num_particles)
 ,scalar1_sorted(num_particles)
 ,scalar2_sorted(num_particles)
-,uccs(num_particles, std::vector<unsigned short>(num_particles, 0))
-,particle_uccs(num_particles, 0)
+,uccs(num_particles, std::vector<unsigned short>(num_particles))
+,particle_uccs(num_particles)
+,status(num_particles)
 ,mcmc_steps(mcmc_steps)
 ,saves_per_iteration(saves_per_iteration)
 ,initialised(false)
@@ -105,8 +106,19 @@ void Sampler<MyModel>::calculate_uccs()
 }
 
 template<class MyModel>
-unsigned short Sampler<MyModel>::choose_ucc_threshold() const
+unsigned short Sampler<MyModel>::choose_ucc_threshold()
 {
+    // Ensure there are at least three unique ucc values
+    short unique = 1;
+    for(int i=1; i<num_particles; ++i)
+        if(particle_uccs[i] != particle_uccs[i-1])
+            ++unique;
+    if(unique < 3)
+    {
+        std::cerr<<"# Less than three distinct particle_ucc values."<<std::endl;
+        exit(0);
+    }
+
     // Sort the particle uccs from highest to lowest
     auto particle_uccs_sorted = particle_uccs;
     std::sort(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
@@ -118,13 +130,6 @@ unsigned short Sampler<MyModel>::choose_ucc_threshold() const
         if(particle_uccs_sorted[i] != particle_uccs_sorted[i-1])
             threshold_id_candidates.push_back(i);
 
-    // Abort if there aren't any suitable candidates for the UCC threshold.
-    if(threshold_id_candidates.size() == 0)
-    {
-        std::cerr<<"# No suitable candidates for UCC threshold."<<std::endl;
-        exit(0);
-    }
-
     // Find the threshold that's closest to dividing the particles in half
     int best = 0;
     for(size_t i=1; i<threshold_id_candidates.size(); ++i)
@@ -133,7 +138,20 @@ unsigned short Sampler<MyModel>::choose_ucc_threshold() const
            abs(threshold_id_candidates[best] - num_particles/2))
             best = i;
     }
-    return particle_uccs_sorted[threshold_id_candidates[best]];
+    unsigned short threshold = particle_uccs_sorted[threshold_id_candidates[best]];
+
+    // Calculate particle statuses
+    for(int i=0; i<num_particles; ++i)
+    {
+        if(particle_uccs[i] < threshold)
+            status[i] = 1;
+        if(particle_uccs[i] == threshold)
+            status[i] = 0;
+        if(particle_uccs[i] > threshold)
+            status[i] = -1;
+    }
+
+    return threshold;
 }
 
 template<class MyModel>
@@ -143,13 +161,13 @@ double Sampler<MyModel>::do_iteration()
     calculate_uccs();
     auto threshold = choose_ucc_threshold();
 
-    // Place forbidding rectangles anywhere ucc > threshold
+    // Place forbidding rectangles anywhere ucc >= threshold
     for(int i=0; i<num_particles; ++i)
     {
         int j = num_particles-1;
-        while(j > 0 && uccs[i][j] <= threshold)
-            j--;
-        if(uccs[i][j] > threshold)
+        while(j > 0 && uccs[i][j] < threshold)
+            --j;
+        if(uccs[i][j] >= threshold)
         {
             std::vector<ScalarType> latest{scalar1_sorted[j],
                                            scalar2_sorted[num_particles-i-1]};
@@ -157,14 +175,27 @@ double Sampler<MyModel>::do_iteration()
         }
     }
 
-    // Save particles with ucc > threshold
-    size_t count = 0;   // Count how many particles died.
+    // Count number of particles with each status
+    int num_interior = 0;
+    int num_boundary = 0;
+    int num_exterior = 0;
     for(int i=0; i<num_particles; ++i)
     {
-        if(particle_uccs[i] > threshold)
+        if(status[i] == -1)
+            ++num_interior;
+        else if(status[i] == 0)
+            ++num_boundary;
+        else
+            ++num_exterior;
+    }
+
+    // Save interior particles
+    for(int i=0; i<num_particles; ++i)
+    {
+        if(status[i] == -1)
         {
             // Assign prior weight
-            double logw = log_prior_mass - log(num_particles);
+            double logw = log_prior_mass - log(num_interior + num_exterior);
 
             // Write it out to an output file
             std::fstream fout;
@@ -180,23 +211,25 @@ double Sampler<MyModel>::do_iteration()
             fout<<scalar1[i].get_value()<<' '<<scalar2[i].get_value()<<' ';
             fout<<std::endl;
             fout.close();
-
-            ++count;
         }
     }
 
     // Reduce remaining prior mass
-    log_prior_mass = logdiffexp(log_prior_mass, log_prior_mass
-                                + log(static_cast<double>(count)/num_particles));
+    double surviving_fraction = static_cast<double>(num_exterior)/
+                                                (num_interior + num_exterior);
+    log_prior_mass += log(surviving_fraction);
 
     // Print messages
     std::cout<<"# Iteration "<<(iteration+1)<<"."<<std::endl;
-    std::cout<<"# Killing "<<count<<" particles. "<<std::endl;
+    std::cout<<"# (num_interior, num_boundary, num_exterior) = (";
+    std::cout<<num_interior<<", "<<num_boundary<<", "<<num_exterior<<").";
+    std::cout<<std::endl;
+    std::cout<<"# Killing "<<(num_interior + num_boundary)<<" particles. "<<std::endl;
     std::cout<<"# There are now "<<context.get_num_rectangles();
     std::cout<<" rectangles, and log(remaining prior mass) = ";
     std::cout<<log_prior_mass<<"."<<std::endl;
 
-    replace_dead_particles(threshold);
+    replace_dead_particles();
 
     ++iteration;
     return log_prior_mass;
@@ -204,7 +237,7 @@ double Sampler<MyModel>::do_iteration()
 
 
 template<class MyModel>
-void Sampler<MyModel>::replace_dead_particles(unsigned short threshold)
+void Sampler<MyModel>::replace_dead_particles()
 {
     // Replace dead particles
     int num_threads = rngs.size();
@@ -220,7 +253,7 @@ void Sampler<MyModel>::replace_dead_particles(unsigned short threshold)
     int count = 0;
     for(int i=0; i<num_particles; ++i)
     {
-        if(particle_uccs[i] > threshold)
+        if(status[i] != 1)
         {
             ++count;
             which_particles[(k++)%num_threads].push_back(i);
@@ -233,7 +266,7 @@ void Sampler<MyModel>::replace_dead_particles(unsigned short threshold)
     std::vector<std::thread> threads;
     for(int i=0; i<num_threads; i++)
     {
-        threads.emplace_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]), threshold)));
+        threads.emplace_back(std::thread(std::bind(&Sampler<MyModel>::refresh_particles, this, which_particles[i], i, std::ref(accepts[i]))));
     }
     for(int i=0; i<num_threads; i++)
         threads[i].join();
@@ -253,17 +286,15 @@ void Sampler<MyModel>::replace_dead_particles(unsigned short threshold)
 template<class MyModel>
 void Sampler<MyModel>::refresh_particles(const std::vector<int>& indices,
                                                         int which_rng,
-                                                        int& accepts,
-                                                        unsigned short threshold)
+                                                        int& accepts)
 {
     accepts = 0;
     for(int i: indices)
-        accepts += refresh_particle(i, which_rng, threshold);
+        accepts += refresh_particle(i, which_rng);
 }
 
 template<class MyModel>
-int Sampler<MyModel>::refresh_particle(int which, int which_rng,
-                                        unsigned short threshold)
+int Sampler<MyModel>::refresh_particle(int which, int which_rng)
 {
     // Choose a particle to clone
     int copy;
@@ -271,7 +302,7 @@ int Sampler<MyModel>::refresh_particle(int which, int which_rng,
     {
         copy = rngs[which_rng].rand_int(num_particles);
     }
-    while(particle_uccs[copy] > threshold);
+    while(status[copy] != 1);
 
     // Clone it
     particles[which] = backup_particles[copy];
