@@ -25,10 +25,15 @@ class Sampler
 		// The particles, and information about them
 		int num_particles;
 		std::vector<MyModel> particles;
-		std::vector< std::vector<ScalarType> > scalars;
+		std::vector<ScalarType> scalar1;
+        std::vector<ScalarType> scalar2;
 
-		// Particle status
-		std::vector<short> status;
+		std::vector<ScalarType> scalar1_sorted;
+        std::vector<ScalarType> scalar2_sorted;
+
+        // UCCS and particle uccs
+        std::vector< std::vector<unsigned short> > uccs;
+        std::vector<unsigned short> particle_uccs;
 
 		// Backup
 		std::vector<MyModel> backup_particles;
@@ -51,6 +56,15 @@ class Sampler
 
 		// Remaining prior mass
 		long double log_prior_mass;
+
+
+
+        /* Private member functions, just used to divide up the job
+           of doing a TwinPeaks iteration. */
+
+        // Calculate the uccs and particle_uccs
+        void calculate_uccs();
+        unsigned short choose_ucc_threshold() const;
 
 		// Do MCMC to equilibrate a particle
 		int refresh_particle(int which, int which_rng);
