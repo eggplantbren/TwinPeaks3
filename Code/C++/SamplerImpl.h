@@ -131,24 +131,40 @@ unsigned short Sampler<MyModel>::choose_ucc_threshold()
             threshold_id_candidates.push_back(i);
 
     // Find the threshold that's closest to dividing the particles in half
-    int best = 0;
-    for(size_t i=1; i<threshold_id_candidates.size(); ++i)
+    std::vector<double> balance(threshold_id_candidates.size());
+    unsigned int threshold;
+    for(size_t i=0; i<threshold_id_candidates.size(); ++i)
     {
-        if(abs(threshold_id_candidates[i] - num_particles/2) <
-           abs(threshold_id_candidates[best] - num_particles/2))
-            best = i;
+        threshold = particle_uccs_sorted[threshold_id_candidates[i]];
+
+        // Count interior and exterior particles
+        int num_interior = 0;
+        int num_exterior = 0;
+        for(int j=0; j<num_particles; ++j)
+        {
+            if(particle_uccs[j] < threshold)
+                ++num_exterior;
+            if(particle_uccs[j] > threshold)
+                ++num_interior;
+        }
+        balance[i] = static_cast<double>(num_interior + 1E-6)/
+                                        (num_interior + num_exterior + 1E-6);
     }
-    unsigned short threshold = particle_uccs_sorted[threshold_id_candidates[best]];
+    int best = 0;
+    for(size_t i=1; i<balance.size(); ++i)
+        if(std::abs(balance[i] - 0.5) < std::abs(balance[best] - 0.5))
+            best = i;
+    threshold = particle_uccs_sorted[threshold_id_candidates[best]];
 
     // Calculate particle statuses
-    for(int i=0; i<num_particles; ++i)
+    for(int j=0; j<num_particles; ++j)
     {
-        if(particle_uccs[i] < threshold)
-            status[i] = 1;
-        if(particle_uccs[i] == threshold)
-            status[i] = 0;
-        if(particle_uccs[i] > threshold)
-            status[i] = -1;
+        if(particle_uccs[j] < threshold)
+            status[j] = 1;
+        if(particle_uccs[j] == threshold)
+            status[j] = 0;
+        if(particle_uccs[j] > threshold)
+            status[j] = -1;
     }
 
     return threshold;
