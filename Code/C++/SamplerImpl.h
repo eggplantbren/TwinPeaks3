@@ -108,21 +108,21 @@ void Sampler<MyModel>::calculate_uccs()
 template<class MyModel>
 unsigned short Sampler<MyModel>::choose_ucc_threshold()
 {
+    // Sort the particle uccs from highest to lowest
+    auto particle_uccs_sorted = particle_uccs;
+    std::sort(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
+    std::reverse(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
+
     // Ensure there are at least three unique ucc values
     short unique = 1;
     for(int i=1; i<num_particles; ++i)
-        if(particle_uccs[i] != particle_uccs[i-1])
+        if(particle_uccs_sorted[i] != particle_uccs_sorted[i-1])
             ++unique;
     if(unique < 3)
     {
         std::cerr<<"# Less than three distinct particle_ucc values."<<std::endl;
         exit(0);
     }
-
-    // Sort the particle uccs from highest to lowest
-    auto particle_uccs_sorted = particle_uccs;
-    std::sort(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
-    std::reverse(particle_uccs_sorted.begin(), particle_uccs_sorted.end());
 
     // Find a ucc threshold
     std::vector<int> threshold_id_candidates;
@@ -147,12 +147,13 @@ unsigned short Sampler<MyModel>::choose_ucc_threshold()
             if(particle_uccs[j] > threshold)
                 ++num_interior;
         }
-        balance[i] = static_cast<double>(num_interior + 1E-6)/
-                                        (num_interior + num_exterior + 1E-6);
+        balance[i] = static_cast<double>(num_interior + 1E-12)/
+                                        (num_interior + num_exterior + 1E-12);
+        balance[i] = log(balance[i]/(1.0 - balance[i]));
     }
     int best = 0;
     for(size_t i=1; i<balance.size(); ++i)
-        if(std::abs(balance[i] - 0.5) < std::abs(balance[best] - 0.5))
+        if(std::abs(balance[i]) < std::abs(balance[best]))
             best = i;
     threshold = particle_uccs_sorted[threshold_id_candidates[best]];
 
