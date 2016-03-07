@@ -179,6 +179,7 @@ double Sampler<MyModel>::do_iteration()
     auto threshold = choose_ucc_threshold();
 
     // Place forbidding rectangles anywhere ucc >= threshold
+    std::vector< std::vector<ScalarType> > latest_rectangles;
     for(int i=0; i<num_particles; ++i)
     {
         int j = num_particles-1;
@@ -188,9 +189,10 @@ double Sampler<MyModel>::do_iteration()
         {
             std::vector<ScalarType> latest{scalar1_sorted[j],
                                            scalar2_sorted[num_particles-i-1]};
-            context.add_rectangle(latest, 1.0);
+            latest_rectangles.push_back(latest);
         }
     }
+    context.add_opaque_rectangles(latest_rectangles);
 
     // Count number of particles with each status
     int num_interior = 0;

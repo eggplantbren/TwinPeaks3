@@ -27,6 +27,9 @@ class Context
         void add_rectangle(const std::vector<ScalarType>& latest,
                            double opacity);
 
+        // Add a whole list of opaque rectangles
+        void add_opaque_rectangles(std::vector< std::vector<ScalarType> >& latest);
+
         // Calculate the log-prob of a point according to this context
         double log_prob(const std::vector<ScalarType>& point) const;
 
