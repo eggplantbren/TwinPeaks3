@@ -218,19 +218,34 @@ double Sampler<MyModel>::do_iteration()
 
             // Write it out to an output file
             std::fstream fout;
-            fout.open("sample.txt", std::ios::out|std::ios::app);
-            fout<<logw<<' ';
-            fout<<scalar1[i].get_value()<<' '<<scalar2[i].get_value()<<' ';
-            particles[i].write_text(fout);
-            fout<<std::endl;
-            fout.close();
-
             fout.open("sample_info.txt", std::ios::out|std::ios::app);
             fout<<logw<<' ';
             fout<<scalar1[i].get_value()<<' '<<scalar2[i].get_value()<<' ';
             fout<<std::endl;
             fout.close();
         }
+    }
+
+    // Write entire particles
+    for(int j=0; j<saves_per_iteration; ++j)
+    {
+        int choice;
+        do
+        {
+            choice = rngs[0].rand_int(num_particles);
+        }while(status[choice] != -1);
+
+        // Assign prior weight
+        double logw = log_prior_mass - log(num_interior + num_exterior);
+
+        std::fstream fout;
+        fout.open("sample.txt", std::ios::out|std::ios::app);
+        fout<<logw<<' ';
+        fout<<scalar1[choice].get_value()<<' ';
+        fout<<scalar2[choice].get_value()<<' ';
+        particles[choice].write_text(fout);
+        fout<<std::endl;
+        fout.close();
     }
 
     // Reduce remaining prior mass
