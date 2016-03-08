@@ -4,6 +4,9 @@
 
 using namespace std;
 
+namespace TwinPeaks
+{
+
 Atoms::Atoms()
 :x(num_atoms), y(num_atoms), z(num_atoms)
 ,terms1(num_atoms, vector<double>(num_atoms))
@@ -114,4 +117,6 @@ void Atoms::write_text(std::ostream& out) const
 	for(size_t i=0; i<z.size(); i++)
 		out<<z[i]<<' ';
 }
+
+} // namespace TwinPeaks
 

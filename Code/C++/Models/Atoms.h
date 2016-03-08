@@ -1,9 +1,12 @@
-#ifndef _Atoms_
-#define _Atoms_
+#ifndef TwinPeaks_Atoms
+#define TwinPeaks_Atoms
 
 #include "RNG.h"
 #include <ostream>
 #include <vector>
+
+namespace TwinPeaks
+{
 
 class Atoms
 {
@@ -42,6 +45,8 @@ class Atoms
 		const std::vector<double>& get_scalars() const
 		{ return scalars; }
 };
+
+} // namespace TwinPeaks
 
 #endif
 
