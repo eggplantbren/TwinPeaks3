@@ -13,3 +13,7 @@ Paper/figures/*.pdf
 Code/C++/Frames/*.png
 Code/C++/Frames/movie.avi
 output.txt
+output.png
+results.pdf
+truth.pdf
+
