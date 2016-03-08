@@ -1,5 +1,3 @@
 #!/bin/bash
-ffmpeg -r 10 -f image2 -i '%04d.png' -b:v 4096k movie.avi
-
-
+ffmpeg -r 10 -i %06d.png -c:v mjpeg -qscale:v 0 movie.avi
 
