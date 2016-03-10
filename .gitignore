@@ -15,6 +15,7 @@ Paper/figures/*.pdf
 *.pyc
 Code/C++/Frames/*.png
 Code/C++/Frames/movie.avi
+Paper/figures/Frames/*.png
 output.txt
 output.png
 results.pdf
