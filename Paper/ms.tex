@@ -54,8 +54,8 @@
 \usepackage{natbib}
 
 \DeclareUnicodeCharacter{00A0}{ }
-\newcommand{\xx}{\boldsymbol{x}}
-\newcommand{\dx}{d\boldsymbol{x}}
+\newcommand{\xx}{\boldsymbol{\theta}}
+\newcommand{\dx}{d\boldsymbol{\theta}}
 \newcommand{\data}{\boldsymbol{D}}
 \newcommand{\II}{\boldsymbol{I}}
 
@@ -101,15 +101,17 @@
 \Title{Nested sampling with two objective functions}
 
 % Authors (Add full first names)
-\Author{Brendon J. Brewer$^{1,}$*, Ewan Cameron$^{2}$, and
-Robert J. N. Baldock$^{3}$}
+\Author{Brendon J. Brewer$^{1,}$*,
+        Ewan Cameron$^{2}$, and
+        Robert J. N. Baldock$^{3}$}
 
 % Affiliations / Addresses (Add [1] after \address if there is only one affiliation.)
 \address{%
 $^{1}$ Department of Statistics, The University of Auckland, Private Bag 92019,
 Auckland 1142, New Zealand\\
 $^{2}$ Spatial Ecology and Epidemiology Group, Tinbergen Building, Department
-of Zoology, University of Oxford, South Parks Road, Oxford, UK\\
+of Zoology,
+        University of Oxford, South Parks Road, Oxford, UK\\
 $^{3}$ Cavendish, University of Cambridge, Cambridge, UK}
 
 %\contributed{$^\dagger$ These authors contributed equally to this work.}
@@ -118,15 +120,20 @@ $^{3}$ Cavendish, University of Cambridge, Cambridge, UK}
 \corres{{\tt bj.brewer@auckland.ac.nz}}
 
 % Abstract (Do not use inserted blank lines, i.e. \\)
-\abstract{We present a generalization of the Nested Sampling algorithm for
-estimating the partition function $Z(\beta_1, \beta_2)$ of a family of
-probability distributions indexed by two hyperparameters $\beta_1$ and
-$\beta_2$. These
-problems arise frequently in statistical mechanics and occasionally in
-Bayesian inference. We demonstrate the algorithm on three example problems.
-The first is a simple toy example where
-$Z(\beta_1, \beta_2)$ is known, where we show empirically how the accuracy
-improves as a function of the number of particles $N$. We also
+\abstract{We present a generalization of the Nested Sampling algorithm,
+which we call ``{\em TwinPeaks}'',
+that estimates
+the partition function $Z(\beta_1, \beta_2)$ for a family of
+probability distributions indexed by two hyperparameters, $\beta_1$ and
+$\beta_2$. Problems like this
+arise frequently in statistical mechanics and occasionally in
+Bayesian inference.
+We demonstrate the algorithm on three example problems.
+The first is a toy problem whose structure allows us
+to accurately calculate $Z(\beta_1, \beta_2)$ numerically using non-Monte-Carlo
+methods.
+We show empirically how the accuracy of TwinPeaks
+improves as a function of the number of particles used, $N$. We also
 calculate the partition function for a collection of atoms with a potential
 that is `intermediate' between a Lennard-Jones form and a polymer form, in
 a single run. Finally, we present a Bayesian image reconstruction example,
@@ -163,8 +170,8 @@ Monte Carlo algorithm that can solve a wide range of problems in Bayesian
 computation and statistical mechanics
 \citep{2009arXiv0906.3544P, 2014PhRvE..89b2302P, 2015arXiv150303404B}.
 Its key strength its ability to cope with phase transitions which cause
-many other methods to fail.
-In a Bayesian inference framework with unknown parameters denoted collectively
+problems for many other methods \citep{skilling}.
+In a Bayesian inference problem with unknown parameters denoted collectively
 by a vector $\xx$, the
 posterior distribution for the parameters given data $\data$ (and prior
 information $\II$) is:
@@ -220,8 +227,10 @@ Throughout this paper we use the popular `overloaded' notation for some
 functions and probability distributions.
 For example, $L(\xx)$ is the likelihood function, and $L(X)$ is the likelihood
 as a function of the enclosed prior mass $X$. These cannot literally be the
-same function as the inputs are not even necessarily of the same dimensionality.
-Therefore the symbol $L$ implies that the output of the function is a
+same function as the inputs typically don't have the same dimensionality
+($\xx$ is usually a collection of quantities and $X$ is a single real number
+in $[0, 1]$).
+Therefore the symbol $L$ implies the output of the function is a
 likelihood value; so $L(\xx)$ represents a likelihood value computed from
 the parameters $\xx$, and $L(X)$ represents a likelihood value that
 corresponds to an amount $X$ of prior mass.
@@ -232,8 +241,8 @@ However,
 NS is required because Equation~\ref{eqn:evidence}
 is the expected value of $L$ with respect to a very heavy-tailed distribution
 (the prior for the $L$ value implied by $\pi(\xx)$). Hence, there is a strong
-connection between NS and ideas from rare event simulation, which has been
-explicitly investigated by \citet{walter}.
+connection between NS and ideas from rare event simulation. \citet{walter} has
+explicitly explored this connection.
 
 Using a single NS run, we can also calculate the properties of any other distribution that
 is in some sense intermediate
