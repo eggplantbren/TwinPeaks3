@@ -187,7 +187,7 @@ function, and $Z$ is the normalising constant, usually known as the
 Z &=& \int \pi(\xx) L(\xx) \, \dx.\label{eqn:evidence}
 \end{eqnarray}
 
-$Z$ is useful because it is the probability of the data given that
+$Z$ is useful because it is the (prior) probability of the data given that
 $\xx$ is {\em one of}
 the possibilities in the space being integrated over, and thus plays the role
 of a likelihood for the parameter space as a whole.
@@ -245,23 +245,26 @@ connection between NS and ideas from rare event simulation. \citet{walter} has
 explicitly explored this connection.
 
 Using a single NS run, we can also calculate the properties of any other distribution that
-is in some sense intermediate
+is (in some sense which we do not make precise) {\em intermediate}
 between the prior and the posterior. For example, we might be interested in
-a `power posterior' where the likelihood is raised to a power $\beta$:
+a `power posterior' where the likelihood is raised to a power $\beta$
+(this is also the family of distributions used in `annealing' or `tempering'
+methods):
 \begin{eqnarray}
 p(\xx; \beta) &=& \frac{\pi(\xx)L(\xx)^\beta}{Z(\beta)}\label{eqn:power_posterior}
 \end{eqnarray}
 The normalisation and posterior samples from this distribution can be obtained
 from the original NS run by re-weighting the output according to $L(\xx)^\beta$
 instead of the usual $L(\xx)$ used to obtain the posterior.
-An example application, in the case of
-a Bayesian inference problem with a `gaussian noise' likelihood assumption,
-computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
+Bayesian inference problems with `gaussian noise' likelihood assumptions
+provide an example of where power posteriors might be useful.
+Computing $p(\xx; \beta)$ for $\beta \neq 1$ allows us to explore what the
 posterior distribution would have been if the noise variance had been greater,
 without having to re-run the algorithm.
 This is different from including an extra parameter to allow the noise variance
 to be greater, because NS allows you to test the consequences of values of the
-variance that are very implausible given the data.
+variance that are very implausible given the data, i.e. that do not have
+a high posterior probability.
 
 Alternatives to NS include methods based on `annealing', where a sequence of
 distributions of the form of Equation~\ref{eqn:power_posterior} is used.
@@ -269,10 +272,11 @@ There are many different methods based on this idea, such as the popular
 parallel tempering method \citep{pt, gregory}.
 However, unlike annealing methods, NS requires only a small number of
 tuning parameters (just the number of particles $N$ is inherent to NS, although
-most NS implementations also have some tuning parameters related to their
+most NS implementations have additional tuning parameters related to their
 methods for sampling Equation~\ref{eq:constrained_prior}). Annealing methods
 also tend to fail on phase change problems \citep{skilling} which can arise
-in data analysis \citep{rjobject, exoplanet}.
+in data analysis \citep{rjobject, exoplanet} as well as in statistical
+mechanics, where they are more familiar.
 
 In statistical mechanics, Equation~\ref{eqn:power_posterior} defines the
 family of {\it canonical distributions}, usually written as:
